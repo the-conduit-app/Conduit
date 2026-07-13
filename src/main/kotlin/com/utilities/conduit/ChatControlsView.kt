@@ -1,0 +1,26 @@
+package com.utilities.conduit
+
+import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.ui.*
+import androidx.compose.ui.unit.dp
+
+// The area above the Chat Text Window, with the Packs Menu and Experts
+@Composable
+fun ChatControlsView(state: AppState) {
+    val appActions = LocalActions.current
+
+    Row(
+        modifier = Modifier.fillMaxWidth().height(100.dp).padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        PackView(state)
+        Spacer(modifier = Modifier.width(16.dp))
+        ExpertsPanelView(
+            state,
+            onExpertSwitch = { newExpert -> appActions.switchExpert(newExpert) },
+            onExpertRetry = { expert -> appActions.retryExpertInitialization(expert) }
+        )
+    }
+}
