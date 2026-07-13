@@ -105,7 +105,7 @@ data class Expert(
         private val colors = listOf(
             Color(0xFF81D4FA), // Sky Blue
             Color(0xFFF48FB1), // Vivid Pink
-            Color(0xFFFFF176), // Bright Yellow
+            Color(0xFFFBC02D), // Bright Yellow
             Color(0xFFFFAB91), // Vibrant Orange
             Color(0xFFA5D6A7), // Soft Green
             Color(0xFFB0BEC5)  // Slate Gray

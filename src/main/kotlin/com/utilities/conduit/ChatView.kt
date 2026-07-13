@@ -7,6 +7,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -17,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
@@ -40,7 +44,7 @@ fun ColumnScope.ChatView(state: AppState) {
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(bottom = 80.dp),
-        modifier = Modifier.fillMaxWidth().weight(1f).padding(10.dp).background(Color(0xFFF5F5F5))
+        modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 16.dp, vertical = 4.dp).background(Color(0xFFF5F5F5))
     ) {
         items(historyNodes) { node -> MessageBubble(state, node = node) }
     }
@@ -96,7 +100,17 @@ fun ExpertMessageBubble(state: AppState, node: Node, text: String) {
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
         horizontalAlignment = alignment
     ) {
-        Text(text = originator, style = TextStyle(fontSize = 10.sp, color = Color.Gray))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(text = originator, style = TextStyle(fontSize = 10.sp, color = Color.Gray))
+            Spacer(modifier = Modifier.width(4.dp))
+            Icon(
+                imageVector = if (state.currentExpert.value?.type == ExpertType.REMOTE) Icons.Default.Public else Icons.Default.Lock,
+                contentDescription = "Lock - Local LLM, Globe - Remote LLM",
+                tint = Color.Gray,
+                modifier = Modifier.size(10.dp)
+            )
+        }
+
         if (text.isEmpty()) {
             CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
         } else {

@@ -1,7 +1,9 @@
 package com.utilities.conduit
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
@@ -11,11 +13,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun ExpertsPanelView(
@@ -23,29 +22,25 @@ fun ExpertsPanelView(
     onExpertSwitch: (Expert) -> Unit,
     onExpertRetry: (Expert) -> Unit
 ) {
-    val expertList = state.expertsMap.toList()
+    val expertList = state.expertsMap.values.toList()
     if (expertList.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxWidth().height(60.dp).padding(8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(modifier = Modifier.size(30.dp))
+        Box(modifier = Modifier.fillMaxWidth().height(90.dp), contentAlignment = Alignment.Center) {
+            Text("There are no experts in this pack.", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
         }
-    } else {
-        Row(
-            modifier = Modifier.fillMaxWidth().height(60.dp).padding(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            expertList.forEachIndexed { index, expertContainer ->
-                val expert: Expert = expertContainer.second
+        return
+    }
 
-                Box(modifier = Modifier.weight(1f)) {
-                    ExpertIcon(state, expert, color = expert.color) {
-                        when (expert.status) {
-                            ExpertStatus.READY -> onExpertSwitch(expert)
-                            ExpertStatus.FAILED -> onExpertRetry(expert)
-                            else -> { /* Do nothing while loading */ }
-                        }
+    Row(
+        modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        expertList.forEach { expert ->
+            Box(modifier = Modifier.weight(1f)) {
+                ExpertIcon(state, expert) {
+                    when (expert.status) {
+                        ExpertStatus.READY -> onExpertSwitch(expert)
+                        ExpertStatus.FAILED -> onExpertRetry(expert)
+                        else -> {}
                     }
                 }
             }
@@ -54,59 +49,34 @@ fun ExpertsPanelView(
 }
 
 @Composable
-fun ExpertIcon(state: AppState, expert: Expert?, color: Color, onClick: () -> Unit) {
-    val status = expert?.status ?: ExpertStatus.LOADING
-    val nickname = expert?.nickname ?: "Expert"
-    val backgroundColor = if (status == ExpertStatus.READY) color else Color.LightGray
-    val isCurrent = expert != null && state.currentExpert.value?.id == expert.id
+fun ExpertIcon(state: AppState, expert: Expert, onClick: () -> Unit) {
+    val isCurrent = state.currentExpert.value?.id == expert.id
+    val backgroundColor = if (expert.status == ExpertStatus.READY) expert.color else Color.LightGray
 
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        if (isCurrent) {
-            Text("Current Expert", style = TextStyle(fontSize = 10.sp, color = Color.Gray))
-        } else {
-            Spacer(modifier = Modifier.height(14.dp)) // Maintain alignment
-        }
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable { onClick() }.padding(4.dp)
+    ) {
         Surface(
-            modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)).clickable { onClick() },
-            color = backgroundColor
+            shape = RoundedCornerShape(8.dp),
+            color = backgroundColor,
+            border = if (isCurrent) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+            modifier = Modifier.width(60.dp).height(60.dp)
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                when (status) {
-                    ExpertStatus.NONE -> { /* Nothing to do */ }
-
-                    ExpertStatus.LOADING -> {
-                        CircularProgressIndicator(modifier = Modifier.size(20.dp))
-                    }
-                    ExpertStatus.READY -> {
-                        IconReady(color)
-                        Text(text = nickname, style = TextStyle(fontSize = 14.sp))
-                    }
-                    ExpertStatus.FAILED -> {
-                        IconFailed(color)
-                        Text(text = "$nickname Failed to load", style = TextStyle(fontSize = 14.sp))
-                    }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.padding(vertical = 4.dp)
+            ) {
+                when (expert.status) {
+                    ExpertStatus.LOADING -> CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White)
+                    ExpertStatus.READY -> Icon(Icons.Default.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
+                    ExpertStatus.FAILED -> Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
+                    else -> {}
                 }
+                Text(expert.nickname, style = MaterialTheme.typography.labelSmall, color = Color.White, maxLines = 1)
             }
         }
+        Text(expert.expertise, style = MaterialTheme.typography.labelSmall, color = Color.Gray, maxLines = 1)
     }
-}
-
-@Composable
-fun IconReady(color: Color) {
-    Icon(
-        imageVector = Icons.Default.Person,
-        contentDescription = "Expert",
-        tint = color,
-        modifier = Modifier.size(40.dp)
-    )
-}
-
-@Composable
-fun IconFailed(color: Color) {
-    Icon(
-        imageVector = Icons.Default.ErrorOutline,
-        contentDescription = "Expert",
-        tint = color,
-        modifier = Modifier.size(24.dp)
-    )
 }
