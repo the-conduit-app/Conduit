@@ -32,27 +32,6 @@ data class Chat(
 }
 
 @Serializable
-data class MessageAuthor(
-    val type: AuthorType,
-    val expertId: String? = null,
-    val packId: String? = null
-)
-enum class AuthorType { USER, CONDUIT, EXPERT }
-
-@Serializable
-data class ChatMessage(
-    val author: MessageAuthor,
-    val text: String,
-
-    // Preferentially displayed over text
-    @kotlinx.serialization.Transient
-    val textInProgress: MutableState<String?> = mutableStateOf(null),
-
-    val timestamp: Long = System.currentTimeMillis(),
-    val responseTime: Long? = null
-)
-
-@Serializable
 data class Node(
     val id: String,
     val type: NodeType,
@@ -76,4 +55,29 @@ data class Node(
             )
         }
     }
+}
+
+@Serializable
+data class ChatMessage(
+    val author: MessageAuthor,
+    val text: String,
+
+    // Preferentially displayed over text
+    @kotlinx.serialization.Transient
+    val textInProgress: MutableState<String?> = mutableStateOf(null),
+
+    val timestamp: Long = System.currentTimeMillis(),
+    val responseTime: Long? = null
+)
+
+@Serializable
+data class MessageAuthor(
+    val type: AuthorType,
+    val expertId: String? = null,
+    val packId: String? = null
+)
+enum class AuthorType {
+    USER { override fun toString() = "USER" },
+    ASSISTANT { override fun toString() = "ASSISTANT" },
+    CONDUIT { override fun toString() = "Conduit" }
 }

@@ -9,14 +9,10 @@ fun MainScreen(state: AppState) {
     val appActions = LocalActions.current
 
     Row(modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
-            TreeView(state)
-        }
-
+        LeftPanelContainer(state = state, modifier = Modifier.weight(1f).fillMaxHeight())
         Column(modifier = Modifier.weight(2f).fillMaxHeight()) {
             ChatControlsView(state)
             ChatView(state)
             InputArea(state, onSend = { userPrompt -> appActions.onSend(userPrompt) })
         }
-    }
-}
+    }}

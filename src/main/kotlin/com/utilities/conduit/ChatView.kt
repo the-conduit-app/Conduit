@@ -29,7 +29,7 @@ import kotlin.collections.get
 
 @Composable
 fun ColumnScope.ChatView(state: AppState) {
-    val chat by state.chatManager.currentChat
+    val chat = state.chatManager.currentChat
     val historyNodes by remember(chat) {
         derivedStateOf { state.chatManager.getFullHistory(chat.currentLeafNodeId) }
     }
@@ -57,7 +57,7 @@ fun MessageBubble(state: AppState, node: Node) {
     val authorType = node.message?.author?.type ?: AuthorType.CONDUIT
     when (authorType) {
         AuthorType.USER -> UserMessageBubble(text)
-        AuthorType.EXPERT -> ExpertMessageBubble(state, node, text)
+        AuthorType.ASSISTANT -> ExpertMessageBubble(state, node, text)
         AuthorType.CONDUIT -> SystemMessageBubble(text)
     }
 }

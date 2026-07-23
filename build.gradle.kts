@@ -10,26 +10,32 @@ kotlin {
 }
 
 dependencies {
+    // Compose
     implementation(compose.desktop.currentOs)
     implementation(libs.compose.runtime)
     implementation(libs.compose.ui)
     implementation(libs.compose.foundation)
     implementation(libs.compose.material3)
+    implementation(libs.compose.ui.tooling)
+    implementation(libs.compose.material.icons.extended)
+
+    // KotlinX
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.logger)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.9.0")
-    implementation("org.jetbrains.compose.ui:ui-tooling:1.6.10")
-    implementation("androidx.compose.material:material-icons-extended:1.7.0")
+    // Tools & Native
+    implementation(libs.jna)
+    implementation(libs.jna.platform)
 
-    implementation("de.kherud:llama:4.2.0")
+    // Remove direct implementation("de.kherud:llama:4.2.0")
+    // if you are now using JNA to bridge the custom dylib.
 }
-
 
 compose.desktop {
     application {
         mainClass = "com.utilities.conduit.MainKt"
+        jvmArgs("--enable-native-access=ALL-UNNAMED")
     }
 }

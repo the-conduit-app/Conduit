@@ -1,6 +1,5 @@
 package com.utilities.conduit
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.*
@@ -16,7 +15,7 @@ fun ChatControlsView(state: AppState) {
         modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        PackView(state)
+        PackMenu(state)
         Spacer(modifier = Modifier.width(16.dp))
         ExpertsPanelView(
             state,
