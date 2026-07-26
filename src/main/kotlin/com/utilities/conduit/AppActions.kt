@@ -55,22 +55,24 @@ class AppActions(
     }
 
     // This is given just the name of the pack (from the JSON file name).
-    fun switchPack(newPackName: String) {
-        if (state.currentPack.value?.name == newPackName) return
+    fun switchPack(newPack: Pack) {
+        if (state.currentPack.value == newPack)
+            return
 
         scope.launch(Dispatchers.IO) {
             try {
                 state.expertsMap.clear()
-                val newPack = Pack.createAndLoad(newPackName, state, scope)
                 state.currentPack.value = newPack
                 state.currentExpert.value = null
-                emitSystemMessage("The current pack is now $newPackName (You need to select a current Expert)")
-            } catch (e: Exception) {
+
+                newPack.initialize(state, scope)
+                emitSystemMessage("The current pack is now ${newPack.name}. Please select an expert.")
+            }
+            catch (e: Exception) {
                 println("Error switching pack: ${e.message}")
             }
         }
     }
-
     // -------------------------------------------------------------------------------------------
 
     // Loads all chat metadata (no messages/nodes) from disk - runs every 10-15s
@@ -125,12 +127,13 @@ class AppActions(
 
         // Find out if the user specifically tagged a particular expert in prompt.
         val taggedExpert = findTaggedExpert(userText, state.expertsMap.values.toList())
-        if (taggedExpert != null) {
-            switchExpert(taggedExpert)
-        }
+        val expert = if (taggedExpert != null && taggedExpert != state.currentExpert.value) {
+            println("Asking ${taggedExpert.nickname}...") ////
+            taggedExpert
+        } else
+            state.currentExpert.value
 
-        val currentExpert = state.currentExpert.value // Capture
-        if (currentExpert == null) {
+        if (expert == null) {
             emitSystemMessage("Please select or tag an expert to whom your prompt should be sent.")
             return
         }
@@ -141,7 +144,7 @@ class AppActions(
             message = ChatMessage(
                 author = MessageAuthor(
                     type = AuthorType.ASSISTANT,
-                    expertId = currentExpert.id,
+                    expertId = expert.id,
                     packId = state.currentPack.value?.id
                 ),
                 text = "" // Placeholder for chunked results
@@ -154,14 +157,10 @@ class AppActions(
             val messages = context.mapNotNull { it.message }
             val startTime = System.currentTimeMillis()
 
-            val prompt = messages.joinToString("\n") { msg ->
-                "${msg.author.type}: ${msg.text}"
-            }
-
             responseNode.message?.textInProgress?.value = ""
             state.chatManager.isStreaming = true // Blocks new SEND until finished
 
-            currentExpert.getResponse(state, prompt)
+            expert.getResponse(state, messages)
                 .onCompletion {
                     val duration = System.currentTimeMillis() - startTime
 
@@ -174,11 +173,9 @@ class AppActions(
                     state.chatManager.isStreaming = false
                 }
                 .collect { chunk ->
-                    for (char in chunk) {
-                        responseNode.message?.textInProgress?.value += char
-                        //delay(50.milliseconds) -- commented out cuz of lost chars in the flow
-                    }
+                    responseNode.message?.textInProgress?.value += chunk
                 }
+
         }
     }
 

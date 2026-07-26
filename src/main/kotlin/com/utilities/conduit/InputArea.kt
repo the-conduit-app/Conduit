@@ -24,14 +24,16 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
 
-    Row(modifier = Modifier.fillMaxWidth().height(80.dp).padding(10.dp)) {
+    Row(modifier = Modifier.fillMaxWidth().padding(10.dp), verticalAlignment = Alignment.Bottom) {
         OutlinedTextField(value = text, singleLine = false, onValueChange = { text = it },
+            minLines = 1, maxLines = 6,
             placeholder = {
                 val name = state.currentExpert.value?.nickname ?: "an Expert"
                 Text("Type a message to $name...")
             },
             modifier = Modifier
                 .weight(1f)
+                .heightIn(min = 60.dp, max = 180.dp)
                 .focusRequester(focusRequester)
                 .onKeyEvent { keyEvent ->
                     when {
@@ -61,5 +63,3 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
         }
     }
 }
-
-//-------------------------------------------------------------------------------

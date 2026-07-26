@@ -5,7 +5,7 @@ import com.sun.jna.Pointer
 import com.sun.jna.Callback
 
 interface ConduitTokenCallback : Callback {
-    fun invoke(piece: String?, userData: Pointer?)
+    fun invoke(text: String?, userData: Pointer?)
 }
 
 interface ConduitLib : Library {

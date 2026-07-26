@@ -12,18 +12,15 @@ import kotlin.time.Duration.Companion.milliseconds
 
 class EchoExpert {
     companion object {
-        fun initialize(expert: Expert) {
-            expert.status = ExpertStatus.READY
-        }
-
         fun getResponse(expert: Expert, text: String): Flow<String> {
+            val prompt = text.trim()
             val response = when (expert.modelPath) {
-                ":simpleEcho" -> getSimpleResponse(text)
-                ":saladEcho" -> getSaladResponse(text)
-                ":wordReverseEcho" -> getWordReverseResponse(text)
-                ":rottenEcho" -> getRottenResponse(text)
-                ":sillyEcho" -> getSillyResponse(text)
-                else -> getSimpleResponse(text)
+                ":simpleEcho" -> getSimpleResponse(prompt)
+                ":saladEcho" -> getSaladResponse(prompt)
+                ":wordReverseEcho" -> getWordReverseResponse(prompt)
+                ":rottenEcho" -> getRottenResponse(prompt)
+                ":sillyEcho" -> getSillyResponse(prompt)
+                else -> getSimpleResponse(prompt)
             }
 
             return response.asIterable().asFlow()

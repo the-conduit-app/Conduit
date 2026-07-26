@@ -15,4 +15,5 @@ fun MainScreen(state: AppState) {
             ChatView(state)
             InputArea(state, onSend = { userPrompt -> appActions.onSend(userPrompt) })
         }
-    }}
+    }
+}

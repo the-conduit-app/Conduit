@@ -61,6 +61,7 @@ data class Node(
 data class ChatMessage(
     val author: MessageAuthor,
     val text: String,
+    var status: MessageStatus = MessageStatus.COMPLETE,
 
     // Preferentially displayed over text
     @kotlinx.serialization.Transient
@@ -69,6 +70,12 @@ data class ChatMessage(
     val timestamp: Long = System.currentTimeMillis(),
     val responseTime: Long? = null
 )
+enum class MessageStatus {
+    STREAMING,
+    COMPLETE,
+    INTERRUPTED,
+    ERROR
+}
 
 @Serializable
 data class MessageAuthor(
@@ -77,7 +84,7 @@ data class MessageAuthor(
     val packId: String? = null
 )
 enum class AuthorType {
-    USER { override fun toString() = "USER" },
-    ASSISTANT { override fun toString() = "ASSISTANT" },
-    CONDUIT { override fun toString() = "Conduit" }
+    USER,
+    ASSISTANT,
+    CONDUIT,
 }

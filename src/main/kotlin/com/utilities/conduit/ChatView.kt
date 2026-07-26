@@ -34,16 +34,20 @@ fun ColumnScope.ChatView(state: AppState) {
         derivedStateOf { state.chatManager.getFullHistory(chat.currentLeafNodeId) }
     }
     val listState = rememberLazyListState()
-
-    LaunchedEffect(historyNodes) {
-        if (historyNodes.isNotEmpty()) {
-            listState.animateScrollToItem(historyNodes.lastIndex)
+    ////val lastStreamingText = historyNodes.lastOrNull()?.message?.textInProgress?.value
+    LaunchedEffect(listState, historyNodes.size) { ->
+        snapshotFlow {
+            listState.layoutInfo.totalItemsCount to listState.layoutInfo.visibleItemsInfo.lastOrNull()?.size
+        }.collect {
+            if (historyNodes.isNotEmpty()) {
+                listState.scrollToItem(historyNodes.lastIndex)
+            }
         }
     }
 
     LazyColumn(
         state = listState,
-        contentPadding = PaddingValues(bottom = 80.dp),
+        contentPadding = PaddingValues(bottom = 10.dp),
         modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 16.dp, vertical = 4.dp).background(Color(0xFFF5F5F5))
     ) {
         items(historyNodes) { node -> MessageBubble(state, node = node) }
@@ -67,7 +71,7 @@ private fun SystemMessageBubble(text: String) {
     Box(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
         Text(
             text = text.trim(),
-            style = TextStyle(fontSize = 12.sp, color = Color.Gray, fontStyle = FontStyle.Italic),
+            style = TextStyle(fontSize = 12.sp, color = Color.Gray),
             modifier = Modifier.padding(10.dp)
         )
     }

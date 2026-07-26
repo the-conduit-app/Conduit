@@ -16,17 +16,19 @@ class AppState(
     val systemExpert: Expert?
 ) {
     var pastChatsInfo = mutableStateMapOf<String, ChatInfo>()
-    var loadedPacks by mutableStateOf<List<PackConfig>?>(null)
+    var availablePacks by mutableStateOf(emptyList<Pack>())
 
     companion object {
-        fun createNew(scope: CoroutineScope): AppState { // One new AppState per invocation
+        // One new AppState per invocation
+        fun createNew(scope: CoroutineScope): AppState {
             val systemExpert = Expert(
                 id = "SYSTEM.ID", // SYSTEM.ID means "sticky" - model never evicted from cache
                 type = ExpertType.LOCAL,
-                nickname = "Internal Gem",
+                nickname = "Internal Expert",
                 expertise = "Various",
-                modelPath = "llm/SmolLM2-135M-Instruct-Q4_K_M.gguf"
-                //modelPath = "llm/gemma-4-E4B-it-Q4_K_M.gguf" //// Make global constant?
+                ////modelPath = "llm/SmolLM2-135M-Instruct-Q4_K_M.gguf"
+                ////modelPath = "llm/gemma-4-E4B-it-Q4_K_M.gguf"
+                modelPath = "llm/gemma-2-9b-it-Q4_K_M.gguf"
             )
 
             return AppState(

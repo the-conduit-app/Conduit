@@ -22,6 +22,18 @@ object AppUtils {
         return "${getAppPath()}/lib/$libName"
     }
 
+    fun getPacksDir(): String {
+        return "${getAppPath()}/packs"
+    }
+
+    fun getChatsDir(): String {
+        return "${getAppPath()}/chats"
+    }
+
+    fun getModelsDir(): String {
+        return "${getAppPath()}/llm"
+    }
+
     fun getAbsolutePathString(path: String): String {
         return if (path.startsWith("/")) path else "${getAppPath()}/$path"
     }

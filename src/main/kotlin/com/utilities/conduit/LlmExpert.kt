@@ -20,6 +20,8 @@ class LlmExpert {
         }
 
         val sessionCache = mutableMapOf<String, Pointer>()
+        fun getSession(path: String): Pointer =
+            sessionCache[path] ?: error("No session loaded for $path")
 
         fun shutdown() {
             println("LlmExpert.shutdown: releasing ${sessionCache.size} sessions")
@@ -42,30 +44,33 @@ class LlmExpert {
 
         // ---------------------------------------------------------------------------------
         // Potentially time-consuming - Ensure it's within IO Thread
-        fun initialize(absoluteModelPath: String)  {
+        fun initialize(absoluteModelPath: String) : Pointer {
             if (!File(absoluteModelPath).exists()) {
                 throw IllegalArgumentException("Model file not found at: ${absoluteModelPath}")
             }
-            sessionCache[absoluteModelPath]?.let {
+
+            println("LLM.init: Cache contains: ${sessionCache.keys}") ////
+            println("LLM.init: Looking for: $absoluteModelPath") ////
+
+            sessionCache[absoluteModelPath]?.let { session ->
                 println("LlmExpert.init: Using existing session for $absoluteModelPath")
-                return
+                return session
             }
 
-            sessionCache[absoluteModelPath] = conduitLib.conduit_llm_get_session(absoluteModelPath)
+            val session = conduitLib.conduit_llm_get_session(absoluteModelPath)
+            sessionCache[absoluteModelPath] = session
                 ?: throw RuntimeException("Failed to Load: ${absoluteModelPath}")
 
             println("LlmExpert.init: Successfully created session for $absoluteModelPath") ////
+            return session
         }
 
         // ---------------------------------------------------------------------------------
-        fun getResponse(expert: Expert, prompt: String): Flow<String> = callbackFlow {
-            val absModelPath = requireNotNull(AppUtils.getAbsolutePathString(expert.modelPath?: ""))
-
-            val sessionPtr = requireSession(absModelPath)
+        fun getResponse(sessionPtr: Pointer, prompt: String): Flow<String> = callbackFlow {
             val callback = object : ConduitTokenCallback {
-                override fun invoke(piece: String?, userData: Pointer?) {
-                    if (piece != null)
-                        trySend(piece)
+                override fun invoke(text: String?, userData: Pointer?) {
+                    //println("CALLBACK: ${text}") ////
+                    trySend(text?: "")
                 }
             }
 
@@ -76,39 +81,5 @@ class LlmExpert {
                 close()
             }
         }
-
-        /* TODO - Obsolete
-        fun XgetResponse(modelPtr: Long, prompt: String, ctxParams: LlamaBridge.LlamaContextParams): Flow<String> = flow {
-            val ctxPtr = LlamaBridge.INSTANCE.llama_new_context_with_model(modelPtr, ctxParams)
-            val tokenBuffer = IntArray(ctxParams.n_ctx)
-
-            try {
-                val numPromptTokens = LlamaBridge.INSTANCE.llama_tokenize(
-                    modelPtr, prompt, tokenBuffer, ctxParams.n_ctx, true
-                )
-
-                LlamaBridge.INSTANCE.llama_eval(ctxPtr, tokenBuffer, numPromptTokens, 0, ctxParams.n_threads)
-
-                var nPast = numPromptTokens
-                val llamaTokenDataArray = LlamaBridge.LlamaTokenDataArray()
-                val eosToken = LlamaBridge.INSTANCE.llama_token_eos(modelPtr)
-
-                repeat(ctxParams.n_ctx - numPromptTokens) {
-                    if (nPast >= ctxParams.n_ctx - 1) return@flow
-
-                    val nextToken = LlamaBridge.INSTANCE.llama_sample_token_greedy(ctxPtr, llamaTokenDataArray)
-                    if (nextToken == eosToken) return@flow
-
-                    emit(LlamaBridge.INSTANCE.llama_token_to_piece(ctxPtr, nextToken))
-
-                    tokenBuffer[0] = nextToken
-                    LlamaBridge.INSTANCE.llama_eval(ctxPtr, tokenBuffer, 1, nPast, ctxParams.n_threads)
-                    nPast += 1
-                }
-            } finally {
-                LlamaBridge.INSTANCE.llama_free(ctxPtr) // Note - only releases the context, not the model itself
-            }
-        }
-        */
     }
 }

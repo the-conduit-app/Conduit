@@ -21,46 +21,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.utilities.conduit.AppUtils.getAppPath
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import java.io.File
-
-/* This is responsible for the Packs menu item in the ChatControllerView. It reads all packs found
- * in $APPDIR/packs/...json, and loads them into a PackConfig object to be rendered by the menu below.
- */
-@Serializable
-data class PackConfig(
-    val id: String,
-    val name: String = "", // overwritten with filename (minus .json) on loading
-    val description: String,
-    val experts: List<ExpertConfig>
-)
-
-@Serializable
-data class ExpertConfig(
-    val id: String,
-    val type: String,
-    val nickname: String,
-    val expertise: String,
-    val modelPath: String,
-    val seedPrompt: String
-)
 
 @Composable
 fun PackMenu(state: AppState) {
     val appActions = LocalActions.current
-    var showMenu by remember { mutableStateOf(false) }
     val currentPack = state.currentPack.value
+    val availablePacks = state.availablePacks
+    var showPacksMenu by remember { mutableStateOf(false) }
 
-    // Needed to warn user before actual switching AFTER selection
-    var packPendingSwitch by remember { mutableStateOf<PackConfig?>(null) }
-
-    // Show existing pack / Button to bring up Packs menu
     Surface(
-        modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable { showMenu = true },
+        modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable { showPacksMenu = true },
         color = MaterialTheme.colorScheme.surfaceVariant
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -70,86 +40,61 @@ fun PackMenu(state: AppState) {
         }
     }
 
-    // Menu of available Packs in $APPDIR/packs/...json
-    if (showMenu) {
+    var selectedNewPack by remember { mutableStateOf<Pack?>(null) }
+
+    if (showPacksMenu) {
         AlertDialog(
-            onDismissRequest = { showMenu = false },
+            onDismissRequest = { showPacksMenu = false },
             title = { Text("Select Pack of Experts") },
             text = {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(state.loadedPacks ?: emptyList()) { packConfig ->
-                        PackCard(packConfig, isSelected = packConfig.id == currentPack?.id) {
-                            if (packConfig.id != currentPack?.id) {
-                                // Trigger confirmation dialog instead of switching immediately
-                                packPendingSwitch = packConfig
-                            }
-                            showMenu = false
+                    items(availablePacks ?: emptyList()) { pack ->
+                        val isSelected = selectedNewPack == pack
+                        PackCard(pack, isSelected) {
+                            if (!isSelected)
+                                selectedNewPack = pack
+                            showPacksMenu = false
                         }
                     }
                 }
             },
-            confirmButton = { TextButton(onClick = { showMenu = false }) { Text("Close") } }
+            confirmButton = { TextButton(onClick = { showPacksMenu = false }) { Text("Close") } }
         )
     }
 
-    // Confirmation Dialog for switching
-    packPendingSwitch?.let { pendingPack ->
+    if (selectedNewPack != null && selectedNewPack != currentPack) {     // Switch confirmation dialog
+        val newPackName: String = selectedNewPack!!.name
         AlertDialog(
-            onDismissRequest = { packPendingSwitch = null },
+            onDismissRequest = { selectedNewPack = null },
             title = { Text("Switch Pack?") },
-            text = { Text("Switching to '${pendingPack.name}' may unload current experts. Proceed?") },
+            text = { Text("Switching to '$newPackName' may unload current experts. Proceed?") },
             confirmButton = {
                 Button(onClick = {
-                    appActions.switchPack(pendingPack.name + ".json") // HERE
-                    packPendingSwitch = null
+                    appActions.switchPack(selectedNewPack!!) // HERE
+                    selectedNewPack = null
                 }) { Text("Confirm") }
             },
             dismissButton = {
-                TextButton(onClick = { packPendingSwitch = null }) { Text("Cancel") }
+                TextButton(onClick = { selectedNewPack = null }) { Text("Cancel") }
             }
         )
     }
 }
 
 @Composable
-fun PackCard(packConfig: PackConfig, isSelected: Boolean, onClick: () -> Unit) {
+fun PackCard(pack: Pack, isSelected: Boolean, onClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth().clickable { onClick() },
         border = if (isSelected) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Pack: ${packConfig.name}", style = MaterialTheme.typography.titleMedium)
-            Text(packConfig.description, style = MaterialTheme.typography.bodySmall)
+            Text("Pack: ${pack.name}", style = MaterialTheme.typography.titleMedium)
+            Text(pack.description, style = MaterialTheme.typography.bodySmall)
             Spacer(modifier = Modifier.height(8.dp))
-            packConfig.experts.forEach { expertConfig ->
+            pack.experts.forEach { expertConfig ->
                 Text("• ${expertConfig.nickname} (${expertConfig.type}) - ${expertConfig.expertise}",
                     style = MaterialTheme.typography.bodySmall)
             }
         }
-    }
-}
-
-/**
- * Loads all .json files in the packs directory and parses them into PackConfig objects.
- */
-suspend fun loadAllPackConfigs(): List<PackConfig> = withContext(Dispatchers.IO) {
-    val packsDir = java.nio.file.Paths.get(getAppPath(), "packs")
-
-    if (!java.nio.file.Files.exists(packsDir)) return@withContext emptyList()
-
-    java.nio.file.Files.list(packsDir).use { stream ->
-        stream.toList()
-            .filter { it.toString().endsWith(".json") }
-            .mapNotNull { path ->
-                try {
-                    val jsonContent = java.nio.file.Files.readString(path)
-                    val packConfig = AppJson.decodeFromString<PackConfig>(jsonContent)
-                    val fileName = path.fileName.toString().removeSuffix(".json")
-                    packConfig.copy(name = fileName)
-                } catch (e: Exception) {
-                    println("Error loading pack ${path.fileName}: ${e.message}")
-                    null
-                }
-            }
     }
 }

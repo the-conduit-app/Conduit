@@ -4,63 +4,93 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.sun.jna.Pointer
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import java.util.UUID
 
 enum class ExpertType { INTERNAL, LOCAL, REMOTE }
 enum class ExpertStatus { NONE, LOADING, READY, FAILED }
 
+// -----------------------------------------------------------------------------
+// Internal expert model identifiers
+
+object InternalExperts {
+    const val SYSTEM = ":system"
+
+    const val SIMPLE_ECHO = ":simpleEcho"
+    const val ROTTEN_ECHO = ":rottenEcho"
+    const val SILLY_ECHO  = ":sillyEcho"
+    const val SALAD_ECHO  = ":saladEcho"
+    const val W_REV_ECHO  = ":wordReverseEcho"
+}
+
+// -----------------------------------------------------------------------------
+// Expert
+
 @Serializable
 class Expert(
-    val id: String,
+
+    @Transient
+    val id: String = UUID.randomUUID().toString(),
+
     val type: ExpertType,
     val nickname: String,
     val expertise: String,
     val modelPath: String? = null,
     val seedPrompt: String? = null,
-    ) {
+) {
+    // -------------------------------------------------------------------------
+    // Runtime state (not serialized)
+
     @Transient
-    val handler: ExpertHandler = ExpertHandler.createNew(this) // TODO - catch failure
+    private val handler: ExpertHandler = when (type) {
+        ExpertType.INTERNAL -> InternalExpertHandler
+        ExpertType.LOCAL    -> LlmExpertHandler
+        ExpertType.REMOTE   -> throw NotImplementedError("Remote experts not yet supported")
+    }
+
+    @Transient
+    var color: Color = Color.Gray          // Assigned by Pack.initialize()
+
+    // NOTE: this sessionPtr is just a copy of the sessionPtr in LlmExpert.sessionCache
+    // for convenience (to save repeated lookups). Hence it is updated for all "linked"
+    // experts whenever an expert's status changes.
+    @Transient
+    var sessionPtr: Pointer? = null        // Assigned by LlmExpertHandler.initialize()
+
+    // -------------------------------------------------------------------------
+    // Observable state
+
     var status by mutableStateOf(ExpertStatus.NONE)
-    val color: Color
-        get() = ExpertTheme.getExpertColor(id)
+
+    // -------------------------------------------------------------------------
 
     companion object {
-        fun setStatusOfGroup(state: AppState, modelPath: String, status: ExpertStatus) {
-            CoroutineScope(Dispatchers.Main).launch {
-                state.expertsMap.values.forEach { expert ->
-                    if (expert.modelPath == modelPath) {
-                        expert.status = status
+
+        fun setStatusOfGroup(
+            state: AppState,
+            modelPath: String,
+            status: ExpertStatus,
+            sessionPtr: Pointer? = null
+        ) {
+            state.expertsMap.values.forEach { expert ->
+                if (expert.modelPath == modelPath) {
+                    expert.status = status
+                    if (sessionPtr != null) {
+                        expert.sessionPtr = sessionPtr
                     }
                 }
-            }
-        }
-
-        object ExpertTheme {
-            private val colors = listOf(
-                Color(0xFF81D4FA), // Sky Blue
-                Color(0xFFF48FB1), // Vivid Pink
-                Color(0xFFFBC02D), // Bright Yellow
-                Color(0xFFFFAB91), // Vibrant Orange
-                Color(0xFFA5D6A7), // Soft Green
-                Color(0xFFB0BEC5)  // Slate Gray
-            )
-            fun getExpertColor(expertId: String): Color {
-                return colors[Math.abs(expertId.hashCode()) % colors.size]
             }
         }
     }
 
     suspend fun initialize(state: AppState) {
-        println("Expert (Init): ${this.nickname}")
+        println("Expert (Init): $nickname")
         handler.initialize(this, state)
     }
 
-    fun getResponse(state: AppState, prompt: String): Flow<String> {
-        return handler.getResponse(this, state, prompt)
-    }
+    fun getResponse(state: AppState, messages: List<ChatMessage>): Flow<String> =
+        handler.generateResponse(this, state, messages)
 }
