@@ -8,10 +8,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 
-class EchoExpert {
+class EchoPortal {
     companion object {
+        private var isAbortRequested = false
+
         fun getResponse(expert: Expert, text: String): Flow<String> {
             val prompt = text.trim()
             val response = when (expert.modelPath) {
@@ -24,8 +27,18 @@ class EchoExpert {
             }
 
             return response.asIterable().asFlow()
-                .onEach { delay(50.milliseconds) }
+                .onEach {
+                    if (isAbortRequested) {
+                        isAbortRequested = false
+                        throw CancellationException("Aborted")
+                    }
+                    delay(50.milliseconds)
+                }
                 .map { it.toString() }
+        }
+
+        fun abortResponse(expert: Expert) {
+            isAbortRequested = true
         }
 
         fun getSimpleResponse(text: String?): String {

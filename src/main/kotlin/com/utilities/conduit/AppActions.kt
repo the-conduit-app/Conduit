@@ -1,42 +1,31 @@
 package com.utilities.conduit
 
-import com.utilities.conduit.AppUtils.getAppPath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.cancellation.CancellationException
 
 class AppActions(
     private val scope: CoroutineScope,
     private val state: AppState
 ) {
-    //--------------------------------------------------------------------------------------------
-    fun emitSystemMessage(messageText: String) {
-        val infoNode = Node.create(
-            type = NodeType.INFO,
-            parentId = state.chatManager.currentChat.currentLeafNodeId,
-            message = ChatMessage(
-                author = MessageAuthor(type = AuthorType.CONDUIT),
-                text = messageText
-            )
+    fun notify(message: String) {
+        state.notification.value = message
+    }
+
+    fun switchExpert(newExpert: Expert?) {
+        if (state.currentExpert.value == newExpert) return
+        state.currentExpert.value = newExpert
+
+        notify(
+            if (newExpert == null) {
+                "No expert is selected currently."
+            } else {
+                "Current expert is now ${newExpert.nickname}."
+            }
         )
-        state.chatManager.addNode(infoNode)
-    }
-
-    fun setCurrentExpert(expert: Expert?) {
-        state.currentExpert.value = expert
-        val message = if (expert == null) {
-            "No expert is selected currently."
-        } else {
-            "Current expert is now ${expert.nickname}."
-        }
-        emitSystemMessage(message)
-    }
-
-    fun switchExpert(newExpert: Expert) {
-        if (state.currentExpert.value != newExpert)
-            setCurrentExpert(newExpert)
     }
 
     // Simultaneously initialize ALL experts sharing the same LLM model file path
@@ -45,137 +34,128 @@ class AppActions(
         if (expert.modelPath == null || expert.modelPath == state.systemExpert?.modelPath)
             return
 
-        Expert.setStatusOfGroup(state, expert.modelPath, ExpertStatus.LOADING)
-
-        state.expertsMap.values
-            .filter { it.modelPath == expert.modelPath }
-            .forEach { targetExpert ->
-                scope.launch(Dispatchers.IO) { targetExpert.initialize(state) }
-            }
+        scope.launch {
+            state.setStatusOfExpertGroup(expert.modelPath, ExpertStatus.LOADING)
+            state.expertsMap.values
+                .filter { it.modelPath == expert.modelPath }
+                .forEach { targetExpert ->
+                    scope.launch(Dispatchers.IO) { targetExpert.initialize(state) }
+                }
+        }
     }
 
     // This is given just the name of the pack (from the JSON file name).
     fun switchPack(newPack: Pack) {
         if (state.currentPack.value == newPack)
             return
+        state.expertsMap.clear()
+        state.currentPack.value = newPack
+        state.currentExpert.value = null
 
         scope.launch(Dispatchers.IO) {
             try {
-                state.expertsMap.clear()
-                state.currentPack.value = newPack
-                state.currentExpert.value = null
-
                 newPack.initialize(state, scope)
-                emitSystemMessage("The current pack is now ${newPack.name}. Please select an expert.")
+                notify("The current pack is now ${newPack.name}. Please select an expert.")
             }
             catch (e: Exception) {
-                println("Error switching pack: ${e.message}")
+                notify("Error switching pack: ${e.message}")
             }
         }
-    }
-    // -------------------------------------------------------------------------------------------
-
-    // Loads all chat metadata (no messages/nodes) from disk - runs every 10-15s
-    // Only needed for refresh - On individual chat updates (add and update nodes)
-    // we only replace a single entry in pastChatsInfo
-    fun refreshPastChatsInfo() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val chatDir = java.nio.file.Paths.get(getAppPath(), "chats")
-                if (!java.nio.file.Files.exists(chatDir)) return@launch
-
-                val sortedList = java.nio.file.Files.list(chatDir)
-                    .filter { it.toString().endsWith(".json") }
-                    .map { path ->
-                        val attrs = java.nio.file.Files.readAttributes(path, java.nio.file.attribute.BasicFileAttributes::class.java)
-                        ChatInfo(
-                            id = path.fileName.toString().removeSuffix(".json"),
-                            creationTime = attrs.creationTime().toMillis(),
-                            modificationTime = attrs.lastModifiedTime().toMillis()
-                        )
-                    }
-                    .toList()
-                    .sortedByDescending { it.modificationTime }
-
-                withContext(Dispatchers.Main) {
-                    state.pastChatsInfo.clear()
-                    state.pastChatsInfo.putAll(sortedList.associateBy { it.id })
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    // Update a single ChatInfo history entry
-    fun updatePastChatsInfo(newChatInfo: ChatInfo) {
-        state.pastChatsInfo[newChatInfo.id] = newChatInfo
     }
 
     //--------------------------------------------------------------------------------------------
-    // Function to call when the user hits the SEND button on the prompt (in UI)
+    // Called when the user hits the SEND button on the prompt (InputArea.kt)
     fun onSend(userText: String) {
-        val currentChat = state.chatManager.currentChat
-        val parentId = currentChat.currentLeafNodeId
-
-        val userNode = Node.create(
-            type = NodeType.TEXT,
-            parentId = parentId,
-            message = ChatMessage(MessageAuthor(type = AuthorType.USER), userText)
-        )
-        state.chatManager.addNode(userNode)
-
-        // Find out if the user specifically tagged a particular expert in prompt.
-        val taggedExpert = findTaggedExpert(userText, state.expertsMap.values.toList())
-        val expert = if (taggedExpert != null && taggedExpert != state.currentExpert.value) {
-            println("Asking ${taggedExpert.nickname}...") ////
-            taggedExpert
-        } else
-            state.currentExpert.value
-
-        if (expert == null) {
-            emitSystemMessage("Please select or tag an expert to whom your prompt should be sent.")
-            return
-        }
-
-        val responseNode = Node.create(
-            type = NodeType.TEXT,
-            parentId = userNode.id,
-            message = ChatMessage(
-                author = MessageAuthor(
-                    type = AuthorType.ASSISTANT,
-                    expertId = expert.id,
-                    packId = state.currentPack.value?.id
-                ),
-                text = "" // Placeholder for chunked results
-            )
-        )
-        state.chatManager.addNode(responseNode)
+        // First, find out if the user specifically mentioned (Hi, Hey) a particular expert in the prompt.
+        val expert = findTaggedExpert(userText, state.expertsMap.values.toList())
+            ?: state.currentExpert.value
 
         scope.launch(Dispatchers.IO) {
-            val context = state.chatManager.getEffectiveNodeHistory(userNode.id)
-            val messages = context.mapNotNull { it.message }
+            if (expert == null) {
+                notify("Please select or tag an expert to whom your prompt should be sent.")
+                return@launch
+            }
+
+            println("Routing prompt to ${expert.nickname}.") ////
+
+            val currentChat = state.chatManager.currentChat
+            val parentNode = currentChat.currentLeafNode
+
+            // Create and add the userNode (with prompt) and the responseNode (with empty placeholder) into
+            // the currentChat.
+            val userNode = Node.create(
+                type = NodeType.TEXT,
+                parentId = parentNode?.id,
+                message = ChatMessage(MessageAuthor(type = AuthorType.USER), userText)
+            )
+
+            val responseNode = Node.create(
+                type = NodeType.TEXT,
+                parentId = userNode.id,
+                message = ChatMessage(
+                    author = MessageAuthor(
+                        type = AuthorType.ASSISTANT,
+                        expertId = expert.id,
+                        packId = state.currentPack.value?.id
+                    ),
+                    text = "" // Placeholder for chunked results to come from conduit
+                )
+            )
+
+            // skip first of two immediate updates to the ChatsList
+            state.chatManager.addNode(userNode) // unused return value
+            val item = state.chatManager.addNode(responseNode)
+            withContext(Dispatchers.Main) { state.chatsList.touch(item.fileName) }
+
+            val effectiveHistory = state.chatManager.getEffectiveNodeHistory(userNode.id)
+            val messages = effectiveHistory.mapNotNull { it.message }
+
+            withContext(Dispatchers.Main) {
+                responseNode.message?.textInProgress?.value = ""
+            }
+
+            state.chatManager.isAbortRequested = false
             val startTime = System.currentTimeMillis()
-
-            responseNode.message?.textInProgress?.value = ""
-            state.chatManager.isStreaming = true // Blocks new SEND until finished
-
             expert.getResponse(state, messages)
-                .onCompletion {
+                .onCompletion { cause ->
                     val duration = System.currentTimeMillis() - startTime
+                    val status = when {
+                        cause == null -> MessageStatus.COMPLETE
+                        cause is CancellationException -> MessageStatus.INTERRUPTED
+                        else -> MessageStatus.ERROR
+                    }
 
-                    val finalText = responseNode.message?.textInProgress?.value ?: ""
+                    val finalText = withContext(Dispatchers.Main) {
+                        val text = responseNode.message?.textInProgress?.value ?: ""
+                        responseNode.message?.textInProgress?.value = null
+                        text
+                    }
+
                     val finalNode = responseNode.copy(
-                        message = responseNode.message?.copy(text = finalText, responseTime = duration)
+                        message = responseNode.message?.copy(
+                            text = finalText,
+                            responseTime = duration,
+                            status = status
+                        )
                     )
-                    responseNode.message?.textInProgress?.value = null
-                    state.chatManager.updateNode(finalNode)
-                    state.chatManager.isStreaming = false
+
+                    val item = state.chatManager.updateNode(finalNode)
+                    withContext(Dispatchers.Main) {
+                        state.chatsList.touch(item.fileName)
+                    }
+                    if (status == MessageStatus.INTERRUPTED) {
+                        notify("Response interrupted by user.")
+                    }
                 }
                 .collect { chunk ->
-                    responseNode.message?.textInProgress?.value += chunk
+                    if (state.chatManager.isAbortRequested) {
+                        expert.abortResponse()
+                        throw CancellationException("Aborted by user")
+                    }
+                    withContext(Dispatchers.Main) {
+                        responseNode.message?.textInProgress?.value += chunk
+                    }
                 }
-
         }
     }
 

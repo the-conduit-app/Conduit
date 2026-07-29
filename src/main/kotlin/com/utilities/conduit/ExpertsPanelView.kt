@@ -34,6 +34,7 @@ fun ExpertsPanelView(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         expertList.forEachIndexed { index, expert ->
+            println("${expert.nickname} ${System.identityHashCode(expert)} ${expert.status}") ////
             Box(modifier = Modifier.weight(1f)) {
                 val bgColor = if (expert.status == ExpertStatus.READY) ExpertTheme.getExpertColor(index) else Color.LightGray
 

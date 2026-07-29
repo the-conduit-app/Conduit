@@ -4,8 +4,9 @@ import com.sun.jna.Pointer
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import java.io.File
+import kotlin.coroutines.cancellation.CancellationException
 
-class LlmExpert {
+class LlmPortal {
     companion object {
         private val conduitLibPath = AppUtils.getNativeLibPath("libconduit.dylib")
 
@@ -69,17 +70,20 @@ class LlmExpert {
         fun getResponse(sessionPtr: Pointer, prompt: String): Flow<String> = callbackFlow {
             val callback = object : ConduitTokenCallback {
                 override fun invoke(text: String?, userData: Pointer?) {
-                    //println("CALLBACK: ${text}") ////
                     trySend(text?: "")
                 }
             }
 
             val rc = conduitLib.conduit_session_generate(sessionPtr, prompt, callback, null)
-            if (rc != 0) {
-                close(RuntimeException("Generation failed (rc=$rc)"))
-            } else {
-                close()
+            when (rc) {
+                0 -> close()
+                1 -> close(CancellationException("Generation interrupted"))
+                else -> close(RuntimeException("Generation failed (rc=$rc)"))
             }
+        }
+
+        fun abortResponse(expert: Expert) {
+            conduitLib.conduit_session_abort_decode(expert.sessionPtr)
         }
     }
 }

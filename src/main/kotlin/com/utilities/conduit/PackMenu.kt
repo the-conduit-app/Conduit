@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 fun PackMenu(state: AppState) {
     val appActions = LocalActions.current
     val currentPack = state.currentPack.value
-    val availablePacks = state.availablePacks
     var showPacksMenu by remember { mutableStateOf(false) }
 
     Surface(
@@ -48,7 +47,7 @@ fun PackMenu(state: AppState) {
             title = { Text("Select Pack of Experts") },
             text = {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(availablePacks ?: emptyList()) { pack ->
+                    items(state.availablePacks) { pack ->
                         val isSelected = selectedNewPack == pack
                         PackCard(pack, isSelected) {
                             if (!isSelected)

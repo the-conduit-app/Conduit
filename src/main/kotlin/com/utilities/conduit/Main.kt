@@ -10,7 +10,7 @@ import kotlin.system.exitProcess
 fun main() {
     Runtime.getRuntime().addShutdownHook(
         Thread {
-            LlmExpert.shutdown()
+            LlmPortal.shutdown()
         }
     )
 
@@ -23,7 +23,7 @@ fun main() {
         Window(
             onCloseRequest = {
                 println("Exiting...")
-                LlmExpert.shutdown()
+                LlmPortal.shutdown()
                 exitProcess(0)
             },
             state = windowState,

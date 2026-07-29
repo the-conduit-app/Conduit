@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,13 +24,8 @@ fun LeftPanelContainer(state: AppState, modifier: Modifier = Modifier) {
     //val savedChats = listOf("Conversation_01", "Legal_Review_v2", "Project_Brainstorm")
 
     Column(modifier = modifier) {
-        Row(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
-            TextButton(onClick = { currentMode = LeftPanelMode.HISTORY }) { Text("History") }
-            TextButton(onClick = { currentMode = LeftPanelMode.TREE }) { Text("Tree") }
-        }
-
         when (currentMode) {
-            LeftPanelMode.HISTORY -> ChatHistoryView(state)
+            LeftPanelMode.HISTORY -> ChatsListView(state)
             LeftPanelMode.TREE -> TreeView(state)
         }
     }

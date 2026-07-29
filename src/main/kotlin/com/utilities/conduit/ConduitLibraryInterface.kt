@@ -15,4 +15,5 @@ interface ConduitLib : Library {
     fun conduit_llm_free_session(sessionPtr: Pointer?)
     fun conduit_session_generate(sessionPtr: Pointer?, prompt: String,
                                  callback: ConduitTokenCallback, userData: Pointer?): Int
+    fun conduit_session_abort_decode(sessionPtr: Pointer?)
 }

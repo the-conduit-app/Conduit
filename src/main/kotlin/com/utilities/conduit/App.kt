@@ -18,21 +18,16 @@ fun App() {
     val state = remember { AppState.createNew(scope) }
 
     LaunchedEffect(Unit) {
-        withContext(Dispatchers.IO) {
-            state.availablePacks = getAvailablePacks()
-            state.systemExpert?.initialize(state)
-
-            val defaultPack = state.availablePacks.find { it.id == "Default" } ?: error("Default pack not found")
-            defaultPack.initialize(state, scope)
-
-            // Start off with the trivial and free Echo Expert always (for now)
-            val echoExpert = defaultPack.experts.find {
-                it.modelPath == InternalExperts.SIMPLE_ECHO
-            }
-            withContext(Dispatchers.Main) {
-                state.currentExpert.value = echoExpert
-            }
+        val packs = withContext(Dispatchers.IO) {
+            getAvailablePacks()
         }
+        state.availablePacks = packs
+
+        val defaultPack = packs.find { it.id == "Default" } ?: error("Default pack not found")
+        defaultPack.initialize(state, scope)
+
+        val echoExpert = defaultPack.experts.find { it.modelPath == InternalExperts.SIMPLE_ECHO }
+        state.currentExpert.value = echoExpert
     }
 
     // UI Thread - doesn't need state/data to be finalized before compose
@@ -50,6 +45,7 @@ suspend fun getAvailablePacks(): List<Pack> = withContext(Dispatchers.IO) {
 
     if (!Files.exists(packsDir))
         return@withContext emptyList()
+
 
     Files.list(packsDir).use { stream ->
         stream.toList()

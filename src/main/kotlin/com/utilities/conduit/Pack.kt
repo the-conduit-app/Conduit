@@ -19,7 +19,6 @@ data class Pack(
 ) {
     suspend fun initialize(state: AppState, scope: CoroutineScope) {
         withContext(Dispatchers.Main) {
-            experts.forEachIndexed { index, expert -> expert.color = getExpertColor(index) }
             state.expertsMap.clear()
             state.expertsMap.putAll(experts.associateBy { it.id })
             state.currentPack.value = this@Pack

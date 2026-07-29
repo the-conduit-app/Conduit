@@ -8,15 +8,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
-import java.io.File
-import kotlin.io.path.exists
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.attribute.BasicFileAttributes
+import kotlin.io.path.getAttribute
 import kotlin.io.path.writeText
 
 interface ChatManager {
     fun getNode(nodeId: String): Node?
-    fun addNode(node: Node)
-    fun updateNode(node: Node)
+    suspend fun addNode(node: Node) : ChatsListItem
+    suspend fun updateNode(node: Node) : ChatsListItem
 
     fun getFullHistory(nodeId: String?): List<Node>
     fun getEffectiveNodeHistory(nodeId: String?): List<Node>
@@ -25,20 +26,22 @@ interface ChatManager {
     //fun undoRollup(nodeId: String)
 }
 
-class LiveChatManager(private val scope: CoroutineScope, initialChat: Chat) : ChatManager {
-    var currentChat by mutableStateOf(initialChat)
+class LiveChatManager(private val scope: CoroutineScope, chat: Chat) : ChatManager {
+    var currentChat by mutableStateOf(chat)
 
-    // This is used to disable SEND while a current response is streaming
-    // TODO - check if still relevant
-    var isStreaming by mutableStateOf(false)
+    @Volatile var isAbortRequested = false
+    fun abortCurrentResponse() {
+        isAbortRequested = true
+    }
 
     override fun getNode(nodeId: String): Node? {
         return currentChat.nodes[nodeId]
     }
 
-    // Adds a new node (already created) to the convo by 1) adding to the hash of nodes and
+    // Called within AppActions:onSend() when a new user or system node is created.
+    // It adds a new node (already created) to the convo by 1) adding to the hash of nodes and
     // 2) updating the node's parent to include it amongst its children 3) setting currentNode
-    override fun addNode(node: Node) {
+    override suspend fun addNode(node: Node): ChatsListItem {
         val chat = currentChat
         val nodes = chat.nodes.toMutableMap()
 
@@ -55,34 +58,45 @@ class LiveChatManager(private val scope: CoroutineScope, initialChat: Chat) : Ch
 
         val updatedChat = chat.copy(
             rootNodeId = chat.rootNodeId ?: node.id,
-            currentLeafNodeId = node.id,
             nodes = nodes
         )
+
+        updatedChat.currentLeafNode = node
         currentChat = updatedChat
 
-        scope.launch(Dispatchers.IO) {
-            saveChatToDisk(updatedChat)
-        }
+        return saveChatToDisk(updatedChat)
     }
 
-    override fun updateNode(node: Node) {
-        val nodes = currentChat.nodes.toMutableMap()
-        nodes.apply { put(node.id, node) }
-        currentChat = currentChat.copy(nodes = nodes)
-        scope.launch(Dispatchers.IO) {
-            saveChatToDisk(currentChat)
+    override suspend fun updateNode(node: Node): ChatsListItem {
+        val chat = currentChat
+
+        val nodes = chat.nodes.toMutableMap()
+        nodes.put(node.id, node) ?: throw IllegalStateException("Cannot update node: Node(${node.id}) not found.")
+
+        val updatedChat = chat.copy(
+            nodes = nodes
+        )
+
+        if (chat.currentLeafNode?.id == node.id) {
+            updatedChat.currentLeafNode = node
+        } else {
+            updatedChat.currentLeafNode = currentChat.currentLeafNode
         }
+        currentChat = updatedChat
+
+        return saveChatToDisk(updatedChat)
     }
 
     // --------------------------------------------------------------------------------------------
     // The following are concerned with saving/loading whole chats from $APPDIR/chats/*.json
 
-    fun loadChatFromDisk(state: AppState, chatId: String) {
+    fun loadChatFromDisk(state: AppState, fileName: String) {
         scope.launch(Dispatchers.IO) {
             try {
-                val path = java.nio.file.Paths.get(getAppPath(), "chats", "$chatId.json")
-                val jsonString = java.nio.file.Files.readString(path)
+                val path = Paths.get(getAppPath(), "chats", fileName)
+                val jsonString = Files.readString(path)
                 val loadedChat = AppJson.decodeFromString<Chat>(jsonString)
+                loadedChat.restoreTransients()
 
                 withContext(Dispatchers.Main) {
                     state.chatManager.currentChat = loadedChat
@@ -92,25 +106,32 @@ class LiveChatManager(private val scope: CoroutineScope, initialChat: Chat) : Ch
             }
         }
     }
-    suspend fun saveChatToDisk(chat: Chat) {
-        withContext(Dispatchers.IO) {
-            val file = getOrCreateFile(chat)
+
+    suspend fun saveChatToDisk(chat: Chat): ChatsListItem {
+        chat.syncTransients()
+
+        return withContext(Dispatchers.IO) {
+            val file = Paths.get(getAppPath(), "chats").resolve(getChatFileName(chat))
+
             file.writeText(AppJson.encodeToString(Chat.serializer(), chat))
+            val attrs = Files.readAttributes(file, BasicFileAttributes::class.java)
+
+            ChatsListItem(
+                title = chat.title,
+                fileName = file.fileName.toString(),
+                creationTime = attrs.creationTime().toMillis(),
+                modificationTime = attrs.lastModifiedTime().toMillis()
+            )
         }
     }
 
-    private fun getOrCreateFile(chat: Chat): java.nio.file.Path {
-        val chatDir = java.nio.file.Paths.get(getAppPath(), "chats")
+    // sanitize, uniqify
+    fun getChatFileName(chat: Chat): String {
+        val sanitizedTitle = chat.title
+            .take(30)
+            .replace(Regex("[^a-zA-Z0-9]"), "-")
 
-        if (!java.nio.file.Files.exists(chatDir)) {
-            java.nio.file.Files.createDirectories(chatDir)
-        }
-
-        val targetPath = chatDir.resolve("${chat.id}.json")
-        if (java.nio.file.Files.exists(targetPath)) { return targetPath }
-
-        val sanitized = chat.title.take(30).replace(Regex("[^a-zA-Z0-9]"), "-")
-        return chatDir.resolve("${sanitized}-${chat.id.take(2)}.json")
+        return "${sanitizedTitle}-${chat.id}.json"
     }
     //-----------------------------------------------------------------------------------------------------
 

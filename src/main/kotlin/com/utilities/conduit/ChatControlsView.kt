@@ -12,7 +12,8 @@ fun ChatControlsView(state: AppState) {
     val appActions = LocalActions.current
 
     Row(
-        modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(2.dp),
+        //modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(2.dp),
+        modifier = Modifier.fillMaxWidth().padding(2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         PackMenu(state)

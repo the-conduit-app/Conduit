@@ -1,8 +1,10 @@
 package com.utilities.conduit
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -12,18 +14,24 @@ import java.io.FileNotFoundException
 interface ExpertHandler {
     suspend fun initialize(expert: Expert, state: AppState)
     fun generateResponse(expert: Expert, state: AppState, messages: List<ChatMessage>): Flow<String>
+    fun abortResponse(expert: Expert)
 }
+
+// ---------------------------------------------------------------------
 
 object InternalExpertHandler : ExpertHandler {
     override suspend fun initialize(expert: Expert, state: AppState) {
-        println("InternalExpertHandler: Initializing ${expert.nickname} -> ${expert.modelPath}") ////
-        expert.status = ExpertStatus.READY
-        // EchoExpert.initialize(expert) // Just do it here!
+        withContext(Dispatchers.Main) { expert.status = ExpertStatus.READY }
     }
 
     override fun generateResponse(expert: Expert, state: AppState, messages: List<ChatMessage>): Flow<String> {
         val prompt: String = buildPrompt(expert, state, messages)
-        return EchoExpert.getResponse(expert, prompt)
+        return EchoPortal.getResponse(expert, prompt)
+    }
+
+    override fun abortResponse(expert: Expert) {
+        println("InternalExpertHandler: Aborting ${expert.modelPath}") ////
+        EchoPortal.abortResponse(expert)
     }
 
      private fun buildPrompt(expert: Expert, state: AppState, messages: List<ChatMessage>): String {
@@ -36,25 +44,22 @@ object InternalExpertHandler : ExpertHandler {
 
 // ---------------------------------------------------------------------------------------------
 
-object LlmExpertHandler : ExpertHandler {
+object LocalExpertHandler : ExpertHandler {
     private val initMutex = Mutex()
 
     // Mainly File system checks before relaying init to LlmExpert.initialize()
     override suspend fun initialize(expert: Expert, state: AppState) {
-        println("LlmExpertHandler.init(${expert.nickname}): ${expert.modelPath}") ////
-
+        println("LocalExpertHandler Initializing ${expert.nickname} ${System.identityHashCode(expert)}")
         initMutex.withLock {
             if (expert.status == ExpertStatus.LOADING || expert.status == ExpertStatus.READY) {
-                println("LlmExpertHandler.init: ${expert.nickname} has status ${expert.status}") ////
                 return
             }
             if (expert.modelPath == null) return
             if (expert.status == ExpertStatus.FAILED) {
-                println("LlmExpertHandler.init: ${expert.nickname} WILL NOT RETRY loading failed model ${expert.modelPath}")
                 return
             }
 
-            Expert.setStatusOfGroup(state, expert.modelPath, ExpertStatus.LOADING)
+            state.setStatusOfExpertGroup(expert.modelPath, ExpertStatus.LOADING)
         }
 
         try {
@@ -63,11 +68,12 @@ object LlmExpertHandler : ExpertHandler {
                 throw FileNotFoundException("Model not found at: ${absPathString}")
             }
 
-            expert.sessionPtr = LlmExpert.initialize(absPathString)
-            Expert.setStatusOfGroup(state, expert.modelPath, ExpertStatus.READY, expert.sessionPtr)
+            expert.sessionPtr = LlmPortal.initialize(absPathString)
+            state.setStatusOfExpertGroup(expert.modelPath, ExpertStatus.READY, expert.sessionPtr)
         } catch (e: Exception) {
-            Expert.setStatusOfGroup(state, expert.modelPath!!, ExpertStatus.FAILED)
+            state.setStatusOfExpertGroup(expert.modelPath!!, ExpertStatus.FAILED)
             e.printStackTrace()
+
         }
         println("LlmExpertHandler.init: Done with ${expert.modelPath} ") ////
     }
@@ -78,7 +84,11 @@ object LlmExpertHandler : ExpertHandler {
         val session = expert.sessionPtr
             ?: throw IllegalStateException("Expert '${expert.nickname}' has not been initialized.")
 
-        return LlmExpert.getResponse(session, prompt)
+        return LlmPortal.getResponse(session, prompt)
+    }
+
+    override fun abortResponse(expert: Expert) {
+        LlmPortal.abortResponse(expert)
     }
 
     private fun buildPrompt(expert: Expert, state: AppState, messages: List<ChatMessage>): String {

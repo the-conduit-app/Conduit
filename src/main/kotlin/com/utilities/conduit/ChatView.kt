@@ -97,7 +97,7 @@ fun ExpertMessageBubble(state: AppState, node: Node, text: String) {
     val expertId = node.message?.author?.expertId
 
     val alignment = Alignment.Start
-    val bubbleColor = state.expertsMap[expertId]?.color ?: Color(0xFFE5E5EA)
+    val bubbleColor = Color(0xFFFFF9C4) // Light yellow
     val originator = state.expertsMap[expertId]?.nickname ?: "Expert"
 
     Column(
