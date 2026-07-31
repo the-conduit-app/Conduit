@@ -18,6 +18,8 @@ fun App() {
     val state = remember { AppState.createNew(scope) }
 
     LaunchedEffect(Unit) {
+        state.chatsList.build()        // load existing chats in the chats dir
+
         val packs = withContext(Dispatchers.IO) {
             getAvailablePacks()
         }

@@ -37,4 +37,21 @@ object AppUtils {
     fun getAbsolutePathString(path: String): String {
         return if (path.startsWith("/")) path else "${getAppPath()}/$path"
     }
+
+    fun createChatFileName(chatTitle: String, chatId: String): String {
+        val sanitizedTitle = chatTitle
+            .take(30)
+            .replace(Regex("[^a-zA-Z0-9]"), "-")
+
+        return "${sanitizedTitle}-${chatId}.json"
+    }
+
+    fun extractChatIdFromFileName(fileName: String): String {
+        val match = Regex(
+            "-([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\\.json$"
+        ).find(fileName)
+
+        return match?.groupValues?.get(1)
+            ?: error("Cannot extract chat ID from filename: $fileName")
+    }
 }

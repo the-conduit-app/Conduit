@@ -25,6 +25,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.collections.get
 
 @Composable
@@ -57,11 +60,12 @@ fun ColumnScope.ChatView(state: AppState) {
 @Composable
 fun MessageBubble(state: AppState, node: Node) {
     val text = node.message?.textInProgress?.value ?: node.message?.text ?: ""
+    val title = node.message?.title
 
     val authorType = node.message?.author?.type ?: AuthorType.CONDUIT
     when (authorType) {
-        AuthorType.USER -> UserMessageBubble(text)
-        AuthorType.ASSISTANT -> ExpertMessageBubble(state, node, text)
+        AuthorType.USER -> UserMessageBubble(text, title)
+        AuthorType.ASSISTANT -> ExpertMessageBubble(state, node, text, title)
         AuthorType.CONDUIT -> SystemMessageBubble(text)
     }
 }
@@ -78,13 +82,12 @@ private fun SystemMessageBubble(text: String) {
 }
 
 @Composable
-private fun UserMessageBubble(text: String) {
+private fun UserMessageBubble(text: String, title: String?) {
     val alignment = Alignment.End
     val bubbleColor = Color(0xFFDCF8C6) //// TODO: Move to theme
-    val originator = "You"
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp), horizontalAlignment = alignment) {
-        Text(text = originator, style = TextStyle(fontSize = 10.sp, color = Color.Gray))
+        Text(text = title?: "Donohue", style = TextStyle(fontSize = 10.sp, color = Color.Gray))
         Text(
             text = text.trim(),
             modifier = Modifier.widthIn(max = 700.dp).background(bubbleColor, RoundedCornerShape(12.dp)).padding(10.dp)
@@ -93,19 +96,16 @@ private fun UserMessageBubble(text: String) {
 }
 
 @Composable
-fun ExpertMessageBubble(state: AppState, node: Node, text: String) {
-    val expertId = node.message?.author?.expertId
-
+fun ExpertMessageBubble(state: AppState, node: Node, text: String, title: String?) {
     val alignment = Alignment.Start
     val bubbleColor = Color(0xFFFFF9C4) // Light yellow
-    val originator = state.expertsMap[expertId]?.nickname ?: "Expert"
 
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
         horizontalAlignment = alignment
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = originator, style = TextStyle(fontSize = 10.sp, color = Color.Gray))
+            Text(text = title?: "Donovich", style = TextStyle(fontSize = 10.sp, color = Color.Gray))
             Spacer(modifier = Modifier.width(4.dp))
             Icon(
                 imageVector = if (state.currentExpert.value?.type == ExpertType.REMOTE) Icons.Default.Public else Icons.Default.Lock,

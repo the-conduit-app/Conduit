@@ -10,7 +10,7 @@ fun MainScreen(state: AppState) {
     val appActions = LocalActions.current
 
     Row(modifier = Modifier.fillMaxSize()) {
-        LeftPanelContainer(state = state, modifier = Modifier.weight(1f).fillMaxHeight())
+        LeftPanelView(state = state, modifier = Modifier.weight(1f).fillMaxHeight())
         Box(
             modifier = Modifier
                 .weight(2f)
@@ -27,7 +27,7 @@ fun MainScreen(state: AppState) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         ChatView(state)
                     }
-                    NotificationView(
+                    ChatViewNotification(
                         state = state,
                         modifier = Modifier.align(Alignment.TopCenter)
                     )

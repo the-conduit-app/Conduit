@@ -39,6 +39,7 @@ data class Chat(
 data class Node(
     val id: String,
     val type: NodeType,
+    val createdAt: Long = System.currentTimeMillis(),
     val parentId: String?,
     val children: List<String> = emptyList(),
 
@@ -65,6 +66,7 @@ enum class NodeType { TEXT, INFO }
 
 @Serializable
 data class ChatMessage(
+    val title: String? = null,
     val author: MessageAuthor,
 
     // Canonical text saved to disk.

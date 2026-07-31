@@ -11,11 +11,11 @@ import kotlinx.coroutines.withContext
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributes
-import kotlin.io.path.getAttribute
 import kotlin.io.path.writeText
 
 interface ChatManager {
     fun getNode(nodeId: String): Node?
+    fun newChat(): Chat
     suspend fun addNode(node: Node) : ChatsListItem
     suspend fun updateNode(node: Node) : ChatsListItem
 
@@ -26,9 +26,15 @@ interface ChatManager {
     //fun undoRollup(nodeId: String)
 }
 
-class LiveChatManager(private val scope: CoroutineScope, chat: Chat) : ChatManager {
-    var currentChat by mutableStateOf(chat)
+class LiveChatManager(private val scope: CoroutineScope) : ChatManager {
+    private fun createChat(): Chat {
+        println("Creating chat") ////
+        return Chat.create("Welcome to Conduit")
+    }
 
+    var currentChat by mutableStateOf(createChat())
+
+        private set
     @Volatile var isAbortRequested = false
     fun abortCurrentResponse() {
         isAbortRequested = true
@@ -36,6 +42,11 @@ class LiveChatManager(private val scope: CoroutineScope, chat: Chat) : ChatManag
 
     override fun getNode(nodeId: String): Node? {
         return currentChat.nodes[nodeId]
+    }
+
+    override fun newChat(): Chat {
+        currentChat = createChat()
+        return currentChat
     }
 
     // Called within AppActions:onSend() when a new user or system node is created.
@@ -111,7 +122,7 @@ class LiveChatManager(private val scope: CoroutineScope, chat: Chat) : ChatManag
         chat.syncTransients()
 
         return withContext(Dispatchers.IO) {
-            val file = Paths.get(getAppPath(), "chats").resolve(getChatFileName(chat))
+            val file = Paths.get(getAppPath(), "chats").resolve(AppUtils.createChatFileName(chat.id, chat.id))
 
             file.writeText(AppJson.encodeToString(Chat.serializer(), chat))
             val attrs = Files.readAttributes(file, BasicFileAttributes::class.java)
@@ -125,14 +136,14 @@ class LiveChatManager(private val scope: CoroutineScope, chat: Chat) : ChatManag
         }
     }
 
-    // sanitize, uniqify
-    fun getChatFileName(chat: Chat): String {
-        val sanitizedTitle = chat.title
-            .take(30)
-            .replace(Regex("[^a-zA-Z0-9]"), "-")
-
-        return "${sanitizedTitle}-${chat.id}.json"
-    }
+//    // sanitize, uniqify
+//    fun getChatFileName(chat: Chat): String {
+//        val sanitizedTitle = chat.title
+//            .take(30)
+//            .replace(Regex("[^a-zA-Z0-9]"), "-")
+//
+//        return "${sanitizedTitle}-${chat.id}.json"
+//    }
     //-----------------------------------------------------------------------------------------------------
 
     // Only used for composing the full chat views (Text and Tree)

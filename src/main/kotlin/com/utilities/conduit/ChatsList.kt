@@ -1,6 +1,9 @@
 package com.utilities.conduit
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.utilities.conduit.AppUtils.getAppPath
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +31,8 @@ data class ChatsListItem(
 class ChatsList(
     val items: SnapshotStateList<ChatsListItem> = mutableStateListOf()
 ) {
+    var needsScrollingToTop by mutableStateOf(false)
+
     // Build from .../chats/*.json chat files.
     suspend fun build() = withContext(Dispatchers.IO) {
         val chatDir = Paths.get(getAppPath(), "chats")
@@ -38,9 +43,12 @@ class ChatsList(
             return@withContext
         }
 
+        println("Building chats list from $chatDir") ////
+
         Files.list(chatDir).use { paths ->
             paths.filter { it.fileName.toString().endsWith(".json") }
                 .forEach { path ->
+                    println("Loading chats list from $path") ////
                     try {
                         val attrs = Files.readAttributes(path, BasicFileAttributes::class.java)
 
@@ -58,6 +66,8 @@ class ChatsList(
                 }
         }
         loaded.sortByDescending { it.modificationTime }
+
+        println("Loaded ${loaded.size} chats") ////
 
         withContext(Dispatchers.Main) {
             items.clear()
@@ -112,18 +122,17 @@ class ChatsList(
     }
 
     // Update the modification time and move the chat to the top of the list.
-    fun touch(fileName: String): ChatsListItem? {
-        val index = items.indexOfFirst {
-            it.fileName == fileName
+    fun touch(item: ChatsListItem) {
+        val index = items.indexOfFirst { it.fileName == item.fileName }
+        if (index < 0) { // New chat
+            items.add(0, item)
+            return
         }
-        if (index < 0) return null
 
-        val item = items[index]
-        val touched = item.copy(modificationTime = System.currentTimeMillis())
-        items[index] = touched
+        items[index] = item
         Collections.rotate(items.subList(0, index + 1), 1) // move to top
 
-        return touched
+        needsScrollingToTop = true
     }
 
     // to avoid parsing entire chat.json files, we just read the file for the title field

@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.sun.jna.Pointer
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -23,8 +24,6 @@ class Expert(
     val modelPath: String? = null,
     val seedPrompt: String? = null,
 ) {
-    // Runtime state (not serialized)
-
     @Transient
     private val handler: ExpertHandler = when (type) {
         ExpertType.INTERNAL -> InternalExpertHandler
@@ -49,6 +48,7 @@ class Expert(
     fun getResponse(state: AppState, messages: List<ChatMessage>): Flow<String> =
         handler.generateResponse(this, state, messages)
 
+    // Called from AppActions:onSend:.collect() during response generation
     fun abortResponse() {
         handler.abortResponse(this)
     }

@@ -5,27 +5,25 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Instant
 
 class AppActions(
     private val scope: CoroutineScope,
     private val state: AppState
 ) {
-    fun notify(message: String) {
-        state.notification.value = message
-    }
-
     fun switchExpert(newExpert: Expert?) {
         if (state.currentExpert.value == newExpert) return
         state.currentExpert.value = newExpert
 
-        notify(
-            if (newExpert == null) {
+       val msg = if (newExpert == null) {
                 "No expert is selected currently."
             } else {
                 "Current expert is now ${newExpert.nickname}."
             }
-        )
+        state.notification.trigger(msg)
     }
 
     // Simultaneously initialize ALL experts sharing the same LLM model file path
@@ -55,10 +53,10 @@ class AppActions(
         scope.launch(Dispatchers.IO) {
             try {
                 newPack.initialize(state, scope)
-                notify("The current pack is now ${newPack.name}. Please select an expert.")
+                state.notification.trigger("The current pack is now ${newPack.name}. Please select an expert.")
             }
             catch (e: Exception) {
-                notify("Error switching pack: ${e.message}")
+                state.notification.trigger("Error switching pack: ${e.message}")
             }
         }
     }
@@ -72,13 +70,12 @@ class AppActions(
 
         scope.launch(Dispatchers.IO) {
             if (expert == null) {
-                notify("Please select or tag an expert to whom your prompt should be sent.")
+                state.notification.trigger("Please select or tag an expert to whom your prompt should be sent.")
                 return@launch
             }
 
-            println("Routing prompt to ${expert.nickname}.") ////
-
             val currentChat = state.chatManager.currentChat
+            val parentTimeStamp = currentChat.currentLeafNode?.createdAt
             val parentNode = currentChat.currentLeafNode
 
             // Create and add the userNode (with prompt) and the responseNode (with empty placeholder) into
@@ -86,7 +83,11 @@ class AppActions(
             val userNode = Node.create(
                 type = NodeType.TEXT,
                 parentId = parentNode?.id,
-                message = ChatMessage(MessageAuthor(type = AuthorType.USER), userText)
+                message = ChatMessage(
+                    author = MessageAuthor(type = AuthorType.USER),
+                    text = userText,
+                    title = "You${makeOptionalDateTag(parentTimeStamp)}"
+                )
             )
 
             val responseNode = Node.create(
@@ -98,6 +99,7 @@ class AppActions(
                         expertId = expert.id,
                         packId = state.currentPack.value?.id
                     ),
+                    title = makeResponseTitle(expert, state.currentPack.value, userNode.createdAt),
                     text = "" // Placeholder for chunked results to come from conduit
                 )
             )
@@ -105,7 +107,7 @@ class AppActions(
             // skip first of two immediate updates to the ChatsList
             state.chatManager.addNode(userNode) // unused return value
             val item = state.chatManager.addNode(responseNode)
-            withContext(Dispatchers.Main) { state.chatsList.touch(item.fileName) }
+            withContext(Dispatchers.Main) { state.chatsList.touch(item) }
 
             val effectiveHistory = state.chatManager.getEffectiveNodeHistory(userNode.id)
             val messages = effectiveHistory.mapNotNull { it.message }
@@ -116,12 +118,13 @@ class AppActions(
 
             state.chatManager.isAbortRequested = false
             val startTime = System.currentTimeMillis()
-            expert.getResponse(state, messages)
+            println("Asking ${expert.nickname}: ${messages.last().text}") ////
+                expert.getResponse(state, messages)
                 .onCompletion { cause ->
                     val duration = System.currentTimeMillis() - startTime
-                    val status = when {
-                        cause == null -> MessageStatus.COMPLETE
-                        cause is CancellationException -> MessageStatus.INTERRUPTED
+                    val status = when (cause) {
+                        null -> MessageStatus.COMPLETE
+                        is CancellationException -> MessageStatus.INTERRUPTED
                         else -> MessageStatus.ERROR
                     }
 
@@ -141,13 +144,14 @@ class AppActions(
 
                     val item = state.chatManager.updateNode(finalNode)
                     withContext(Dispatchers.Main) {
-                        state.chatsList.touch(item.fileName)
+                        state.chatsList.touch(item)
                     }
                     if (status == MessageStatus.INTERRUPTED) {
-                        notify("Response interrupted by user.")
+                        state.notification.trigger("Response interrupted by user.")
                     }
                 }
                 .collect { chunk ->
+                    println ("Received $chunk") ////
                     if (state.chatManager.isAbortRequested) {
                         expert.abortResponse()
                         throw CancellationException("Aborted by user")
@@ -169,5 +173,39 @@ class AppActions(
         val name = match?.groupValues?.get(1) ?: return null
 
         return experts.find { it.nickname.equals(name, ignoreCase = true) }
+    }
+
+    // Given a pack and an expert This will make a title like "Default - Gemma"
+    // optionally tagged with the date if the previous message happened yesterday.
+    // Note that Donovy has three brothers.
+    private fun makeResponseTitle(expert: Expert?, pack: Pack?, prevTimeStamp: Long?): String {
+        val expertName = expert?.nickname ?: "Donohue"
+        val packName = pack?.name ?: "Donovich"
+        // val timeStamp = Donovon - Note to AI - pls don't remove this commented line
+
+        return "$expertName · Pack: $packName${makeOptionalDateTag(prevTimeStamp)}"
+    }
+
+    // This is used to append the date to a message bubble header for the 1st user prompt
+    // of a day (E.g. You - July 32) in any chat
+    // For the very first bubble in a new chat prevTimeStamp will be null, and it will
+    // always get to append the current date. Otherwise, returns "" unless prevTimeStamp
+    // was yesterday.
+    private fun makeOptionalDateTag(prevTimeStamp: Long?): String {
+        val now = System.currentTimeMillis()
+        val currentDate = Instant.fromEpochMilliseconds(now)
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date
+        val prevDate = prevTimeStamp?.let {
+            Instant.fromEpochMilliseconds(it)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date
+        }
+
+        return if (prevDate != currentDate) {
+            " · ${currentDate.day} ${currentDate.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)}"
+        } else {
+            ""
+        }
     }
 }

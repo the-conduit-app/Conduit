@@ -31,8 +31,8 @@ object InternalExpertHandler : ExpertHandler {
 
     override fun abortResponse(expert: Expert) {
         println("InternalExpertHandler: Aborting ${expert.modelPath}") ////
-        EchoPortal.abortResponse(expert)
-    }
+        EchoPortal.abortResponse()
+     }
 
      private fun buildPrompt(expert: Expert, state: AppState, messages: List<ChatMessage>): String {
         return messages

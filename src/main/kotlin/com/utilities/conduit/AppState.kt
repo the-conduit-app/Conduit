@@ -22,6 +22,9 @@ class AppState(
 ) {
     var chatsList by mutableStateOf(ChatsList())
     var availablePacks by mutableStateOf(emptyList<Pack>())
+    val notification = Notification(scope)
+
+    var leftPanelMode by mutableStateOf(LeftPanelMode.LIST)
 
     companion object {
         // One new AppState per invocation
@@ -38,7 +41,7 @@ class AppState(
 
             return AppState(
                 scope = scope,
-                chatManager = LiveChatManager(scope, Chat.create("Welcome to Conduit")),
+                chatManager = LiveChatManager(scope),
                 currentExpert = mutableStateOf(null),
                 currentPack = mutableStateOf(null),
                 expertsMap = mutableStateMapOf(),
