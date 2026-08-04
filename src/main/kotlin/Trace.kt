@@ -7,6 +7,6 @@ object Trace {
     private val seq = AtomicInteger(0)
 
     fun log(msg: String) {
-        println("${seq.incrementAndGet()}: $msg")
+        println("${seq.incrementAndGet()}. ${Thread.currentThread().name}: $msg")
     }
 }

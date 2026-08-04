@@ -22,6 +22,14 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
     val focusRequester = remember { FocusRequester() }
     val isGenerating = (state.currentExpert.value?.modelState?.status == ModelStatus.GENERATING)
 
+    LaunchedEffect(state.currentExpert.value?.modelState?.status) {
+        Trace.log(
+            "UI expert=${System.identityHashCode(state.currentExpert.value)} " +
+                    "modelState=${System.identityHashCode(state.currentExpert.value?.modelState)} " +
+                    "status=${state.currentExpert.value?.modelState?.status}"
+        )
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()

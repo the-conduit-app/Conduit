@@ -20,14 +20,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
 fun ColumnScope.ChatView(state: AppState) {
+    val version = state.chatManager.version // DO NOT REMOVE - observable for Compose
+
     val chat = state.chatManager.currentChat
     val historyNodes = ChatUtils.getFullHistory(chat, chat.currentLeafNodeId)
     val listState = rememberLazyListState()
+
+    // title above message bubbles
+    Text(
+        text = "${chat.title} (${AppUtils.formatDateRange(chat.createdAt, System.currentTimeMillis())})",
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 2.dp, bottom = 2.dp),
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.bodySmall,
+        color = Color.Gray,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
 
     // Auto-scroll to bottom
     LaunchedEffect(listState, historyNodes.size) { ->

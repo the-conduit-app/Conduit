@@ -6,8 +6,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -28,7 +30,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.input.key.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun ChatRenameDialog(
@@ -50,7 +54,13 @@ fun ChatRenameDialog(
     }
 
     Dialog(
-        onDismissRequest = onCancel
+        onDismissRequest = {
+            if (isSuggesting) {
+                // Ignore outside clicks while busy.
+            } else {
+                onCancel()
+            }
+        }
     ) {
         Surface(
             shape = MaterialTheme.shapes.medium,
@@ -73,6 +83,14 @@ fun ChatRenameDialog(
                     value = chatTitle,
                     onValueChange = { chatTitle = it },
                     singleLine = true,
+                    trailingIcon = {
+                        if (isSuggesting) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp
+                            )
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .focusRequester(focusRequester)
@@ -113,19 +131,23 @@ fun ChatRenameDialog(
                     OutlinedButton(
                         enabled = !isSuggesting,
                         onClick = {
-                            scope.launch {
-                                isSuggesting = true
+                            isSuggesting = true
+                            scope.launch(Dispatchers.IO) {
                                 try {
-                                    chatTitle = onSuggest()
+                                    val title = onSuggest()
+                                    withContext(Dispatchers.Main) {
+                                        chatTitle = title
+                                    }
                                 } finally {
-                                    isSuggesting = false
+                                    withContext(Dispatchers.Main) {
+                                        isSuggesting = false
+                                    }
                                 }
                             }
                         }
                     ) {
-                        Text(if (isSuggesting) "Reviewing..." else "Suggest a Title")
+                        Text(if (isSuggesting) "Reviewing Chat" else "Suggest a Title")
                     }
-
                     Spacer(Modifier.width(12.dp))
 
                     Button(

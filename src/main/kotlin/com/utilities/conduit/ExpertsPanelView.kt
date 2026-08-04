@@ -85,10 +85,13 @@ fun ExpertIcon(state: AppState, expert: Expert, bgColor: Color, onClick: () -> U
             border = if (isCurrent) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
             modifier = Modifier.width(60.dp).height(60.dp)
         ) {
+            val clickable = modelState?.status == ModelStatus.READY || modelState?.status == ModelStatus.FAILED
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(vertical = 4.dp)
+                modifier = (if (clickable) Modifier.clickable(onClick = onClick) else Modifier)
+                    .padding(vertical = 2.dp)
             ) {
                 when (modelState?.status) {
                     ModelStatus.LOADING -> CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White)

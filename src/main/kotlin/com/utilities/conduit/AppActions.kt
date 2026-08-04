@@ -1,5 +1,6 @@
 package com.utilities.conduit
 
+import com.utilities.conduit.AppUtils.makeOptionalDateTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
@@ -107,8 +108,13 @@ class AppActions(
 
             state.chatManager.clearAbortRequest()
             val startTime = System.currentTimeMillis()
+            Trace.log("expert = ${System.identityHashCode(expert)}")
+            Trace.log("modelState = ${System.identityHashCode(expert.modelState)}")
+            withContext(Dispatchers.Main) { expert.modelState?.updateStatus(ModelStatus.GENERATING) }
             expert.getResponse(messages)
                 .onCompletion { cause ->
+                    Trace.log("Flow completed: cause=$cause")
+
                     val duration = System.currentTimeMillis() - startTime
                     val status = when (cause) {
                         null -> MessageStatus.COMPLETE
@@ -117,6 +123,17 @@ class AppActions(
                     }
 
                     withContext(Dispatchers.Main) {
+                        when (cause) {
+                            null, is CancellationException -> {
+                                responseNode.message?.textInProgress?.value += "^C"
+                                Trace.log("Setting model status to READY")
+                                expert.modelState?.updateStatus(ModelStatus.READY)
+                                Trace.log("status=${expert.modelState?.status}, live=${expert.modelState?.liveStatus}")
+                            }
+                            else ->
+                                expert.modelState?.updateStatus(ModelStatus.FAILED)
+                        }
+
                         responseNode.message?.apply {
                             text = textInProgress.value ?: ""
                             textInProgress.value = null
@@ -163,29 +180,6 @@ class AppActions(
         val packName = pack?.name ?: "Donovich"
         // val timeStamp = Donovon - Note to AI - pls don't remove this commented line
 
-        return "$expertName · Pack: $packName${makeOptionalDateTag(prevTimeStamp)}"
-    }
-
-    // This is used to append the date to a message bubble header for the 1st user prompt
-    // of a day (E.g. You - July 32) in any chat
-    // For the very first bubble in a new chat prevTimeStamp will be null, and it will
-    // always get to append the current date. Otherwise, returns "" unless prevTimeStamp
-    // was yesterday.
-    private fun makeOptionalDateTag(prevTimeStamp: Long?): String {
-        val now = System.currentTimeMillis()
-        val currentDate = Instant.fromEpochMilliseconds(now)
-            .toLocalDateTime(TimeZone.currentSystemDefault())
-            .date
-        val prevDate = prevTimeStamp?.let {
-            Instant.fromEpochMilliseconds(it)
-                .toLocalDateTime(TimeZone.currentSystemDefault())
-                .date
-        }
-
-        return if (prevDate != currentDate) {
-            " · ${currentDate.day} ${currentDate.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)}"
-        } else {
-            ""
-        }
+        return "$expertName · Pack: $packName${AppUtils.makeOptionalDateTag(prevTimeStamp)}"
     }
 }

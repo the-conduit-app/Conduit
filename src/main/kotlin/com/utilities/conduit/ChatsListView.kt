@@ -2,6 +2,7 @@ package com.utilities.conduit
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -62,6 +63,8 @@ fun ChatsListView(state: AppState) {
                 items = chatsList.items,
                 key = { it.chat.id }
             ) { item ->
+                val isCurrent = item.chat.id == state.chatManager.currentChat.id
+
                 ContextMenuArea(
                     items = {
                         listOf(
@@ -84,6 +87,12 @@ fun ChatsListView(state: AppState) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .background(
+                                if (isCurrent)
+                                    MaterialTheme.colorScheme.surfaceVariant
+                                else
+                                    Color.Transparent
+                            )
                             .clickable(enabled = enabled) {
                                 state.chatManager.currentChat = item.chat
                             }
@@ -102,7 +111,7 @@ fun ChatsListView(state: AppState) {
                         Spacer(Modifier.width(8.dp))
 
                         Text(
-                            text = "(${formatDateRange(item.creationTime, item.modificationTime)})",
+                            text = "(${AppUtils.formatDateRange(item.creationTime, item.modificationTime)})",
                             style = MaterialTheme.typography.bodySmall,
                             color = Color.Gray
                         )
@@ -120,28 +129,14 @@ fun ChatsListView(state: AppState) {
                     },
                 onOk = { newTitle ->
                     scope.launch {
-                        state.chatsList.rename(item, newTitle)
+                        val updatedChat = state.chatsList.rename(item, newTitle)
+                        if (updatedChat != null && updatedChat.id == state.chatManager.currentChat.id) {
+                            state.chatManager.currentChat = updatedChat
+                        }
                     }
                     showRenameDialog = null
                 }
             )
         }
-    }
-}
-
-private fun formatDateRange(
-    creation: Long,
-    modification: Long
-): String {
-
-    val created = Instant.ofEpochMilli(creation).atZone(ZoneId.systemDefault()).toLocalDate()
-    val modified = Instant.ofEpochMilli(modification).atZone(ZoneId.systemDefault()).toLocalDate()
-
-    val fmt = DateTimeFormatter.ofPattern("MMM d")
-
-    return if (created == modified) {
-        modified.format(fmt)
-    } else {
-        "${created.format(fmt)} – ${modified.format(fmt)}"
     }
 }

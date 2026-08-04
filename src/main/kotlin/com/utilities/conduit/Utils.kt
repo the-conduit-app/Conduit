@@ -6,10 +6,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.attribute.BasicFileAttributes
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import kotlin.io.path.writeText
 
 object AppUtils {
@@ -46,6 +51,46 @@ object AppUtils {
 
     fun getAbsolutePathString(path: String): String {
         return if (path.startsWith("/")) path else "${getAppPath()}/$path"
+    }
+
+    fun formatDateRange(
+        creation: Long,
+        modification: Long
+    ): String {
+        val created = Instant.ofEpochMilli(creation).atZone(ZoneId.systemDefault()).toLocalDate()
+        val modified = Instant.ofEpochMilli(modification).atZone(ZoneId.systemDefault()).toLocalDate()
+
+        val fmt = DateTimeFormatter.ofPattern("MMM d")
+
+        return if (created == modified) {
+            modified.format(fmt)
+        } else {
+            "${created.format(fmt)} – ${modified.format(fmt)}"
+        }
+    }
+
+
+    // This is used to append the date to a message bubble header for the 1st user prompt
+    // of a day (E.g. You - July 32) in any chat (Ref: AppActions:onSend)
+    // For the very first bubble in a new chat prevTimeStamp will be null, and it will
+    // always get to append the current date. Otherwise, returns "" unless prevTimeStamp
+    // was yesterday.
+    fun makeOptionalDateTag(prevTimeStamp: Long?): String {
+        val now = System.currentTimeMillis()
+        val currentDate = kotlin.time.Instant.fromEpochMilliseconds(now)
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date
+        val prevDate = prevTimeStamp?.let {
+            kotlin.time.Instant.fromEpochMilliseconds(it)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date
+        }
+
+        return if (prevDate != currentDate) {
+            " · ${currentDate.day} ${currentDate.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)}"
+        } else {
+            ""
+        }
     }
 }
 
@@ -114,9 +159,18 @@ object ChatUtils {
     }
 
     suspend fun generateChatTitle(systemExpert: Expert, chat: Chat): String {
-        val messages = getEffectiveNodeHistory(chat, chat.currentLeafNodeId)
+        val oldTitle : String = chat.title
+        val maxTextLen = 250
+
+        var messages = getEffectiveNodeHistory(chat, chat.currentLeafNodeId)
             .mapNotNull { it.message }
-            .toMutableList()
+            .map { message ->
+                if (message.author.type == AuthorType.ASSISTANT && message.text.length > maxTextLen) {
+                    message.copy(text = message.text.take(maxTextLen) + "...")
+                } else {
+                    message
+                }
+            }
 
         messages += ChatMessage(
             author = MessageAuthor(type = AuthorType.SYSTEM),
@@ -128,6 +182,7 @@ object ChatUtils {
             result.append(token)
         }
 
-        return result.toString().trim()
+        val newTitle = result.toString().trim()
+        return if (newTitle.isNotEmpty()) newTitle else oldTitle
     }
 }

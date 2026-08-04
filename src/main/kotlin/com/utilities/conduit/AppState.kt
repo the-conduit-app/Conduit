@@ -53,18 +53,19 @@ class AppState(
     }
 
     suspend fun shutdown() = withContext(Dispatchers.IO) {
-        Trace.log("AppState.shutdown() ENTER")
-        Trace.log("ModelStates = ${modelStates.size}")
+        //Trace.log("AppState.shutdown() ENTER")
+        //Trace.log("ModelStates = ${modelStates.size}")
 
         modelStates.values.forEach {
-            Trace.log("Shutdown start: ${it.modelPath}")
+            //Trace.log("Shutdown start: ${it.modelPath}")
+            //Trace.log("${it.modelPath}.status = " + it.status  )
             it.shutdown()
-            Trace.log("Shutdown done: ${it.modelPath}")
+            //Trace.log("Shutdown done: ${it.modelPath}")
         }
 
-        Trace.log("Calling LlmPortal.shutdown()")
+        //Trace.log("Calling LlmPortal.shutdown()")
         LlmPortal.shutdown()
 
-        Trace.log("AppState.shutdown() EXIT")
+        //Trace.log("AppState.shutdown() EXIT")
     }
 }

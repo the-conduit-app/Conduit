@@ -7,6 +7,7 @@ import androidx.compose.ui.window.rememberWindowState
 import com.utilities.conduit.AppUtils.getAppPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.nio.file.Files
@@ -18,10 +19,22 @@ val AppJson = Json { prettyPrint = true; allowComments = true; ignoreUnknownKeys
 
 @Composable
 fun App(exitApplication: () -> Unit) {
-    Trace.log(" Entered App()")
-
     val scope = rememberCoroutineScope()
     val state = remember { AppState.createNew(scope = scope) }
+
+    DisposableEffect(Unit) {
+        Runtime.getRuntime().addShutdownHook(
+            Thread {
+                //Trace.log("Shutdown hook entered")
+                runBlocking {
+                    state.shutdown()
+                }
+                //Trace.log("Shutdown hook exiting")
+            }
+        )
+
+        onDispose { }
+    }
 
     LaunchedEffect(Unit) {
         state.chatsList.build()        // load existing chats in the chats dir
@@ -49,10 +62,7 @@ fun App(exitApplication: () -> Unit) {
     Window(
         state = windowState,
         title = "Conduit Workspace",
-        onCloseRequest = {
-            Trace.log("Window.onCloseRequest")
-            exitApplication()
-        }
+        onCloseRequest = { exitApplication() }
     ) {
         CompositionLocalProvider(LocalActions provides AppActions(scope, state)) {
             MainScreen(state)

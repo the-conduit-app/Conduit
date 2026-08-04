@@ -29,35 +29,40 @@ class ChatsList(
     // Build from .../chats/*.json chat files.
     suspend fun build() = withContext(Dispatchers.IO) {
         val chatDir = Paths.get(getAppPath(), "chats")
+        val chatsById = mutableMapOf<String, ChatsListItem>()
 
         if (!Files.exists(chatDir)) {
             Files.createDirectories(chatDir)
             return@withContext
         }
-        //println("Building chats list from $chatDir") ////
 
-        val newItems = mutableListOf<ChatsListItem>()
         Files.newDirectoryStream(chatDir, "*.json").use { paths ->
             for (path in paths) {
-                //println("Loading $path") ////
                 try {
                     val chat = AppJson.decodeFromString<Chat>(Files.readString(path))
                     chat.restoreTransients()
-
                     val attrs = Files.readAttributes(path, BasicFileAttributes::class.java)
 
-                    newItems += ChatsListItem(
+                    val item = ChatsListItem(
                         chat = chat,
                         creationTime = attrs.creationTime().toMillis(),
                         modificationTime = attrs.lastModifiedTime().toMillis()
                     )
+
+                    val existing = chatsById[chat.id]
+                    if (existing == null || item.modificationTime > existing.modificationTime) {
+                        if (existing != null) {
+                            println("Duplicate chat id ${chat.id}: ignoring older ${path.fileName}")                        }
+                        chatsById[chat.id] = item
+                    }
                 } catch (e: Exception) {
                     println("Skipping corrupted chat: $path")
                 }
             }
         }
+        val newItems = chatsById.values.toMutableList()
         newItems.sortByDescending { it.modificationTime }
-        println("Loaded ${newItems.size} chats") ////
+        println("Loaded ${newItems.size} chats")
 
         withContext(Dispatchers.Main) {
             items.clear()
@@ -100,11 +105,11 @@ class ChatsList(
         }
     }
 
-    suspend fun rename(item: ChatsListItem, newTitle: String): Boolean {
+    suspend fun rename(item: ChatsListItem, newTitle: String): Chat? {
         val index = withContext(Dispatchers.Main) {
             items.indexOfFirst { it.chat.id == item.chat.id }
         }
-        if (index < 0) return false
+        if (index < 0) return null
 
         return withContext(Dispatchers.IO) {
             val oldTitle = item.chat.title
@@ -120,11 +125,11 @@ class ChatsList(
                 withContext(Dispatchers.Main) {
                     items[index] = item.copy(chat = updatedChat)
                 }
-                true
+                updatedChat
             } catch (e: Exception) {
                 println("Failed chat rename: ${newTitle} ${e.message}")
                 item.chat.title = oldTitle // Rollback
-                false
+                null
             }
         }
     }

@@ -4,7 +4,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -12,17 +11,7 @@ fun main() {
     copyAssetsToFilesDir()
 
     application {
-        Trace.log("Main launching app") ////
-        App(exitApplication = ::exitApplication,
-        onExit = {
-            Trace.log("Exit hook entered")
-            runBlocking {
-                Trace.log("Shutdown coroutine entered")
-                state.shutdown()
-                Trace.log("Shutdown complete")
-            }
-            Trace.log("Exit hook returning")
-        })
+        App(exitApplication = ::exitApplication)
     }
 }
 
