@@ -7,55 +7,63 @@ import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
 
 object LlmPortal {
-    private val conduitLibPath = AppUtils.getNativeLibPath("libconduit.dylib")
-    val sessionCache = mutableMapOf<String, Pointer>() // Conduit session cache
+//    private val conduitLibPath = AppUtils.getNativeLibPath("libconduit.dylib")
+    private val conduitLibPath = run {
+        println("Computing conduitLibPath")
+        AppUtils.getNativeLibPath("libconduit.dylib")
+}
 
-    val conduitLib: ConduitLib =
-        com.sun.jna.Native.load(
+    val conduitLib: ConduitLib = run {
+        println("Before Native.load")
+        println("Lib path = $conduitLibPath")
+        println(File(conduitLibPath).exists())
+        println("Attempting native load")
+        System.load(conduitLibPath) ////
+        println("ret from native load")
+
+
+        println(File(conduitLibPath).absolutePath)
+        val lib = com.sun.jna.Native.load(
             conduitLibPath,
             ConduitLib::class.java
         )
+        println("After Native.load")
+        lib
+    }
 
     init {
+        println("LlmPortal object init: start")
         conduitLib.conduit_llm_init() // for llama_backend init
+        println("LlmPortal object init: end")
+
+    }
+    fun freeSession(session: Pointer) {
+        conduitLib.conduit_llm_free_session(session)
     }
 
     fun shutdown() {
-        println("LlmExpert.shutdown: releasing ${sessionCache.size} sessions")
-
-        sessionCache.forEach { (name, session) ->
-            println("Freeing session: $name")
-            conduitLib.conduit_llm_free_session(session)
-        }
-
-        sessionCache.clear()
-
-        println("Freeing llama backend")
+        Trace.log("LlmPortal.shutdown ENTER")
+        Trace.log("Calling conduit_llm_shutdown")
         conduitLib.conduit_llm_free()
-
-        println("LlmExpert.shutdown: complete")
+        Trace.log("Returned conduit_llm_shutdown")
+        Trace.log("LlmPortal.shutdown EXIT")
     }
 
     // ---------------------------------------------------------------------------------
     // Potentially time-consuming - Ensure it's within IO Thread
-    fun initialize(absoluteModelPath: String) : Pointer {
+    // Potentially time-consuming - Ensure it's called from an IO thread.
+    fun initialize(absoluteModelPath: String): Pointer {
+        println("LlmPortal Initializing $absoluteModelPath")
+
         if (!File(absoluteModelPath).exists()) {
-            throw IllegalArgumentException("Model file not found at: ${absoluteModelPath}")
+            throw IllegalArgumentException("Model file not found at: $absoluteModelPath")
         }
 
-        println("LLM.init: Cache contains: ${sessionCache.keys}") ////
-        println("LLM.init: Looking for: $absoluteModelPath") ////
-
-        sessionCache[absoluteModelPath]?.let { session ->
-            println("LlmExpert.init: Using existing session for $absoluteModelPath")
-            return session
-        }
-
+        println("LlmPortal.init: Loading $absoluteModelPath")
         val session = conduitLib.conduit_llm_get_session(absoluteModelPath)
-        sessionCache[absoluteModelPath] = session
-            ?: throw RuntimeException("Failed to Load: ${absoluteModelPath}")
+            ?: throw RuntimeException("Failed to load model: $absoluteModelPath")
+        println("LlmPortal.init: Successfully loaded $absoluteModelPath")
 
-        println("LlmExpert.init: Successfully created session for $absoluteModelPath") ////
         return session
     }
 
@@ -75,7 +83,10 @@ object LlmPortal {
         }
     }
 
-    fun abortResponse(expert: Expert) {
-        conduitLib.conduit_session_abort_decode(expert.sessionPtr)
+    fun abortResponse(sessionPtr: Pointer?) {
+        if (sessionPtr != null) {
+            error("LlmPortal couldn't find a session to abort")
+        }
+        conduitLib.conduit_session_abort_decode(sessionPtr)
     }
 }

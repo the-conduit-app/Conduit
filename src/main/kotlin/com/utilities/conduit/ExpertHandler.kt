@@ -1,40 +1,32 @@
 package com.utilities.conduit
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.io.FileNotFoundException
 
-// NOTE: Echo Expert is currently (July 2026) the only Internal Expert so
-// watch out for some confusion below.
+// NOTE: Echo Expert is currently (July 2026) the only Internal Expert
 
 interface ExpertHandler {
-    suspend fun initialize(expert: Expert, state: AppState)
-    fun generateResponse(expert: Expert, state: AppState, messages: List<ChatMessage>): Flow<String>
-    fun abortResponse(expert: Expert)
+    //suspend fun initialize(expert: Expert, state: AppState)
+    fun generateResponse(expert: Expert, messages: List<ChatMessage>): Flow<String>
+    fun abortResponse(modelState: ModelState?)
 }
 
 // ---------------------------------------------------------------------
 
 object InternalExpertHandler : ExpertHandler {
-    override suspend fun initialize(expert: Expert, state: AppState) {
-        withContext(Dispatchers.Main) { expert.status = ExpertStatus.READY }
-    }
+    override fun generateResponse(expert: Expert, messages: List<ChatMessage>): Flow<String> {
+        val modelState = expert.modelState ?: error("Expert ${expert.nickname}: Model not found.")
 
-    override fun generateResponse(expert: Expert, state: AppState, messages: List<ChatMessage>): Flow<String> {
-        val prompt: String = buildPrompt(expert, state, messages)
+        val prompt = buildPrompt(expert, messages)
         return EchoPortal.getResponse(expert, prompt)
     }
 
-    override fun abortResponse(expert: Expert) {
-        println("InternalExpertHandler: Aborting ${expert.modelPath}") ////
+    override fun abortResponse(modelState: ModelState?) {
+        println("InternalExpertHandler: Aborting generation")
         EchoPortal.abortResponse()
-     }
+    }
 
-     private fun buildPrompt(expert: Expert, state: AppState, messages: List<ChatMessage>): String {
+    // Unused param expert
+    private fun buildPrompt(expert: Expert, messages: List<ChatMessage>): String {
         return messages
             .lastOrNull { it.author.type == AuthorType.USER }
             ?.text
@@ -45,53 +37,19 @@ object InternalExpertHandler : ExpertHandler {
 // ---------------------------------------------------------------------------------------------
 
 object LocalExpertHandler : ExpertHandler {
-    private val initMutex = Mutex()
+    override fun generateResponse(expert: Expert, messages: List<ChatMessage>): Flow<String> {
+        val modelState = expert.modelState ?: error("Expert '${expert.nickname}': Model not found.")
+        val sessionPtr = modelState.p ?: error("Expert '${expert.nickname}': LLM session not found.")
 
-    // Mainly File system checks before relaying init to LlmExpert.initialize()
-    override suspend fun initialize(expert: Expert, state: AppState) {
-        println("LocalExpertHandler Initializing ${expert.nickname} ${System.identityHashCode(expert)}")
-        initMutex.withLock {
-            if (expert.status == ExpertStatus.LOADING || expert.status == ExpertStatus.READY) {
-                return
-            }
-            if (expert.modelPath == null) return
-            if (expert.status == ExpertStatus.FAILED) {
-                return
-            }
-
-            state.setStatusOfExpertGroup(expert.modelPath, ExpertStatus.LOADING)
-        }
-
-        try {
-            val absPathString = AppUtils.getAbsolutePathString(expert.modelPath!!)
-            if (!File(absPathString).exists()) {
-                throw FileNotFoundException("Model not found at: ${absPathString}")
-            }
-
-            expert.sessionPtr = LlmPortal.initialize(absPathString)
-            state.setStatusOfExpertGroup(expert.modelPath, ExpertStatus.READY, expert.sessionPtr)
-        } catch (e: Exception) {
-            state.setStatusOfExpertGroup(expert.modelPath!!, ExpertStatus.FAILED)
-            e.printStackTrace()
-
-        }
-        println("LlmExpertHandler.init: Done with ${expert.modelPath} ") ////
+        val prompt: String = buildPrompt(expert, messages)
+        return LlmPortal.getResponse(sessionPtr, prompt)
     }
 
-    override fun generateResponse(expert: Expert, state: AppState, messages: List<ChatMessage>): Flow<String> {
-        val prompt: String = buildPrompt(expert, state, messages)
-
-        val session = expert.sessionPtr
-            ?: throw IllegalStateException("Expert '${expert.nickname}' has not been initialized.")
-
-        return LlmPortal.getResponse(session, prompt)
+    override fun abortResponse(modelState: ModelState?) {
+        LlmPortal.abortResponse(modelState?.p)
     }
 
-    override fun abortResponse(expert: Expert) {
-        LlmPortal.abortResponse(expert)
-    }
-
-    private fun buildPrompt(expert: Expert, state: AppState, messages: List<ChatMessage>): String {
+    private fun buildPrompt(expert: Expert, messages: List<ChatMessage>): String {
         return buildString {
 
             expert.seedPrompt
@@ -106,7 +64,7 @@ object LocalExpertHandler : ExpertHandler {
                 val role = when (msg.author.type) {
                     AuthorType.USER      -> "user"
                     AuthorType.ASSISTANT -> "assistant"
-                    AuthorType.CONDUIT    -> "system"
+                    AuthorType.SYSTEM    -> "system"
                 }
 
                 append("<|im_start|>")

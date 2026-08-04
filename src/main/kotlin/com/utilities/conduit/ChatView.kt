@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Public
@@ -20,24 +19,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.collections.get
 
 @Composable
 fun ColumnScope.ChatView(state: AppState) {
     val chat = state.chatManager.currentChat
-    val historyNodes by remember(chat) {
-        derivedStateOf { state.chatManager.getFullHistory(chat.currentLeafNodeId) }
-    }
+    val historyNodes = ChatUtils.getFullHistory(chat, chat.currentLeafNodeId)
     val listState = rememberLazyListState()
-    ////val lastStreamingText = historyNodes.lastOrNull()?.message?.textInProgress?.value
+
+    // Auto-scroll to bottom
     LaunchedEffect(listState, historyNodes.size) { ->
         snapshotFlow {
             listState.layoutInfo.totalItemsCount to listState.layoutInfo.visibleItemsInfo.lastOrNull()?.size
@@ -59,14 +51,11 @@ fun ColumnScope.ChatView(state: AppState) {
 
 @Composable
 fun MessageBubble(state: AppState, node: Node) {
-    val text = node.message?.textInProgress?.value ?: node.message?.text ?: ""
-    val title = node.message?.title
-
-    val authorType = node.message?.author?.type ?: AuthorType.CONDUIT
+    val authorType = node.message?.author?.type ?: AuthorType.SYSTEM
     when (authorType) {
-        AuthorType.USER -> UserMessageBubble(text, title)
-        AuthorType.ASSISTANT -> ExpertMessageBubble(state, node, text, title)
-        AuthorType.CONDUIT -> SystemMessageBubble(text)
+        AuthorType.USER -> UserMessageBubble(state, node)
+        AuthorType.ASSISTANT -> ExpertMessageBubble(state, node)
+        AuthorType.SYSTEM -> SystemMessageBubble(node.message?.text?: "Hmm... Wonder where this came from!")
     }
 }
 
@@ -74,7 +63,7 @@ fun MessageBubble(state: AppState, node: Node) {
 private fun SystemMessageBubble(text: String) {
     Box(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
         Text(
-            text = text.trim(),
+            text = text,
             style = TextStyle(fontSize = 12.sp, color = Color.Gray),
             modifier = Modifier.padding(10.dp)
         )
@@ -82,30 +71,38 @@ private fun SystemMessageBubble(text: String) {
 }
 
 @Composable
-private fun UserMessageBubble(text: String, title: String?) {
+private fun UserMessageBubble(state: AppState, node: Node) {
+    val text = node.message?.textInProgress?.value?: node.message?.text.orEmpty()
+    val title = node.message?.title ?: "Donowatt" // Could consume unknown amt of energy
+
     val alignment = Alignment.End
     val bubbleColor = Color(0xFFDCF8C6) //// TODO: Move to theme
 
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp), horizontalAlignment = alignment) {
-        Text(text = title?: "Donohue", style = TextStyle(fontSize = 10.sp, color = Color.Gray))
+        Text(text = title, style = TextStyle(fontSize = 10.sp, color = Color.Gray))
         Text(
-            text = text.trim(),
+            text = text,
             modifier = Modifier.widthIn(max = 700.dp).background(bubbleColor, RoundedCornerShape(12.dp)).padding(10.dp)
         )
     }
 }
 
 @Composable
-fun ExpertMessageBubble(state: AppState, node: Node, text: String, title: String?) {
+fun ExpertMessageBubble(state: AppState, node: Node) {
+    val text = node.message?.textInProgress?.value?: node.message?.text.orEmpty()
+    val title = node.message?.title ?: "Donovich"
+
     val alignment = Alignment.Start
     val bubbleColor = Color(0xFFFFF9C4) // Light yellow
+
+    val isCurrentLeaf = state.chatManager.currentChat.currentLeafNodeId == node.id
 
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 8.dp),
         horizontalAlignment = alignment
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = title?: "Donovich", style = TextStyle(fontSize = 10.sp, color = Color.Gray))
+            Text(text = title, style = TextStyle(fontSize = 10.sp, color = Color.Gray))
             Spacer(modifier = Modifier.width(4.dp))
             Icon(
                 imageVector = if (state.currentExpert.value?.type == ExpertType.REMOTE) Icons.Default.Public else Icons.Default.Lock,
@@ -115,7 +112,7 @@ fun ExpertMessageBubble(state: AppState, node: Node, text: String, title: String
             )
         }
 
-        if (text.isEmpty()) {
+        if (text.isEmpty() && isCurrentLeaf && node.message?.textInProgress?.value != null) {
             CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
         } else {
             Text(
@@ -123,9 +120,9 @@ fun ExpertMessageBubble(state: AppState, node: Node, text: String, title: String
                 modifier = Modifier.widthIn(max = 700.dp).background(bubbleColor, RoundedCornerShape(12.dp))
                     .padding(10.dp)
             )
-            if (node.message?.responseTime != null) {
+            node.message?.responseTime?.let { ts ->
                 Text(
-                    text = "Response took ${"%.1f".format(node.message.responseTime / 1000.0)}s",
+                    text = "Response took ${"%.1f".format(ts / 1000.0)}s",
                     style = TextStyle(fontSize = 10.sp, color = Color.Gray)
                 )
             }

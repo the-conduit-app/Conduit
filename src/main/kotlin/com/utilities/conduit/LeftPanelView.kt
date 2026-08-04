@@ -59,7 +59,8 @@ fun LeftPanelView(
                     Text(
                         text = "+",
                         modifier = Modifier.clickable {
-                            state.chatManager.newChat()
+                            val chat = state.chatManager.createChat()
+                            state.chatManager.currentChat = chat
                         }.padding(horizontal = 12.dp),
                     )
                 }

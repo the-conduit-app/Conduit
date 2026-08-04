@@ -26,19 +26,12 @@ class AppActions(
         state.notification.trigger(msg)
     }
 
-    // Simultaneously initialize ALL experts sharing the same LLM model file path
     fun retryExpertInitialization(expert: Expert) {
-        // Never purge the system expert
-        if (expert.modelPath == null || expert.modelPath == state.systemExpert?.modelPath)
+        if (expert.modelPath == state.systemExpert.modelPath)
             return
 
-        scope.launch {
-            state.setStatusOfExpertGroup(expert.modelPath, ExpertStatus.LOADING)
-            state.expertsMap.values
-                .filter { it.modelPath == expert.modelPath }
-                .forEach { targetExpert ->
-                    scope.launch(Dispatchers.IO) { targetExpert.initialize(state) }
-                }
+        scope.launch(Dispatchers.IO) {
+            expert.modelState?.retryInitialization()
         }
     }
 
@@ -52,7 +45,7 @@ class AppActions(
 
         scope.launch(Dispatchers.IO) {
             try {
-                newPack.initialize(state, scope)
+                newPack.initializeExperts(state, scope)
                 state.notification.trigger("The current pack is now ${newPack.name}. Please select an expert.")
             }
             catch (e: Exception) {
@@ -78,8 +71,6 @@ class AppActions(
             val parentTimeStamp = currentChat.currentLeafNode?.createdAt
             val parentNode = currentChat.currentLeafNode
 
-            // Create and add the userNode (with prompt) and the responseNode (with empty placeholder) into
-            // the currentChat.
             val userNode = Node.create(
                 type = NodeType.TEXT,
                 parentId = parentNode?.id,
@@ -104,22 +95,19 @@ class AppActions(
                 )
             )
 
-            // skip first of two immediate updates to the ChatsList
             state.chatManager.addNode(userNode) // unused return value
-            val item = state.chatManager.addNode(responseNode)
-            withContext(Dispatchers.Main) { state.chatsList.touch(item) }
-
-            val effectiveHistory = state.chatManager.getEffectiveNodeHistory(userNode.id)
+            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(currentChat, userNode.id)
             val messages = effectiveHistory.mapNotNull { it.message }
+            val item = state.chatManager.addNode(responseNode)
 
             withContext(Dispatchers.Main) {
+                state.chatsList.touch(item)
                 responseNode.message?.textInProgress?.value = ""
             }
 
-            state.chatManager.isAbortRequested = false
+            state.chatManager.clearAbortRequest()
             val startTime = System.currentTimeMillis()
-            println("Asking ${expert.nickname}: ${messages.last().text}") ////
-                expert.getResponse(state, messages)
+            expert.getResponse(messages)
                 .onCompletion { cause ->
                     val duration = System.currentTimeMillis() - startTime
                     val status = when (cause) {
@@ -128,30 +116,22 @@ class AppActions(
                         else -> MessageStatus.ERROR
                     }
 
-                    val finalText = withContext(Dispatchers.Main) {
-                        val text = responseNode.message?.textInProgress?.value ?: ""
-                        responseNode.message?.textInProgress?.value = null
-                        text
-                    }
-
-                    val finalNode = responseNode.copy(
-                        message = responseNode.message?.copy(
-                            text = finalText,
-                            responseTime = duration,
-                            status = status
-                        )
-                    )
-
-                    val item = state.chatManager.updateNode(finalNode)
                     withContext(Dispatchers.Main) {
-                        state.chatsList.touch(item)
+                        responseNode.message?.apply {
+                            text = textInProgress.value ?: ""
+                            textInProgress.value = null
+                            responseTime = duration
+                            this.status = status
+                        }
                     }
+                    ChatUtils.saveChatToDisk(currentChat)
+
                     if (status == MessageStatus.INTERRUPTED) {
                         state.notification.trigger("Response interrupted by user.")
                     }
                 }
                 .collect { chunk ->
-                    println ("Received $chunk") ////
+                    // Abort can be requested from the generation loop (i.e. stop button)
                     if (state.chatManager.isAbortRequested) {
                         expert.abortResponse()
                         throw CancellationException("Aborted by user")

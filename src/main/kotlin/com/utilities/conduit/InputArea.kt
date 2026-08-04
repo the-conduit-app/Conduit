@@ -14,15 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.*
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun InputArea(state: AppState, onSend: (String) -> Unit) {
     var text by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
-    val isStreaming =
-        state.chatManager.currentChat.currentLeafNode?.message?.textInProgress?.value != null
+    val isGenerating = (state.currentExpert.value?.modelState?.status == ModelStatus.GENERATING)
 
     Row(
         modifier = Modifier
@@ -36,7 +34,7 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
             singleLine = false,
             minLines = 1,
             maxLines = 6,
-            enabled = !isStreaming,
+            enabled = !isGenerating,
             placeholder = {
                 val name = state.currentExpert.value?.nickname ?: "an Expert"
                 Text("Type a message to $name...")
@@ -53,7 +51,7 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
                         }
 
                         ev.key == Key.Enter && !ev.isShiftPressed -> {
-                            if (text.isNotBlank() && !isStreaming) {
+                            if (text.isNotBlank() && !isGenerating) {
                                 onSend(text)
                                 text = ""
                             }
@@ -68,8 +66,8 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
                 }
         )
 
-        LaunchedEffect(state.currentExpert.value, isStreaming) {
-            if (!isStreaming) {
+        LaunchedEffect(state.currentExpert.value, isGenerating) {
+            if (!isGenerating) {
                 focusRequester.requestFocus()
             }
         }
@@ -77,17 +75,17 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
         Spacer(modifier = Modifier.width(8.dp))
 
         Button(
+            enabled = isGenerating || text.isNotBlank(),
             onClick = {
-                if (isStreaming) {
+                if (isGenerating) {
                     state.chatManager.abortCurrentResponse()
                 } else if (text.isNotBlank()) {
                     onSend(text)
                     text = ""
-                    focusRequester.requestFocus()
                 }
             }
         ) {
-            if (isStreaming) {
+            if (isGenerating) {
                 Icon(Icons.Default.Stop, contentDescription = "Stop")
             } else {
                 Icon(Icons.Default.ArrowUpward, contentDescription = "Send")

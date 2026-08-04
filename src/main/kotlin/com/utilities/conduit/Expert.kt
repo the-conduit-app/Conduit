@@ -4,14 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.sun.jna.Pointer
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.util.*
 
 enum class ExpertType { INTERNAL, LOCAL, REMOTE }
-enum class ExpertStatus { NONE, LOADING, READY, FAILED }
 
 @Serializable
 class Expert(
@@ -31,26 +29,15 @@ class Expert(
         ExpertType.REMOTE   -> throw NotImplementedError("Remote experts not yet supported")
     }
 
-    // NOTE: this sessionPtr is just a copy of the sessionPtr in LlmExpert.sessionCache
-    // for convenience (to save repeated lookups). Hence, it is updated for all "linked"
-    // experts whenever an expert's status changes. It is a pointer to the conduit c++
-    // library gateway
+    // Runtime state shared by all Experts using the same model.
     @Transient
-    var sessionPtr: Pointer? = null        // Assigned by LlmExpertHandler.initialize()
+    var modelState: ModelState? = null
 
-    // Observable status
-    var status by mutableStateOf(ExpertStatus.NONE)
+    fun getResponse(messages: List<ChatMessage>): Flow<String> =
+        handler.generateResponse(this, messages)
 
-    suspend fun initialize(state: AppState) {
-        handler.initialize(this, state)
-    }
-
-    fun getResponse(state: AppState, messages: List<ChatMessage>): Flow<String> =
-        handler.generateResponse(this, state, messages)
-
-    // Called from AppActions:onSend:.collect() during response generation
     fun abortResponse() {
-        handler.abortResponse(this)
+        handler.abortResponse(modelState)
     }
 }
 

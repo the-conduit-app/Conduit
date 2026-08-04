@@ -1,8 +1,12 @@
 package com.utilities.conduit
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.rememberWindowState
 import com.utilities.conduit.AppUtils.getAppPath
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.nio.file.Files
@@ -13,9 +17,11 @@ val LocalActions = staticCompositionLocalOf<AppActions> { error("No AppActions p
 val AppJson = Json { prettyPrint = true; allowComments = true; ignoreUnknownKeys = true }
 
 @Composable
-fun App() {
+fun App(exitApplication: () -> Unit) {
+    Trace.log(" Entered App()")
+
     val scope = rememberCoroutineScope()
-    val state = remember { AppState.createNew(scope) }
+    val state = remember { AppState.createNew(scope = scope) }
 
     LaunchedEffect(Unit) {
         state.chatsList.build()        // load existing chats in the chats dir
@@ -26,15 +32,31 @@ fun App() {
         state.availablePacks = packs
 
         val defaultPack = packs.find { it.id == "Default" } ?: error("Default pack not found")
-        defaultPack.initialize(state, scope)
+        defaultPack.select(state)
+
+        scope.launch {state.systemExpert.modelState?.initialize() }
+
+        defaultPack.initializeExperts(state, scope) // may launch several model.inits
 
         val echoExpert = defaultPack.experts.find { it.modelPath == InternalExperts.SIMPLE_ECHO }
         state.currentExpert.value = echoExpert
     }
 
-    // UI Thread - doesn't need state/data to be finalized before compose
-    CompositionLocalProvider(LocalActions provides AppActions(scope, state)) {
-        MainScreen(state)
+    val windowState = rememberWindowState(
+        width = 1280.dp,
+        height = 800.dp
+    )
+    Window(
+        state = windowState,
+        title = "Conduit Workspace",
+        onCloseRequest = {
+            Trace.log("Window.onCloseRequest")
+            exitApplication()
+        }
+    ) {
+        CompositionLocalProvider(LocalActions provides AppActions(scope, state)) {
+            MainScreen(state)
+        }
     }
 }
 
@@ -47,7 +69,6 @@ suspend fun getAvailablePacks(): List<Pack> = withContext(Dispatchers.IO) {
 
     if (!Files.exists(packsDir))
         return@withContext emptyList()
-
 
     Files.list(packsDir).use { stream ->
         stream.toList()

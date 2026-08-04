@@ -1,7 +1,9 @@
 package com.utilities.conduit
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.util.*
@@ -9,15 +11,15 @@ import java.util.*
 @Serializable
 data class Chat(
     val id: String,
-    val title: String,
     val createdAt: Long = System.currentTimeMillis(),
-    val nodes: Map<String, Node> = emptyMap(),
-    val rootNodeId: String?,
+    var rootNodeId: String?,
     var currentLeafNodeId: String? = null,
+    var title: String,
+    val nodes: MutableMap<String, Node> = mutableMapOf(),
 
     @Transient
-    var currentLeafNode: Node? = null
-) {
+    var currentLeafNode: Node? = null,
+    ) {
     companion object {
         fun create(title: String): Chat {
             return Chat(
@@ -35,13 +37,14 @@ data class Chat(
     }
 }
 
+// ---------------------------------------------------------------------------
 @Serializable
 data class Node(
     val id: String,
     val type: NodeType,
     val createdAt: Long = System.currentTimeMillis(),
     val parentId: String?,
-    val children: List<String> = emptyList(),
+    val children: MutableList<String> = mutableListOf(),
 
     val message: ChatMessage?, // Payload
     val summaryToThisNode: String? = null
@@ -64,33 +67,31 @@ data class Node(
 @Serializable
 enum class NodeType { TEXT, INFO }
 
+// ---------------------------------------------------------------------------
+
 @Serializable
 data class ChatMessage(
-    val title: String? = null,
-    val author: MessageAuthor,
-
-    // Canonical text saved to disk.
-    var text: String,
-
+    var title: String? = null,
+    val timestamp: Long = System.currentTimeMillis(),
     var status: MessageStatus = MessageStatus.COMPLETE,
 
-    val timestamp: Long = System.currentTimeMillis(),
-    val responseTime: Long? = null
+    val author: MessageAuthor,
+    var text: String, // Canonical text saved to disk.
+    var responseTime: Long? = null
 ) {
     // Run-time only states
 
     // Displayed preferentially to text while the message is streaming.
     @Transient
     val textInProgress: MutableState<String?> = mutableStateOf(null)
-
-    val isStreaming: Boolean
-        get() = textInProgress.value != null
 }
 enum class MessageStatus {
     COMPLETE,
     INTERRUPTED,
     ERROR
 }
+
+// ---------------------------------------------------------------------------
 
 @Serializable
 data class MessageAuthor(
@@ -101,5 +102,5 @@ data class MessageAuthor(
 enum class AuthorType {
     USER,
     ASSISTANT,
-    CONDUIT,
+    SYSTEM,
 }

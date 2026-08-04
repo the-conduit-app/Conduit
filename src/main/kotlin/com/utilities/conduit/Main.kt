@@ -4,33 +4,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import kotlin.system.exitProcess
 
 fun main() {
-    Runtime.getRuntime().addShutdownHook(
-        Thread {
-            LlmPortal.shutdown()
-        }
-    )
-
-    // Create fresh copies of packs/{Default,Echoes,Sample}.json
     copyAssetsToFilesDir()
 
     application {
-        val windowState = rememberWindowState(width = 1280.dp, height = 800.dp)
-
-        Window(
-            onCloseRequest = {
-                println("Exiting...")
-                LlmPortal.shutdown()
-                exitProcess(0)
-            },
-            state = windowState,
-            title = "Conduit Workspace"
-        ) {
-            App()
-        }
+        Trace.log("Main launching app") ////
+        App(exitApplication = ::exitApplication,
+        onExit = {
+            Trace.log("Exit hook entered")
+            runBlocking {
+                Trace.log("Shutdown coroutine entered")
+                state.shutdown()
+                Trace.log("Shutdown complete")
+            }
+            Trace.log("Exit hook returning")
+        })
     }
 }
 

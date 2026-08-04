@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text2.input.TextFieldState.Saver.restore
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -22,7 +23,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import com.utilities.conduit.ChatUtils.generateChatTitle
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -56,18 +60,23 @@ fun ChatsListView(state: AppState) {
         ) {
             items(
                 items = chatsList.items,
-                key = { it.fileName }
+                key = { it.chat.id }
             ) { item ->
-
                 ContextMenuArea(
                     items = {
                         listOf(
                             ContextMenuItem("Rename…") {
-                                println("Rename ${item.title}") ////
                                 showRenameDialog = item
                             },
                             ContextMenuItem("Delete…") {
-                                println("Delete ${item.title}")
+                                scope.launch {
+                                    val removed = state.chatsList.remove(item)
+                                    if (removed && item.chat.id == state.chatManager.currentChat.id) {
+                                        state.notification.trigger(
+                                            "Chat deleted. Continue chatting here to restore it."
+                                        )
+                                    }
+                                }
                             }
                         )
                     }
@@ -76,14 +85,14 @@ fun ChatsListView(state: AppState) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable(enabled = enabled) {
-                                state.chatManager.loadChatFromDisk(state, item.fileName)
+                                state.chatManager.currentChat = item.chat
                             }
                             .padding(horizontal = 4.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = item.title,
+                            text = item.chat.title,
                             modifier = Modifier.weight(1f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -104,22 +113,15 @@ fun ChatsListView(state: AppState) {
 
         showRenameDialog?.let { item ->
             ChatRenameDialog(
-                initialTitle = item.title,
+                initialTitle = item.chat.title,
                 onCancel = { showRenameDialog = null },
-                onGenerate = {
-                    // TODO
-                },
+                onSuggest = {
+                        ChatUtils.generateChatTitle(state.systemExpert, item.chat)
+                    },
                 onOk = { newTitle ->
-                    val chatId = AppUtils.extractChatIdFromFileName(item.fileName)
-                    val renamed = item.copy(
-                        title = newTitle,
-                        fileName = AppUtils.createChatFileName(newTitle, chatId)
-                    )
-
                     scope.launch {
-                        state.chatsList.rename(item, renamed)
+                        state.chatsList.rename(item, newTitle)
                     }
-
                     showRenameDialog = null
                 }
             )

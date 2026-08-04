@@ -34,14 +34,16 @@ fun ExpertsPanelView(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         expertList.forEachIndexed { index, expert ->
-            println("${expert.nickname} ${System.identityHashCode(expert)} ${expert.status}") ////
             Box(modifier = Modifier.weight(1f)) {
-                val bgColor = if (expert.status == ExpertStatus.READY) ExpertTheme.getExpertColor(index) else Color.LightGray
+                val status = expert.modelState?.status
+
+                val bgColor = if (status == ModelStatus.READY)
+                    ExpertTheme.getExpertColor(index) else Color.LightGray
 
                 ExpertIcon(state, expert, bgColor) {
-                    when (expert.status) {
-                        ExpertStatus.READY -> onExpertSwitch(expert)
-                        ExpertStatus.FAILED -> onExpertRetry(expert)
+                    when (status) {
+                        ModelStatus.READY -> onExpertSwitch(expert)
+                        ModelStatus.FAILED -> onExpertRetry(expert)
                         else -> {}
                     }
                 }
@@ -71,6 +73,7 @@ object ExpertTheme {
 @Composable
 fun ExpertIcon(state: AppState, expert: Expert, bgColor: Color, onClick: () -> Unit) {
     val isCurrent = state.currentExpert.value?.id == expert.id
+    val modelState = expert.modelState
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,10 +90,10 @@ fun ExpertIcon(state: AppState, expert: Expert, bgColor: Color, onClick: () -> U
                 verticalArrangement = Arrangement.Center,
                 modifier = Modifier.padding(vertical = 4.dp)
             ) {
-                when (expert.status) {
-                    ExpertStatus.LOADING -> CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White)
-                    ExpertStatus.READY -> Icon(Icons.Default.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
-                    ExpertStatus.FAILED -> Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
+                when (modelState?.status) {
+                    ModelStatus.LOADING -> CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White)
+                    ModelStatus.READY   -> Icon(Icons.Default.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
+                    ModelStatus.FAILED -> Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
                     else -> {}
                 }
                 Text(expert.expertise, style = MaterialTheme.typography.labelSmall, color = Color.White, maxLines = 1)

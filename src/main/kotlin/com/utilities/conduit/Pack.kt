@@ -1,10 +1,8 @@
 package com.utilities.conduit
 
-import com.utilities.conduit.ExpertTheme.getExpertColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -17,15 +15,21 @@ data class Pack(
     val description: String = "",
     val experts: List<Expert>
 ) {
-    suspend fun initialize(state: AppState, scope: CoroutineScope) {
-        withContext(Dispatchers.Main) {
-            state.expertsMap.clear()
-            state.expertsMap.putAll(experts.associateBy { it.id })
-            state.currentPack.value = this@Pack
-        }
+    fun select(state: AppState) {
+        state.expertsMap.clear()
+        state.expertsMap.putAll(experts.associateBy { it.id })
 
         experts.forEach { expert ->
-            scope.launch(Dispatchers.IO) { expert.initialize(state) }
+            val modelPath = expert.modelPath ?: return@forEach
+            expert.modelState = state.getModelState(modelPath)
+        }
+
+        state.currentPack.value = this
+    }
+
+    suspend fun initializeExperts(state: AppState, scope: CoroutineScope) {
+        experts.forEach { expert ->
+            scope.launch(Dispatchers.IO) { expert.modelState?.initialize() }
         }
     }
 }
