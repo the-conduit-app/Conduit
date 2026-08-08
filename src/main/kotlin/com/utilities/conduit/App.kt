@@ -62,6 +62,9 @@ fun App(exitApplication: () -> Unit) {
         val echoExpert = defaultPack.experts.find { it.modelPath == InternalExperts.SIMPLE_ECHO }
         state.currentExpert.value = echoExpert
     }
+    LaunchedEffect(Unit) { // Low priority maintenance loop (cleanup chats etc.)
+        Maintenance.start(state, scope)
+    }
 
     val windowState = rememberWindowState(
         width = 1280.dp,
@@ -80,7 +83,7 @@ fun App(exitApplication: () -> Unit) {
 
 /**
  * Reads all .json files in the packs directory and parses them into Pack objects
- * IMPORTANT: NO PACK EXPERT INITIALIZATIONS
+ * IMPORTANT: NO PACK EXPERT INITIALIZATIONS (Hence not time-consuming)
  */
 suspend fun getAvailablePacks(): List<Pack> = withContext(Dispatchers.IO) {
     val packsDir = Paths.get(getAppPath(), "packs")

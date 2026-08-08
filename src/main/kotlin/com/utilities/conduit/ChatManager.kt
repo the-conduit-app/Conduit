@@ -12,9 +12,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
-// TODO...Don't delete this line until place below better
-enum class ResponseGenerationStatus { IDLE, GENERATING, ABORTING }
-
 class ChatManager(
     private val scope: CoroutineScope,
     val systemExpert: Expert)
@@ -32,21 +29,17 @@ class ChatManager(
 
     fun beginCurrentResponse(expert: Expert) {
         currentlyGeneratingExpert = expert
-        scope.launch(Dispatchers.Main) { responseStatus = ResponseGenerationStatus.GENERATING }
     }
+
     fun finishCurrentResponse() {
-        scope.launch(Dispatchers.Main) { responseStatus = ResponseGenerationStatus.IDLE }
+        currentlyGeneratingExpert = null
     }
+
     fun abortCurrentResponse() {
         println("ABORT 1 ChatManager ${System.currentTimeMillis()}")
         currentlyGeneratingExpert?.abortResponse()
         println("ABORT 2 ChatManager ${System.currentTimeMillis()}")
-
-        scope.launch(Dispatchers.Main) { responseStatus = ResponseGenerationStatus.ABORTING }
     }
-
-    var responseStatus by mutableStateOf(ResponseGenerationStatus.IDLE)
-        private set
 
     suspend fun addNode(node: Node): ChatsListItem = mutex.withLock {
         val chat = currentChat
@@ -71,17 +64,6 @@ class ChatManager(
             ++version
         } // recomp
 
-        // Check if to be renamed
-        if (chat.title.equals("Welcome to Conduit") && chat.nodes.size > 2 && chat.renameStatus == ChatRenameStatus.NONE) {
-            chat.renameStatus = ChatRenameStatus.GENERATING
-            scope.launch(Dispatchers.IO) {
-                val newTitle = ChatUtils.generateChatTitle(systemExpert, chat)
-                withContext(Dispatchers.Main) {
-                    chat.title = newTitle
-                    chat.renameStatus = ChatRenameStatus.DONE
-                }
-            }
-        }
         ChatUtils.saveChatToDisk(chat)
     }
 }

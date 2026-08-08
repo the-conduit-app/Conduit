@@ -94,7 +94,7 @@ object AppUtils {
 }
 
 object ChatUtils {
-    private val mutex = Mutex() // locking for save etc.
+    private val chatUtilsMutex = Mutex() // locking for save etc.
 
     fun makeChatFileName(chatId: String, chatTitle: String): String {
         val sanitizedTitle = chatTitle
@@ -105,7 +105,7 @@ object ChatUtils {
     }
 
     suspend fun saveChatToDisk(chat: Chat): ChatsListItem {
-        mutex.withLock {
+        chatUtilsMutex.withLock {
             chat.syncTransients()
 
             return withContext(Dispatchers.IO) {
@@ -158,36 +158,40 @@ object ChatUtils {
     }
 
     suspend fun generateChatTitle(systemExpert: Expert, chat: Chat): String {
-        val oldTitle : String = chat.title
-        val maxTextLen = 250
+        chatUtilsMutex.withLock {
+            val oldTitle : String = chat.title
+            val maxTextLen = 250
 
-        var messages = getEffectiveNodeHistory(chat, chat.currentLeafNodeId)
-            .mapNotNull { it.message }
-            .map { message ->
-                if (message.author.type == AuthorType.ASSISTANT && message.text.length > maxTextLen) {
-                    message.copy(text = message.text.take(maxTextLen) + "...")
-                } else {
-                    message
+            var messages = getEffectiveNodeHistory(chat, chat.currentLeafNodeId)
+                .mapNotNull { it.message }
+                .map { message ->
+                    if (message.author.type == AuthorType.ASSISTANT && message.text.length > maxTextLen) {
+                        message.copy(text = message.text.take(maxTextLen) + "...")
+                    } else {
+                        message
+                    }
                 }
+
+            val currentTitle = if (oldTitle.equals("Welcome to Conduit", ignoreCase = true))
+                "NO CURRENT TITLE"
+            else
+                oldTitle
+
+            val prompt = PROMPTS.TITLE_GENERATION.replace("{CURRENT_TITLE}", currentTitle)
+            messages += ChatMessage(
+                author = MessageAuthor(type = AuthorType.SYSTEM),
+                text = prompt
+            )
+
+            Trace.log("TITLE GEN START session=${systemExpert.sessionPtr}")
+            val result = StringBuilder()
+            systemExpert.getResponse(messages).collect { token ->
+                result.append(token)
             }
+            Trace.log("TITLE GEN END session=${systemExpert.sessionPtr}")
 
-        val currentTitle = if (oldTitle.equals("Welcome to Conduit", ignoreCase = true))
-            "NO CURRENT TITLE"
-        else
-            oldTitle
-
-        val prompt = PROMPTS.TITLE_GENERATION.replace("{CURRENT_TITLE}", currentTitle)
-        messages += ChatMessage(
-            author = MessageAuthor(type = AuthorType.SYSTEM),
-            text = prompt
-        )
-
-        val result = StringBuilder()
-        systemExpert.getResponse(messages).collect { token ->
-            result.append(token)
+            val newTitle = result.toString().trim()
+            return newTitle.ifEmpty { oldTitle }
         }
-
-        val newTitle = result.toString().trim()
-        return newTitle.ifEmpty { oldTitle }
     }
 }

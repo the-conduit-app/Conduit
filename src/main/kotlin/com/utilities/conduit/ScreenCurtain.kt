@@ -22,13 +22,11 @@ class ScreenCurtain (private val scope: CoroutineScope) {
     // Eases opacity from 0 to 1 and back to 0 with a given delay (optionally set msg if given)
     private var job: Job? = null
     suspend fun show(duration: Int = 200) {
-        Trace.log("screen curtain show")
         isActive = true
         animate(initialValue = opacity, targetValue = 1f, animationSpec = tween(duration)) { value, _ -> opacity = value }
     }
 
     suspend fun hide(duration: Int = 200) {
-        Trace.log("screen curtain hide")
         animate(initialValue = opacity, targetValue = 0f, animationSpec = tween(duration)) { value, _ -> opacity = value }
         isActive = false
     }

@@ -7,8 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,18 +52,20 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // New chat (List mode only) ----------------------------------
                 if (state.leftPanelMode == LeftPanelMode.LIST) {
-                    Spacer(Modifier.width(12.dp))
+                    Spacer(Modifier.width(6.dp))
 
-                    Text(
-                        text = "+",
-                        modifier = Modifier.clickable {
+                    IconButton(
+                        modifier = Modifier.size(24.dp),
+                        enabled = state.chatManager.currentlyGeneratingExpert == null,
+                        onClick = {
                             val chat = state.chatManager.createChat()
                             Trace.log("Created new chat ${chat.id}")
-
                             state.focusInput.value++
                             state.chatManager.currentChat = chat
-                        }.padding(horizontal = 12.dp),
-                    )
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.Add, contentDescription = "New chat")  // "+" button
+                    }
                 }
 
                 // Toggle -----------------------------------------------------
