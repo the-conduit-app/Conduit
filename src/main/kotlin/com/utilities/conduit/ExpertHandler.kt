@@ -5,23 +5,19 @@ import kotlinx.coroutines.flow.Flow
 // NOTE: Echo Expert is currently (July 2026) the only Internal Expert
 
 interface ExpertHandler {
-    //suspend fun initialize(expert: Expert, state: AppState)
     fun generateResponse(expert: Expert, messages: List<ChatMessage>): Flow<String>
-    fun abortResponse(modelState: ModelState?)
+    fun abortResponse(expert: Expert)
 }
 
 // ---------------------------------------------------------------------
 
 object InternalExpertHandler : ExpertHandler {
     override fun generateResponse(expert: Expert, messages: List<ChatMessage>): Flow<String> {
-        val modelState = expert.modelState ?: error("Expert ${expert.nickname}: Model not found.")
-
         val prompt = buildPrompt(expert, messages)
         return EchoPortal.getResponse(expert, prompt)
     }
 
-    override fun abortResponse(modelState: ModelState?) {
-        println("InternalExpertHandler: Aborting generation")
+    override fun abortResponse(expert: Expert) {
         EchoPortal.abortResponse()
     }
 
@@ -38,15 +34,16 @@ object InternalExpertHandler : ExpertHandler {
 
 object LocalExpertHandler : ExpertHandler {
     override fun generateResponse(expert: Expert, messages: List<ChatMessage>): Flow<String> {
-        val modelState = expert.modelState ?: error("Expert '${expert.nickname}': Model not found.")
-        val sessionPtr = modelState.p ?: error("Expert '${expert.nickname}': LLM session not found.")
+        val sessionPtr = expert.sessionPtr ?: error("Expert '${expert.nickname}': LLM session not found.")
 
         val prompt: String = buildPrompt(expert, messages)
         return LlmPortal.getResponse(sessionPtr, prompt)
     }
 
-    override fun abortResponse(modelState: ModelState?) {
-        LlmPortal.abortResponse(modelState?.p)
+    override fun abortResponse(expert: Expert) {
+        expert.sessionPtr?.let {
+            LlmPortal.abortResponse(it)
+        }
     }
 
     private fun buildPrompt(expert: Expert, messages: List<ChatMessage>): String {

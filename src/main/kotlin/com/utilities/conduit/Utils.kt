@@ -45,12 +45,11 @@ object AppUtils {
         return "${getAppPath()}/chats"
     }
 
-    fun getModelsDir(): String {
-        return "${getAppPath()}/llm"
-    }
-
-    fun getAbsolutePathString(path: String): String {
-        return if (path.startsWith("/")) path else "${getAppPath()}/$path"
+    fun getAbsoluteModelPath(modelPath: String): String {
+            return if (Paths.get(modelPath).isAbsolute)
+                modelPath
+            else
+                Paths.get(getAppPath(), modelPath).toString()
     }
 
     fun formatDateRange(
@@ -172,9 +171,15 @@ object ChatUtils {
                 }
             }
 
+        val currentTitle = if (oldTitle.equals("Welcome to Conduit", ignoreCase = true))
+            "NO CURRENT TITLE"
+        else
+            oldTitle
+
+        val prompt = PROMPTS.TITLE_GENERATION.replace("{CURRENT_TITLE}", currentTitle)
         messages += ChatMessage(
             author = MessageAuthor(type = AuthorType.SYSTEM),
-            text = PROMPTS.TITLE_GENERATION
+            text = prompt
         )
 
         val result = StringBuilder()
@@ -183,6 +188,6 @@ object ChatUtils {
         }
 
         val newTitle = result.toString().trim()
-        return if (newTitle.isNotEmpty()) newTitle else oldTitle
+        return newTitle.ifEmpty { oldTitle }
     }
 }

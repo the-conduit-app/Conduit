@@ -20,8 +20,7 @@ fun ChatControlsView(state: AppState) {
         Spacer(modifier = Modifier.width(16.dp))
         ExpertsPanelView(
             state,
-            onExpertSwitch = { newExpert -> appActions.switchExpert(newExpert) },
-            onExpertRetry = { expert -> appActions.retryExpertInitialization(expert) }
+            onExpertSwitch = { newExpert -> appActions.switchExpert(newExpert) }
         )
     }
 }

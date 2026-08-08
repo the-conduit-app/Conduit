@@ -21,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-
 @Composable
 fun PackMenu(state: AppState) {
     val appActions = LocalActions.current
@@ -29,52 +28,47 @@ fun PackMenu(state: AppState) {
     var showPacksMenu by remember { mutableStateOf(false) }
 
     Surface(
-        modifier = Modifier.clip(RoundedCornerShape(8.dp)).clickable { showPacksMenu = true },
+        modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .clickable { showPacksMenu = true },
         color = MaterialTheme.colorScheme.surfaceVariant
     ) {
-        Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text("Pack: ${currentPack?.name ?: "Select"}")
             Spacer(modifier = Modifier.width(8.dp))
             Icon(Icons.Default.ArrowDropDown, null)
         }
     }
 
-    var selectedNewPack by remember { mutableStateOf<Pack?>(null) }
-
     if (showPacksMenu) {
         AlertDialog(
             onDismissRequest = { showPacksMenu = false },
             title = { Text("Select Pack of Experts") },
             text = {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
                     items(state.availablePacks) { pack ->
-                        val isSelected = selectedNewPack == pack
+                        val isSelected = currentPack == pack
+
                         PackCard(pack, isSelected) {
-                            if (!isSelected)
-                                selectedNewPack = pack
+                            if (!isSelected) {
+                                appActions.switchPack(pack)
+                            }
                             showPacksMenu = false
                         }
                     }
                 }
             },
-            confirmButton = { TextButton(onClick = { showPacksMenu = false }) { Text("Close") } }
-        )
-    }
-
-    if (selectedNewPack != null && selectedNewPack != currentPack) {     // Switch confirmation dialog
-        val newPackName: String = selectedNewPack!!.name
-        AlertDialog(
-            onDismissRequest = { selectedNewPack = null },
-            title = { Text("Switch Pack?") },
-            text = { Text("Switching to '$newPackName' may unload current experts. Proceed?") },
             confirmButton = {
-                Button(onClick = {
-                    appActions.switchPack(selectedNewPack!!) // HERE
-                    selectedNewPack = null
-                }) { Text("Confirm") }
-            },
-            dismissButton = {
-                TextButton(onClick = { selectedNewPack = null }) { Text("Cancel") }
+                TextButton(
+                    onClick = { showPacksMenu = false }
+                ) {
+                    Text("Close")
+                }
             }
         )
     }

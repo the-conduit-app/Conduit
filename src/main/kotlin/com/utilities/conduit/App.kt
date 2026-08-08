@@ -20,19 +20,19 @@ val AppJson = Json { prettyPrint = true; allowComments = true; ignoreUnknownKeys
 @Composable
 fun App(exitApplication: () -> Unit) {
     val scope = rememberCoroutineScope()
-    val state = remember { AppState.createNew(scope = scope) }
+
+    val maxTokensPerResponse = 2048L
+    val conduitPtr = remember { LlmPortal.createConduit(maxTokensPerResponse) }
+    val state = remember { AppState.createNew(conduitPtr, scope = scope) }
 
     DisposableEffect(Unit) {
         Runtime.getRuntime().addShutdownHook(
             Thread {
-                //Trace.log("Shutdown hook entered")
                 runBlocking {
                     state.shutdown()
                 }
-                //Trace.log("Shutdown hook exiting")
             }
         )
-
         onDispose { }
     }
 
@@ -46,10 +46,18 @@ fun App(exitApplication: () -> Unit) {
 
         val defaultPack = packs.find { it.id == "Default" } ?: error("Default pack not found")
         defaultPack.select(state)
-
-        scope.launch {state.systemExpert.modelState?.initialize() }
-
         defaultPack.initializeExperts(state, scope) // may launch several model.inits
+
+        state.systemExpert.modelPath?.let { modelPath ->
+            val absoluteModelPath = AppUtils.getAbsoluteModelPath(modelPath)
+            scope.launch(Dispatchers.IO) {
+                try {
+                    state.systemExpert.sessionPtr = LlmPortal.initialize(state.conduitPtr, absoluteModelPath)
+                } catch (e: Exception) {
+                    Trace.log("System expert initialization failed: ${e.message}")
+                }
+            }
+        }
 
         val echoExpert = defaultPack.experts.find { it.modelPath == InternalExperts.SIMPLE_ECHO }
         state.currentExpert.value = echoExpert

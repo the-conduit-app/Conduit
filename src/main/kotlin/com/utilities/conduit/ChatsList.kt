@@ -13,12 +13,13 @@ import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.BasicFileAttributes
-import java.util.Collections
+import java.util.*
 
 data class ChatsListItem(
     val chat: Chat,
     val creationTime: Long,
-    val modificationTime: Long
+    val modificationTime: Long,
+    val needsHumanReview: Boolean = false
 )
 
 class ChatsList(
@@ -62,7 +63,6 @@ class ChatsList(
         }
         val newItems = chatsById.values.toMutableList()
         newItems.sortByDescending { it.modificationTime }
-        println("Loaded ${newItems.size} chats")
 
         withContext(Dispatchers.Main) {
             items.clear()
@@ -115,7 +115,7 @@ class ChatsList(
             val oldTitle = item.chat.title
             try {
                 val updatedChat = item.chat.copy(title = newTitle)
-                ChatUtils.saveChatToDisk(updatedChat)
+                ChatUtils.saveChatToDisk(updatedChat) // Ignore returned Item
 
                 val chatDir = Paths.get(getAppPath(), "chats")
                 val oldFileName = makeChatFileName(item.chat.id, oldTitle)
@@ -147,4 +147,32 @@ class ChatsList(
 
         needsScrollingToTop = true
     }
+
+//    suspend fun runMaintenance(systemExpert: Expert?) {
+//        Trace.log("Maintenance pass starting - SystemExpert: ${systemExpert?.nickname} ")
+//        if (systemExpert == null) return
+//
+//        for (index in items.indices) {
+//            val item = items[index]
+//            if (!item.chat.title.equals("Welcome to Conduit", ignoreCase = true))
+//                continue
+//            Trace.log("Auto-renaming chat ${item.chat.title}")
+//            val newTitle = ChatUtils.generateChatTitle(systemExpert, item.chat)
+//            Trace.log("Suggested title: \"$newTitle\"")
+//
+//            if (newTitle.equals(item.chat.title, ignoreCase = true)) {
+//                Trace.log("Title unchanged")
+//                continue
+//            }
+//            val updatedChat = rename(item, newTitle) ?: continue
+//
+//            items[index] = item.copy(
+//                chat = updatedChat,
+//                modificationTime = System.currentTimeMillis(),
+//                needsHumanReview = true
+//            )
+//            Trace.log("Renamed to '$newTitle'")
+//        }
+//        Trace.log("Maintenance pass complete")
+//    }
 }

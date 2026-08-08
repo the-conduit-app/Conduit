@@ -15,11 +15,18 @@ data class Chat(
     var rootNodeId: String?,
     var currentLeafNodeId: String? = null,
     var title: String,
+    var needsHumanReview: Boolean = false,
     val nodes: MutableMap<String, Node> = mutableMapOf(),
 
     @Transient
     var currentLeafNode: Node? = null,
-    ) {
+
+    @Transient
+    var renameStatus: ChatRenameStatus = ChatRenameStatus.NONE,
+
+) {
+    var isGenerating by mutableStateOf(false)
+
     companion object {
         fun create(title: String): Chat {
             return Chat(
@@ -29,13 +36,18 @@ data class Chat(
             )
         }
     }
+
     fun restoreTransients() {
         currentLeafNode = currentLeafNodeId?.let(nodes::get)
     }
+
     fun syncTransients() {
         currentLeafNodeId = currentLeafNode?.id
     }
 }
+
+// Used for automatic chat renaming
+enum class ChatRenameStatus { NONE, GENERATING, DONE }
 
 // ---------------------------------------------------------------------------
 @Serializable

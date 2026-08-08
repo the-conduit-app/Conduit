@@ -2,39 +2,24 @@ package com.utilities.conduit
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.seconds
 
 @Composable
 fun MainScreen(state: AppState) {
-    val appActions = LocalActions.current
+    // launchMaintenance (Aug 5) sweeps thru chats list and renames default titles in the bg
+//    LaunchedEffect(Unit) {
+//        while (true) {
+//            state.chatsList.runMaintenance(state.systemExpert)
+//            delay(10.seconds)
+//        }
+//    }
 
     Row(modifier = Modifier.fillMaxSize()) {
-        LeftPanelView(state = state, modifier = Modifier.weight(1f).fillMaxHeight())
-        Box(
-            modifier = Modifier
-                .weight(2f)
-                .fillMaxHeight()
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                ChatControlsView(state)
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        ChatView(state)
-                    }
-                    ChatViewNotification(
-                        state = state,
-                        modifier = Modifier.align(Alignment.TopCenter)
-                    )
-                }
-
-                InputArea(state, onSend = { userPrompt -> appActions.onSend(userPrompt) })
-            }
-        }
+        AppLeftView(state = state, modifier = Modifier.weight(1f))
+        AppRightView(state = state, modifier = Modifier.weight(1f))
     }
 }

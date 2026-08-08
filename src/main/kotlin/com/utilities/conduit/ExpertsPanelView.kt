@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 fun ExpertsPanelView(
     state: AppState,
     onExpertSwitch: (Expert) -> Unit,
-    onExpertRetry: (Expert) -> Unit
 ) {
     val expertList = state.currentPack.value?.experts.orEmpty()
     if (expertList.isEmpty()) {
@@ -35,17 +34,10 @@ fun ExpertsPanelView(
     ) {
         expertList.forEachIndexed { index, expert ->
             Box(modifier = Modifier.weight(1f)) {
-                val status = expert.modelState?.status
-
-                val bgColor = if (status == ModelStatus.READY)
-                    ExpertTheme.getExpertColor(index) else Color.LightGray
-
+                val bgColor = if (expert.isReady) ExpertTheme.getExpertColor(index) else Color.LightGray
                 ExpertIcon(state, expert, bgColor) {
-                    when (status) {
-                        ModelStatus.READY -> onExpertSwitch(expert)
-                        ModelStatus.FAILED -> onExpertRetry(expert)
-                        else -> {}
-                    }
+                    if (expert.isReady)
+                        onExpertSwitch(expert)
                 }
             }
         }
@@ -73,7 +65,6 @@ object ExpertTheme {
 @Composable
 fun ExpertIcon(state: AppState, expert: Expert, bgColor: Color, onClick: () -> Unit) {
     val isCurrent = state.currentExpert.value?.id == expert.id
-    val modelState = expert.modelState
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -85,20 +76,18 @@ fun ExpertIcon(state: AppState, expert: Expert, bgColor: Color, onClick: () -> U
             border = if (isCurrent) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
             modifier = Modifier.width(60.dp).height(60.dp)
         ) {
-            val clickable = modelState?.status == ModelStatus.READY || modelState?.status == ModelStatus.FAILED
+            val ready = expert.sessionPtr != null
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = (if (clickable) Modifier.clickable(onClick = onClick) else Modifier)
-                    .padding(vertical = 2.dp)
+                modifier = (if (ready) Modifier.clickable(onClick = onClick) else Modifier).padding(vertical = 2.dp)
             ) {
-                when (modelState?.status) {
-                    ModelStatus.LOADING -> CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White)
-                    ModelStatus.READY   -> Icon(Icons.Default.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
-                    ModelStatus.FAILED -> Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
-                    else -> {}
-                }
+                if (expert.isReady)
+                    Icon(Icons.Default.Person, contentDescription = null, tint = Color.White, modifier = Modifier.size(32.dp))
+                else
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White)
+
                 Text(expert.expertise, style = MaterialTheme.typography.labelSmall, color = Color.White, maxLines = 1)
             }
         }

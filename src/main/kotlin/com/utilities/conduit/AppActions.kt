@@ -6,10 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.time.Instant
 
 class AppActions(
     private val scope: CoroutineScope,
@@ -27,15 +24,6 @@ class AppActions(
         state.notification.trigger(msg)
     }
 
-    fun retryExpertInitialization(expert: Expert) {
-        if (expert.modelPath == state.systemExpert.modelPath)
-            return
-
-        scope.launch(Dispatchers.IO) {
-            expert.modelState?.retryInitialization()
-        }
-    }
-
     // This is given just the name of the pack (from the JSON file name).
     fun switchPack(newPack: Pack) {
         if (state.currentPack.value == newPack)
@@ -43,6 +31,10 @@ class AppActions(
         state.expertsMap.clear()
         state.currentPack.value = newPack
         state.currentExpert.value = null
+
+        newPack.experts.forEach { expert ->
+            state.expertsMap[expert.id] = expert
+        }
 
         scope.launch(Dispatchers.IO) {
             try {
@@ -58,6 +50,9 @@ class AppActions(
     //--------------------------------------------------------------------------------------------
     // Called when the user hits the SEND button on the prompt (InputArea.kt)
     fun onSend(userText: String) {
+        val needsChatListInsertion = state.chatManager.currentChat.nodes.isEmpty()
+        val currentChat = state.chatManager.currentChat
+        
         // First, find out if the user specifically mentioned (Hi, Hey) a particular expert in the prompt.
         val expert = findTaggedExpert(userText, state.expertsMap.values.toList())
             ?: state.currentExpert.value
@@ -67,8 +62,11 @@ class AppActions(
                 state.notification.trigger("Please select or tag an expert to whom your prompt should be sent.")
                 return@launch
             }
+            if (!expert.isReady) {
+                state.notification.trigger("${expert.nickname} is still loading")
+                return@launch
+            }
 
-            val currentChat = state.chatManager.currentChat
             val parentTimeStamp = currentChat.currentLeafNode?.createdAt
             val parentNode = currentChat.currentLeafNode
 
@@ -96,9 +94,14 @@ class AppActions(
                 )
             )
 
-            state.chatManager.addNode(userNode) // unused return value
-            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(currentChat, userNode.id)
-            val messages = effectiveHistory.mapNotNull { it.message }
+            val chatListItem: ChatsListItem = state.chatManager.addNode(userNode)
+
+            if (needsChatListInsertion) { // first node in chat
+                withContext(Dispatchers.Main) {
+                    state.chatsList.add(chatListItem)
+                }
+            }
+
             val item = state.chatManager.addNode(responseNode)
 
             withContext(Dispatchers.Main) {
@@ -106,15 +109,16 @@ class AppActions(
                 responseNode.message?.textInProgress?.value = ""
             }
 
-            state.chatManager.clearAbortRequest()
+            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(currentChat, userNode.id)
+            val messages = effectiveHistory.mapNotNull { it.message }
             val startTime = System.currentTimeMillis()
-            Trace.log("expert = ${System.identityHashCode(expert)}")
-            Trace.log("modelState = ${System.identityHashCode(expert.modelState)}")
-            withContext(Dispatchers.Main) { expert.modelState?.updateStatus(ModelStatus.GENERATING) }
+
+            // Note: Aug 7. beginResponse and finishResponse were put in to be able to
+            // stop a response request while the decode hasn't yet started (i.e. spinner,
+            // not streaming)
+            state.chatManager.beginCurrentResponse(expert)
             expert.getResponse(messages)
                 .onCompletion { cause ->
-                    Trace.log("Flow completed: cause=$cause")
-
                     val duration = System.currentTimeMillis() - startTime
                     val status = when (cause) {
                         null -> MessageStatus.COMPLETE
@@ -125,13 +129,8 @@ class AppActions(
                     withContext(Dispatchers.Main) {
                         when (cause) {
                             null, is CancellationException -> {
-                                responseNode.message?.textInProgress?.value += "^C"
-                                Trace.log("Setting model status to READY")
-                                expert.modelState?.updateStatus(ModelStatus.READY)
-                                Trace.log("status=${expert.modelState?.status}, live=${expert.modelState?.liveStatus}")
-                            }
-                            else ->
-                                expert.modelState?.updateStatus(ModelStatus.FAILED)
+                                if (cause is CancellationException)
+                                    responseNode.message?.textInProgress?.let { it.value += "^C" }                            }
                         }
 
                         responseNode.message?.apply {
@@ -146,13 +145,9 @@ class AppActions(
                     if (status == MessageStatus.INTERRUPTED) {
                         state.notification.trigger("Response interrupted by user.")
                     }
+                    state.chatManager.finishCurrentResponse()
                 }
                 .collect { chunk ->
-                    // Abort can be requested from the generation loop (i.e. stop button)
-                    if (state.chatManager.isAbortRequested) {
-                        expert.abortResponse()
-                        throw CancellationException("Aborted by user")
-                    }
                     withContext(Dispatchers.Main) {
                         responseNode.message?.textInProgress?.value += chunk
                     }

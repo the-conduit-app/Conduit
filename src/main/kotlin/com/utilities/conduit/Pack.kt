@@ -1,10 +1,12 @@
 package com.utilities.conduit
 
+import com.utilities.conduit.AppUtils.getAppPath
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import java.nio.file.Paths
 
 @Serializable
 data class Pack(
@@ -18,18 +20,19 @@ data class Pack(
     fun select(state: AppState) {
         state.expertsMap.clear()
         state.expertsMap.putAll(experts.associateBy { it.id })
-
-        experts.forEach { expert ->
-            val modelPath = expert.modelPath ?: return@forEach
-            expert.modelState = state.getModelState(modelPath)
-        }
-
         state.currentPack.value = this
     }
 
     suspend fun initializeExperts(state: AppState, scope: CoroutineScope) {
         experts.forEach { expert ->
-            scope.launch(Dispatchers.IO) { expert.modelState?.initialize() }
+            val modelPath = expert.modelPath ?: return@forEach
+            if (expert.type != ExpertType.LOCAL) return@forEach
+
+            val absoluteModelPath = AppUtils.getAbsoluteModelPath(modelPath)
+
+            scope.launch(Dispatchers.IO) {
+                expert.sessionPtr = LlmPortal.initialize(state.conduitPtr, absoluteModelPath)
+            }
         }
     }
 }

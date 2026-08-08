@@ -1,6 +1,7 @@
 package com.utilities.conduit
 
 import com.sun.jna.Pointer
+import com.utilities.conduit.LlmPortal.conduitLib
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import java.io.File
@@ -8,38 +9,28 @@ import java.lang.Thread.interrupted
 import kotlin.coroutines.cancellation.CancellationException
 
 object LlmPortal {
-    private val conduitLibPath = run {
-        AppUtils.getNativeLibPath("libconduit.dylib")
-    }
+    private val conduitLibPath = AppUtils.getNativeLibPath("libconduit.dylib")
+    val conduitLib: ConduitLib = com.sun.jna.Native.load(conduitLibPath, ConduitLib::class.java)
 
-    val conduitLib: ConduitLib = run {
-        com.sun.jna.Native.load(conduitLibPath, ConduitLib::class.java)
-    }
+    fun createConduit(maxTokens: Long): Pointer = conduitLib.conduit_create(maxTokens)
+            ?: error("Failed to create Conduit")
+    fun destroyConduit(conduit: Pointer) { conduitLib.conduit_destroy(conduit) }
 
-    init {
-        conduitLib.conduit_llm_init() // for llama_backend init
-
-    }
-    fun freeSession(session: Pointer) {
-        conduitLib.conduit_llm_free_session(session)
-    }
-
-    fun shutdown() {
-        conduitLib.conduit_llm_free()
+    fun freeSession(conduitPtr: Pointer, sessionPtr: Pointer) {
+        conduitLib.conduit_destroy_session(conduitPtr, sessionPtr)
     }
 
     // ---------------------------------------------------------------------------------
-    // Potentially time-consuming - Ensure it's within IO Thread
     // Potentially time-consuming - Ensure it's called from an IO thread.
-    fun initialize(absoluteModelPath: String): Pointer {
+    fun initialize(conduitPtr: Pointer, absoluteModelPath: String): Pointer {
         if (!File(absoluteModelPath).exists()) {
             throw IllegalArgumentException("Model file not found at: $absoluteModelPath")
         }
 
-        val session = conduitLib.conduit_llm_get_session(absoluteModelPath)
+        val sessionPtr = conduitLib.conduit_create_session(conduitPtr, absoluteModelPath)
             ?: throw RuntimeException("Failed to load model: $absoluteModelPath")
 
-        return session
+        return sessionPtr
     }
 
     // ---------------------------------------------------------------------------------
@@ -50,16 +41,26 @@ object LlmPortal {
             }
         }
 
-        val rc = conduitLib.conduit_session_generate(sessionPtr, prompt, callback, null)
+        val rc = conduitLib.conduit_generate(sessionPtr, prompt, callback, null)
         when (rc) {
-            0 -> { Trace.log("normal close"); close() }
-            1 -> { Trace.log("cancelled flow close"); close(CancellationException("Generation interrupted")) }
-            else -> { Trace.log("error flow rc = $rc"); close(RuntimeException("Generation failed (rc=$rc)")) }
+            ConduitLib.OK -> {
+                close()
+            }
+            ConduitLib.OUTPUT_MAXED -> {
+                trySend("\n\n[LARGE MESSAGE TRUNCATED]")
+                close()
+            }
+            ConduitLib.ABORTED -> {
+                close(CancellationException("Aborted by user"))
+            }
+            else -> {
+                close(RuntimeException("Generation failed (rc=$rc)"))
+            }
         }
     }
 
-    fun abortResponse(sessionPtr: Pointer?) {
+    fun abortResponse(sessionPtr: Pointer) {
         requireNotNull(sessionPtr) { "LlmPortal couldn't find a session to abort" }
-        conduitLib.conduit_session_abort_decode(sessionPtr)
+        conduitLib.conduit_abort_generation(sessionPtr)
     }
 }

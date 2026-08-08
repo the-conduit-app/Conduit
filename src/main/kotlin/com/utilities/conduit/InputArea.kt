@@ -18,16 +18,20 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun InputArea(state: AppState, onSend: (String) -> Unit) {
+    @Suppress("UNUSED_VARIABLE")
+    val version = state.chatManager.version // Observe structural chat changes
+
     var text by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
-    val isGenerating = (state.currentExpert.value?.modelState?.status == ModelStatus.GENERATING)
+    val isGenerating = state.chatManager.currentChat.currentLeafNode?.message?.textInProgress?.value != null
 
-    LaunchedEffect(state.currentExpert.value?.modelState?.status) {
-        Trace.log(
-            "UI expert=${System.identityHashCode(state.currentExpert.value)} " +
-                    "modelState=${System.identityHashCode(state.currentExpert.value?.modelState)} " +
-                    "status=${state.currentExpert.value?.modelState?.status}"
-        )
+    // value incremented by ChatsListView when selecting a new chat (to force recomp)
+    LaunchedEffect(state.focusInput.value, isGenerating) {
+        focusRequester.requestFocus()
+    }
+    // User is free to switch experts via the Experts panel (for next prompt) during generation
+    LaunchedEffect(state.currentExpert.value) {
+        focusRequester.requestFocus()
     }
 
     Row(
@@ -73,12 +77,6 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
                     }
                 }
         )
-
-        LaunchedEffect(state.currentExpert.value, isGenerating) {
-            if (!isGenerating) {
-                focusRequester.requestFocus()
-            }
-        }
 
         Spacer(modifier = Modifier.width(8.dp))
 

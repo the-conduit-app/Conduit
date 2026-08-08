@@ -30,14 +30,19 @@ class Expert(
     }
 
     // Runtime state shared by all Experts using the same model.
-    @Transient
-    var modelState: ModelState? = null
+    var sessionPtr by mutableStateOf<Pointer?>(null)
+    val isReady: Boolean
+        get() = when (type) {
+            ExpertType.LOCAL -> sessionPtr != null
+            else -> true
+        }
+
 
     fun getResponse(messages: List<ChatMessage>): Flow<String> =
         handler.generateResponse(this, messages)
 
     fun abortResponse() {
-        handler.abortResponse(modelState)
+        handler.abortResponse(this)
     }
 }
 

@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text2.input.TextFieldState.Saver.restore
 import androidx.compose.material3.HorizontalDivider
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -55,14 +57,12 @@ fun ChatsListView(state: AppState) {
     ) {
         LazyColumn(
             state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 8.dp)
+            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)
         ) {
-            items(
+            itemsIndexed(
                 items = chatsList.items,
-                key = { it.chat.id }
-            ) { item ->
+                key = { _, item -> item.chat.id }
+            ) { index, item ->
                 val isCurrent = item.chat.id == state.chatManager.currentChat.id
 
                 ContextMenuArea(
@@ -94,7 +94,13 @@ fun ChatsListView(state: AppState) {
                                     Color.Transparent
                             )
                             .clickable(enabled = enabled) {
-                                state.chatManager.currentChat = item.chat
+                                scope.launch {
+                                    state.screenCurtain.show()
+                                    state.chatManager.currentChat = item.chat
+                                    state.chatsList.items[index] = item.copy(needsHumanReview = false)
+                                    state.screenCurtain.hide()
+                                    state.focusInput.value++ // just to trigger recomp of input area
+                                }
                             }
                             .padding(horizontal = 4.dp, vertical = 4.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -105,7 +111,8 @@ fun ChatsListView(state: AppState) {
                             modifier = Modifier.weight(1f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = if (item.needsHumanReview) FontWeight.SemiBold else FontWeight.Normal
                         )
 
                         Spacer(Modifier.width(8.dp))
