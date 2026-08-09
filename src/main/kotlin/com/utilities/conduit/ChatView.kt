@@ -1,10 +1,5 @@
 package com.utilities.conduit
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,13 +12,12 @@ import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -34,7 +28,6 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun ColumnScope.ChatView(state: AppState) {
     val version = state.chatManager.version // DO NOT REMOVE - recomp trigger
-    //    val chatBackground = Color(0xFFF5F5F5)
     val chatBackground = Color.Transparent
     // TODO make chat background exact same color as parent bg.
     val chat = state.chatManager.currentChat
@@ -62,9 +55,11 @@ fun ColumnScope.ChatView(state: AppState) {
         ) {
             items(historyNodes) { node -> MessageBubble(state, node = node) }
         }
-        if (state.screenCurtain.isActive) {
+        if (state.rightScreenCurtain.isActive) {
+            val screenColor = Color(0xFFF2F2F2) ////
             Box(modifier = Modifier
-                .matchParentSize().alpha(state.screenCurtain.opacity).background(chatBackground)
+                .clip(RoundedCornerShape(12.dp))
+                .matchParentSize().alpha(state.rightScreenCurtain.opacity).background(screenColor)
             )
         }
     }

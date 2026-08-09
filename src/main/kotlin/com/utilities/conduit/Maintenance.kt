@@ -19,15 +19,11 @@ object Maintenance {
     fun start(state: AppState, scope: CoroutineScope) {
         val chatsList = state.chatsList
 
-        Trace.log("Maintenance start, Generating expert = ${state.chatManager.currentlyGeneratingExpert}")
         scope.launch(Dispatchers.Default) {
             while (isActive) {
                 if (state.chatManager.currentlyGeneratingExpert == null) {
-                    Trace.log("Title maintenance run")
                     runTitleMaintenance(state, chatsList)
                 }
-
-                Trace.log("Maintenance 10s sleep")
                 delay(10_000.milliseconds)
             }
         }
@@ -45,17 +41,13 @@ object Maintenance {
             if (state.chatManager.currentlyGeneratingExpert != null)
                 return
 
-            Trace.log("Auto-renaming chat ${item.chat.title}")
             val newTitle = ChatUtils.generateChatTitle(systemExpert, item.chat)
-            Trace.log("Suggested title: \"$newTitle\"")
-
             if (newTitle.equals(item.chat.title, ignoreCase = true))
                 continue
 
             chatsList.rename(item, newTitle)
             chatsList.setNeedsHumanReview(item.chat.id, true)
 
-            Trace.log("MaintTitle Yielding")
             yield()
         }
     }

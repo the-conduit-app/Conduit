@@ -23,7 +23,9 @@ class AppState(
     var chatsList by mutableStateOf(ChatsList())
     var availablePacks by mutableStateOf(emptyList<Pack>())
     val notification = Notification(scope)
-    val screenCurtain = ScreenCurtain(scope)
+
+    val rightScreenCurtain = ScreenCurtain(scope)
+    val leftScreenCurtain = ScreenCurtain(scope)
 
     var leftPanelMode by mutableStateOf(LeftPanelMode.LIST)
     val focusInput = mutableStateOf(0)

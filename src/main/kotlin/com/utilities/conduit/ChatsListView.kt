@@ -4,47 +4,44 @@ import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text2.input.TextFieldState.Saver.restore
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import com.utilities.conduit.ChatUtils.generateChatTitle
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.yield
 
 @Composable
 fun ChatsListView(state: AppState) {
     val chatsList = state.chatsList
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(chatsList.needsScrollingToTop) {
         if (chatsList.needsScrollingToTop) {
             listState.animateScrollToItem(0)
             chatsList.needsScrollingToTop = false
         }
+    }
+    LaunchedEffect(Unit) {
+        yield()
+        focusRequester.requestFocus()
     }
 
     val enabled = state.chatManager.currentChat.currentLeafNode?.message?.textInProgress?.value == null
@@ -57,7 +54,41 @@ fun ChatsListView(state: AppState) {
     ) {
         LazyColumn(
             state = listState,
-            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp)
+                .focusRequester(focusRequester)
+                .focusable()
+                .onPreviewKeyEvent { event ->
+                    if (event.type != KeyEventType.KeyDown)
+                        return@onPreviewKeyEvent false
+
+                    val direction = when (event.key) {
+                        Key.DirectionUp -> -1
+                        Key.DirectionDown -> 1
+                        else -> return@onPreviewKeyEvent false
+                    }
+
+                    scope.launch {
+                        val currentIndex = chatsList.items.indexOfFirst {
+                            it.chat.id == state.chatManager.currentChat.id
+                        }
+                        val newIndex = currentIndex + direction
+
+                        if (currentIndex >= 0 && newIndex in chatsList.items.indices) {
+                            val item = chatsList.items[newIndex]
+
+                            state.rightScreenCurtain.show()
+                            state.chatManager.currentChat = item.chat
+                            chatsList.setNeedsHumanReview(item.chat.id, false)
+                            state.rightScreenCurtain.hide()
+                            state.focusInput.value++
+
+                            //listState.animateScrollToItem(newIndex)
+                        }
+                    }
+                    true
+                }
         ) {
             itemsIndexed(
                 items = chatsList.items,
@@ -95,10 +126,10 @@ fun ChatsListView(state: AppState) {
                             )
                             .clickable(enabled = enabled) {
                                 scope.launch {
-                                    state.screenCurtain.show()
+                                    state.rightScreenCurtain.show()
                                     state.chatManager.currentChat = item.chat
-                                    state.chatsList.items[index] = item.copy(needsHumanReview = false)
-                                    state.screenCurtain.hide()
+                                    state.chatsList.setNeedsHumanReview(item.chat.id, false)
+                                    state.rightScreenCurtain.hide()
                                     state.focusInput.value++ // just to trigger recomp of input area
                                 }
                             }

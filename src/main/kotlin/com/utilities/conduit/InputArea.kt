@@ -27,11 +27,13 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
 
     // value incremented by ChatsListView when selecting a new chat (to force recomp)
     LaunchedEffect(state.focusInput.value, isGenerating) {
-        focusRequester.requestFocus()
+        if (state.leftPanelMode != LeftPanelMode.LIST)
+            focusRequester.requestFocus()
     }
     // User is free to switch experts via the Experts panel (for next prompt) during generation
     LaunchedEffect(state.currentExpert.value) {
-        focusRequester.requestFocus()
+        if (state.leftPanelMode != LeftPanelMode.LIST)
+            focusRequester.requestFocus()
     }
 
     Row(

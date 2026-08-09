@@ -12,6 +12,8 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.nio.file.Files
 import java.nio.file.Paths
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
 
 // App level global constants
 val LocalActions = staticCompositionLocalOf<AppActions> { error("No AppActions provided") }
@@ -48,6 +50,7 @@ fun App(exitApplication: () -> Unit) {
         defaultPack.select(state)
         defaultPack.initializeExperts(state, scope) // may launch several model.inits
 
+        // Launch the system expert
         state.systemExpert.modelPath?.let { modelPath ->
             val absoluteModelPath = AppUtils.getAbsoluteModelPath(modelPath)
             scope.launch(Dispatchers.IO) {
