@@ -13,19 +13,15 @@ data class Chat(
     val id: String,
     val createdAt: Long = System.currentTimeMillis(),
     var rootNodeId: String?,
-    var currentLeafNodeId: String? = null,
+    var cursorNodeId: String? = null,
     var title: String,
     var needsHumanReview: Boolean = false,
     val nodes: MutableMap<String, Node> = mutableMapOf(),
 
     @Transient
-    var currentLeafNode: Node? = null,
-
-    @Transient
     var renameStatus: ChatRenameStatus = ChatRenameStatus.NONE,
-
-) {
-    var isGenerating by mutableStateOf(false)
+    ) {
+    //var isGenerating by mutableStateOf(false)
 
     companion object {
         fun create(title: String): Chat {
@@ -35,14 +31,6 @@ data class Chat(
                 rootNodeId = null
             )
         }
-    }
-
-    fun restoreTransients() {
-        currentLeafNode = currentLeafNodeId?.let(nodes::get)
-    }
-
-    fun syncTransients() {
-        currentLeafNodeId = currentLeafNode?.id
     }
 }
 
@@ -59,7 +47,7 @@ data class Node(
     val children: MutableList<String> = mutableListOf(),
 
     val message: ChatMessage?, // Payload
-    val summaryToThisNode: String? = null
+    val historySummary: String? = null
 ) {
     companion object {
         fun create(

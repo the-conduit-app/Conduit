@@ -36,7 +36,7 @@ object LocalExpertHandler : ExpertHandler {
     override fun generateResponse(expert: Expert, messages: List<ChatMessage>): Flow<String> {
         val sessionPtr = expert.sessionPtr ?: error("Expert '${expert.nickname}': LLM session not found.")
 
-        val prompt: String = buildPrompt(expert, messages)
+        val prompt: String = buildFinalPrompt(expert, messages)
         return LlmPortal.getResponse(sessionPtr, prompt)
     }
 
@@ -46,7 +46,7 @@ object LocalExpertHandler : ExpertHandler {
         }
     }
 
-    private fun buildPrompt(expert: Expert, messages: List<ChatMessage>): String {
+    private fun buildFinalPrompt(expert: Expert, messages: List<ChatMessage>): String {
         return buildString {
 
             expert.seedPrompt
@@ -67,6 +67,13 @@ object LocalExpertHandler : ExpertHandler {
                 append("<|im_start|>")
                 append(role)
                 append('\n')
+
+                if (msg.author.type == AuthorType.ASSISTANT) {
+                    val nickname = msg.title?.substringBefore("·")?.trim()
+                    if (!nickname.isNullOrEmpty())
+                    append("${nickname}: ")
+                }
+
                 append(msg.text)
                 append("\n<|im_end|>\n")
             }

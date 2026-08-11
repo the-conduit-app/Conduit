@@ -58,11 +58,8 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-
                 Row(verticalAlignment = Alignment.CenterVertically) {
-
                     when (state.leftPanelMode) {
-
                         LeftPanelMode.LIST -> {
                             // New chat ------------------------------------------------
                             Spacer(Modifier.width(6.dp))
@@ -72,7 +69,6 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
                                 enabled = state.chatManager.currentlyGeneratingExpert == null,
                                 onClick = {
                                     val chat = state.chatManager.createChat()
-                                    Trace.log("Created new chat ${chat.id}")
                                     state.focusInput.value++
                                     state.chatManager.currentChat = chat
                                 }

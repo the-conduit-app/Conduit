@@ -56,7 +56,6 @@ class ChatsList(
             for (path in paths) {
                 try {
                     val chat = AppJson.decodeFromString<Chat>(Files.readString(path))
-                    chat.restoreTransients()
                     val attrs = Files.readAttributes(path, BasicFileAttributes::class.java)
 
                     val item = ChatsListItem(

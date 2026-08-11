@@ -23,10 +23,11 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
 
     var text by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
-    val isGenerating = state.chatManager.currentChat.currentLeafNode?.message?.textInProgress?.value != null
+    val isGenerating = state.chatManager.isGenerating
 
     // value incremented by ChatsListView when selecting a new chat (to force recomp)
     LaunchedEffect(state.focusInput.value, isGenerating) {
+        ////println("INPUT FOCUS: expert changed to ${state.currentExpert.value?.nickname}")
         if (state.leftPanelMode != LeftPanelMode.LIST)
             focusRequester.requestFocus()
     }

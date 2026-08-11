@@ -16,7 +16,6 @@ object EchoPortal {
 
     fun getResponse(expert: Expert, text: String): Flow<String> {
         val prompt = text.trim()
-        println("Getting echo response for $prompt") ////
 
         cancelRequested = false
         val response = when (expert.modelPath) {

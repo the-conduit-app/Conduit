@@ -1,7 +1,6 @@
 package com.utilities.conduit
 
 import com.utilities.conduit.AppUtils.getChatsDir
-import jdk.internal.misc.Blocker.end
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -15,6 +14,7 @@ import java.nio.file.attribute.BasicFileAttributes
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.io.path.writeText
 
 object AppUtils {
@@ -106,7 +106,7 @@ object ChatUtils {
 
     suspend fun saveChatToDisk(chat: Chat): ChatsListItem {
         chatUtilsMutex.withLock {
-            chat.syncTransients()
+            //chat.syncTransients()
 
             return withContext(Dispatchers.IO) {
                 val file = Paths.get(getChatsDir()).resolve(makeChatFileName(chat.id, chat.title))
@@ -149,7 +149,7 @@ object ChatUtils {
             if (authorType == AuthorType.USER || authorType == AuthorType.ASSISTANT) {
                 history.add(node)
             }
-            if (node.summaryToThisNode != null) {
+            if (node.historySummary != null) {
                 break
             }
             currentId = node.parentId
@@ -162,7 +162,7 @@ object ChatUtils {
             val oldTitle : String = chat.title
             val maxTextLen = 250
 
-            var messages = getEffectiveNodeHistory(chat, chat.currentLeafNodeId)
+            var messages = getEffectiveNodeHistory(chat, chat.cursorNodeId)
                 .mapNotNull { it.message }
                 .map { message ->
                     if (message.author.type == AuthorType.ASSISTANT && message.text.length > maxTextLen) {
@@ -193,5 +193,62 @@ object ChatUtils {
             val newTitle = result.toString().trim()
             return newTitle.ifEmpty { oldTitle }
         }
+    }
+
+    suspend fun generateHistorySummary(systemExpert: Expert, chat: Chat, node: Node): String {
+        chatUtilsMutex.withLock {
+            val history = getEffectiveNodeHistory(chat, node.id) + node
+
+            val previousSummary =
+                history.firstOrNull()?.historySummary.orEmpty()
+
+            val conversation = history
+                .mapNotNull { it.message }
+                .joinToString("\n\n") { message ->
+                    "${message.author.type}: ${message.text}"
+                }
+
+            val prompt = PROMPTS.HISTORY_SUMMARY_GENERATION
+                .replace("{PREVIOUS_SUMMARY}", previousSummary)
+                .replace("{CONVERSATION}", conversation)
+
+            val messages = listOf(
+                ChatMessage(
+                    author = MessageAuthor(type = AuthorType.SYSTEM),
+                    text = prompt
+                )
+            )
+
+            Trace.log("HISTORY SUMMARY START session=${systemExpert.sessionPtr}")
+
+            val result = StringBuilder()
+            try {
+                systemExpert.getResponse(messages).collect { token ->
+                    result.append(token)
+                }
+                Trace.log("HISTORY SUMMARY END session=${systemExpert.sessionPtr}")
+            } catch (e: CancellationException) {
+                Trace.log("HISTORY SUMMARY ABORTED session=${systemExpert.sessionPtr}")
+                throw e
+            }
+
+            Trace.log("HISTORY SUMMARY END session=${systemExpert.sessionPtr}")
+
+            return result.toString().trim()
+        }
+    }
+
+    // Used to decide whether to present a node as a branching candidate
+    fun leadsToCursor(chat: Chat, node: Node): Boolean {
+        var currentId = chat.cursorNodeId
+
+        while (currentId != null) {
+            if (currentId == node.id) {
+                return true
+            }
+            currentId = chat.nodes[currentId]?.parentId
+        }
+
+        return false
     }
 }

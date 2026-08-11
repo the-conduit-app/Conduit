@@ -67,8 +67,8 @@ class AppActions(
                 return@launch
             }
 
-            val parentTimeStamp = currentChat.currentLeafNode?.createdAt
-            val parentNode = currentChat.currentLeafNode
+            val parentNode = currentChat.nodes[currentChat.cursorNodeId]
+            val parentTimeStamp = parentNode?.createdAt
 
             val userNode = Node.create(
                 type = NodeType.TEXT,
