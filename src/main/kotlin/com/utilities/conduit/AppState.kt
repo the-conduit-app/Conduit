@@ -59,5 +59,6 @@ class AppState(
 
     suspend fun shutdown() = withContext(Dispatchers.IO) {
         LlmPortal.conduitLib.conduit_destroy(conduitPtr)
+        UserActivityMonitor.stop()
     }
 }

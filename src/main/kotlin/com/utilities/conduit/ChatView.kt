@@ -46,7 +46,9 @@ fun ColumnScope.ChatView(state: AppState) {
             contentPadding = PaddingValues(bottom = 10.dp),
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
         ) {
-            items(historyNodes) { node -> MessageBubble(state, node = node) }
+            items(items = historyNodes, key = { node-> node.id }) {
+                node -> MessageBubble(state, node = node, childCount = node.children.size)
+            }
         }
         if (state.rightScreenCurtain.isActive) {
             val screenColor = Color(0xFFF2F2F2) ////

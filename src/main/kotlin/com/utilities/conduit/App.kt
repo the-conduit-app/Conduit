@@ -1,17 +1,17 @@
 package com.utilities.conduit
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.rememberWindowState
-import com.utilities.conduit.AppUtils.getAppPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import java.nio.file.Files
-import java.nio.file.Paths
 
 // App level global constants
 val LocalActions = staticCompositionLocalOf<AppActions> { error("No AppActions provided") }
@@ -25,22 +25,11 @@ fun App(exitApplication: () -> Unit) {
     val conduitPtr = remember { LlmPortal.createConduit(maxTokensPerResponse) }
     val state = remember { AppState.createNew(conduitPtr, scope = scope) }
 
-    DisposableEffect(Unit) {
-        Runtime.getRuntime().addShutdownHook(
-            Thread {
-                runBlocking {
-                    state.shutdown()
-                }
-            }
-        )
-        onDispose { }
-    }
-
     LaunchedEffect(Unit) {
         state.chatsList.build()        // load existing chats in the chats dir
 
         val packs = withContext(Dispatchers.IO) {
-            getAvailablePacks()
+            AppUtils.getAvailablePacks()
         }
         state.availablePacks = packs
 
@@ -63,48 +52,49 @@ fun App(exitApplication: () -> Unit) {
         val echoExpert = defaultPack.experts.find { it.modelPath == InternalExperts.SIMPLE_ECHO }
         state.currentExpert.value = echoExpert
     }
-    LaunchedEffect(Unit) { // Low priority maintenance loop (cleanup chats etc.)
-        Maintenance.start(state, scope)
+    DisposableEffect(Unit) {
+        Runtime.getRuntime().addShutdownHook(
+            Thread {
+                runBlocking {
+                    state.shutdown()
+                }
+            }
+        )
+        onDispose { }
     }
+
+    // -----------------------------------------------------------------------------------------
+
+    // Monitoring user activity for maint jobs (renaming chats, etc.)
+    LaunchedEffect(Unit) {
+        UserActivityMonitor.start(scope, onIdleJob = { Maintenance.start(state, scope) })
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            UserActivityMonitor.stop()
+        }
+    }
+
+    //------------------------------------------------------------------------------------------
 
     val windowState = rememberWindowState(
         width = 1280.dp,
         height = 800.dp
     )
+
     Window(
         state = windowState,
         title = "Conduit Workspace",
         onCloseRequest = { exitApplication() }
     ) {
         CompositionLocalProvider(LocalActions provides AppActions(scope, state)) {
-            MainScreen(state)
-        }
-    }
-}
-
-/**
- * Reads all .json files in the packs directory and parses them into Pack objects
- * IMPORTANT: NO PACK EXPERT INITIALIZATIONS (Hence not time-consuming)
- */
-suspend fun getAvailablePacks(): List<Pack> = withContext(Dispatchers.IO) {
-    val packsDir = Paths.get(getAppPath(), "packs")
-
-    if (!Files.exists(packsDir))
-        return@withContext emptyList()
-
-    Files.list(packsDir).use { stream ->
-        stream.toList()
-            .sortedBy { it.fileName.toString() }
-            .filter { it.toString().endsWith(".json") }
-            .mapNotNull { path ->
-                try {
-                    val id = path.fileName.toString().removeSuffix(".json")
-                    val json = Files.readString(path)
-                    AppJson.decodeFromString<Pack>(json).copy(id = id)
-                } catch (e: Exception) {
-                    println("Error loading pack ${path.fileName}: ${e.message}")
-                    null
-                }
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .userActivityMonitor()
+            ) {
+                MainScreen(state)
             }
+        }
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,10 +41,16 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun MessageBubble(state: AppState, node: Node) {
+fun MessageBubble(state: AppState, node: Node, childCount: Int) {
     val scope = rememberCoroutineScope()
     var showBranchingDialog by remember { mutableStateOf(false) }
-    val isBranchPoint = node.children.size > 1
+    //val isBranchPoint = node.children.size > 1
+    val isBranchPoint = childCount > 1
+    Trace.log("BUBBLE ${node.id}: children=${node.children.size} branch=$isBranchPoint")
+
+    LaunchedEffect(showBranchingDialog) {
+        //Trace.log("DIALOG STATE OBSERVER node=${node.id} flag=$showBranchingDialog")
+    }
 
     val bubbleColor = when {
         isBranchPoint && node.message?.author?.type == AuthorType.USER -> Color(0xFFF3D6DC) // Rosish
@@ -58,6 +65,7 @@ fun MessageBubble(state: AppState, node: Node) {
             .onPointerEvent(PointerEventType.Press) {
                 if (it.button?.isSecondary == true) {
                     showBranchingDialog = true
+                    Trace.log("RIGHT CLICK NODE = ${node.id}, flag = $showBranchingDialog")
                 }
             }
     ) {
@@ -99,8 +107,10 @@ fun MessageBubble(state: AppState, node: Node) {
         }
     }
 
+    //Trace.log("showBranchingDialog = ${showBranchingDialog}")
     // Branching dialog -------------------------------------------------------
     if (node.children.isNotEmpty() && showBranchingDialog) {
+       Trace.log("DIALOG STATE node=${node.id} children=${node.children.size}")
         BranchingDialog(
             state = state,
             node = node,
@@ -147,9 +157,8 @@ private fun UserMessageBubble(state: AppState, node: Node, bubbleColor: Color,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (isBranchPoint) {
-                    PulsingArrow(
-                        modifier = Modifier.size(28.dp),
-                        direction = ArrowDirection.Left,
+                    PulsingBranchIcon(
+                        modifier = Modifier.size(22.dp),
                         onClick = onBranchArrowClick
                     )
                 }
@@ -223,9 +232,8 @@ fun ExpertMessageBubble(state: AppState, node: Node, bubbleColor: Color,
                 )
 
                 if (isBranchPoint) {
-                    PulsingArrow(
-                        modifier = Modifier.size(28.dp),
-                        direction = ArrowDirection.Right,
+                    PulsingBranchIcon(
+                        modifier = Modifier.size(22.dp),
                         onClick = onBranchArrowClick
                     )
                 }

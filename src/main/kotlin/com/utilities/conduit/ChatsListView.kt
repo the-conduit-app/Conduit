@@ -39,7 +39,7 @@ fun ChatsListView(state: AppState) {
         }
     }
     LaunchedEffect(Unit) {
-        yield()
+        yield() // why? hack?
         focusRequester.requestFocus()
     }
 

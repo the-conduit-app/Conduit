@@ -52,6 +52,34 @@ object AppUtils {
                 Paths.get(getAppPath(), modelPath).toString()
     }
 
+
+    /**
+     * Reads all .json files in the packs directory and parses them into Pack objects
+     * IMPORTANT: NO PACK EXPERT INITIALIZATIONS (Hence not time-consuming)
+     */
+    suspend fun getAvailablePacks(): List<Pack> = withContext(Dispatchers.IO) {
+        val packsDir = Paths.get(getAppPath(), "packs")
+
+        if (!Files.exists(packsDir))
+            return@withContext emptyList()
+
+        Files.list(packsDir).use { stream ->
+            stream.toList()
+                .sortedBy { it.fileName.toString() }
+                .filter { it.toString().endsWith(".json") }
+                .mapNotNull { path ->
+                    try {
+                        val id = path.fileName.toString().removeSuffix(".json")
+                        val json = Files.readString(path)
+                        AppJson.decodeFromString<Pack>(json).copy(id = id)
+                    } catch (e: Exception) {
+                        println("Error loading pack ${path.fileName}: ${e.message}")
+                        null
+                    }
+                }
+        }
+    }
+
     fun formatDateRange(
         creation: Long,
         modification: Long
@@ -161,6 +189,10 @@ object ChatUtils {
         chatUtilsMutex.withLock {
             val oldTitle : String = chat.title
             val maxTextLen = 250
+
+            if (systemExpert.sessionPtr == null) {
+                error("Generating chat title for ${chat.title} return early (sysExpert = ${systemExpert.sessionPtr})")
+            }
 
             var messages = getEffectiveNodeHistory(chat, chat.cursorNodeId)
                 .mapNotNull { it.message }

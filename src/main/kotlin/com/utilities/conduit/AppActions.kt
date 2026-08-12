@@ -50,6 +50,8 @@ class AppActions(
     //--------------------------------------------------------------------------------------------
     // Called when the user hits the SEND button on the prompt (InputArea.kt)
     fun onSend(userText: String) {
+        Maintenance.cancel() // Free up the cpu (may be exec native code)
+
         val needsChatListInsertion = state.chatManager.currentChat.nodes.isEmpty()
         val currentChat = state.chatManager.currentChat
         
