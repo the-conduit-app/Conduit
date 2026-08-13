@@ -22,7 +22,6 @@ data class ChatsListItem(
     val chat: Chat,
     val creationTime: Long,
     val modificationTime: Long,
-    val needsHumanReview: Boolean = false
 )
 
 class ChatsList(
@@ -32,12 +31,14 @@ class ChatsList(
 
     var needsScrollingToTop by mutableStateOf(false)
 
-    suspend fun setNeedsHumanReview(chatId: String, p: Boolean) {
+    suspend fun setNeedsHumanReview(chatId: String, value: Boolean) {
         chatsListMutex.withLock {
             val index = items.indexOfFirst { it.chat.id == chatId }
             if (index >= 0) {
                 val item = items[index]
-                items[index] = item.copy(needsHumanReview = p)
+                val updatedChat = item.chat.copy(needsHumanReview = value)
+                withContext(Dispatchers.IO) { ChatUtils.saveChatToDisk(updatedChat) }
+                items[index] = item.copy(chat = updatedChat)
             }
         }
     }
@@ -124,7 +125,7 @@ class ChatsList(
     }
 
     // Syncs changes to disk, but NOT FROM DISK. Relaunch instead.
-    suspend fun rename(item: ChatsListItem, newTitle: String): Chat? {
+    suspend fun rename(item: ChatsListItem, newTitle: String, needsHumanReview: Boolean = false): Chat? {
         chatsListMutex.withLock {
             val index = withContext(Dispatchers.Main) {
                 items.indexOfFirst { it.chat.id == item.chat.id }
@@ -134,7 +135,7 @@ class ChatsList(
             return withContext(Dispatchers.IO) {
                 val oldTitle = item.chat.title
                 try {
-                    val updatedChat = item.chat.copy(title = newTitle)
+                    val updatedChat = item.chat.copy(title = newTitle, needsHumanReview = needsHumanReview)
                     ChatUtils.saveChatToDisk(updatedChat) // Ignore returned Item
 
                     val chatDir = Paths.get(getAppPath(), "chats")
@@ -148,7 +149,7 @@ class ChatsList(
                     }
                     updatedChat
                 } catch (e: Exception) {
-                    println("Failed chat rename: ${newTitle} ${e.message}")
+                    println("ChatsList.rename: Failed '$oldTitle' to '$newTitle' ${e.message}")
                     null
                 }
             }

@@ -43,8 +43,6 @@ fun ChatsListView(state: AppState) {
         focusRequester.requestFocus()
     }
 
-    val currentChat = state.chatManager.currentChat
-    val cursorNode = currentChat.nodes[currentChat.cursorNodeId]
     val enabled = !state.chatManager.isGenerating
     var showRenameDialog by remember { mutableStateOf<ChatsListItem?>(null) }
 
@@ -144,7 +142,7 @@ fun ChatsListView(state: AppState) {
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = if (item.needsHumanReview) FontWeight.SemiBold else FontWeight.Normal
+                            fontWeight = if (item.chat.needsHumanReview) FontWeight.SemiBold else FontWeight.Normal
                         )
 
                         Spacer(Modifier.width(8.dp))

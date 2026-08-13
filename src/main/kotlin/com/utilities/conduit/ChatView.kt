@@ -1,5 +1,6 @@
 package com.utilities.conduit
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -46,8 +46,9 @@ fun ColumnScope.ChatView(state: AppState) {
             contentPadding = PaddingValues(bottom = 10.dp),
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)
         ) {
-            items(items = historyNodes, key = { node-> node.id }) {
-                node -> MessageBubble(state, node = node, childCount = node.children.size)
+            items(items = historyNodes, key = { node -> node.id }) { node ->
+                val isBranchPoint = node.children.size > 1 || (node.id == chat.cursorNodeId && node.children.isNotEmpty())
+                MessageBubble(state, node = node, childCount = node.children.size, isBranchPoint = isBranchPoint)
             }
         }
         if (state.rightScreenCurtain.isActive) {

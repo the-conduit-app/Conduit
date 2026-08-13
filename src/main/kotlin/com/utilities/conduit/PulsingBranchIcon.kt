@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 
 @Composable
-fun PulsingBranchIcon(modifier: Modifier = Modifier, pulseDuration: Int = 1500, onClick: (() -> Unit)? = null) {
+fun PulsingBranchIcon(modifier: Modifier = Modifier, pulseDuration: Int = 1000, onClick: (() -> Unit)? = null) {
     val transition = rememberInfiniteTransition()
 
     val opacity by transition.animateFloat(

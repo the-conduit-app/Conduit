@@ -79,7 +79,7 @@ class ChatManager(
         setCursor(nodeIter)
     }
 
-    // When a node has exactly 2 branches, clicking on the branch icon arrow doesn't
+    // When a node has <= 2 branches, clicking on the branch icon arrow doesn't
     // bring up the branch selection menu, but immediately switches to the only other branch
     suspend fun selectOtherBranch(node: Node) {
         var nodeIter = node.children
@@ -101,6 +101,6 @@ class ChatManager(
     suspend fun setCursor(node: Node) {
         currentChat.cursorNodeId = node.id
         ++version // recompose ChatView
-        ChatUtils.saveChatToDisk(currentChat)
+        withContext(Dispatchers.IO) { ChatUtils.saveChatToDisk(currentChat) }
     }
 }

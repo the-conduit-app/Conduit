@@ -67,7 +67,11 @@ fun App(exitApplication: () -> Unit) {
 
     // Monitoring user activity for maint jobs (renaming chats, etc.)
     LaunchedEffect(Unit) {
-        UserActivityMonitor.start(scope, onIdleJob = { Maintenance.start(state, scope) })
+        UserActivityMonitor.start(
+            scope,
+            onIdleJob = { Maintenance.start(state, scope) },
+            onActivity = { Maintenance.cancel() }
+        )
     }
     DisposableEffect(Unit) {
         onDispose {

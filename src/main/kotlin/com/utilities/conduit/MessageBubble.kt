@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,7 +19,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,28 +27,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isSecondary
 import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun MessageBubble(state: AppState, node: Node, childCount: Int) {
+fun MessageBubble(state: AppState, node: Node, childCount: Int, isBranchPoint: Boolean = false) {
     val scope = rememberCoroutineScope()
     var showBranchingDialog by remember { mutableStateOf(false) }
-    //val isBranchPoint = node.children.size > 1
-    val isBranchPoint = childCount > 1
-    Trace.log("BUBBLE ${node.id}: children=${node.children.size} branch=$isBranchPoint")
-
-    LaunchedEffect(showBranchingDialog) {
-        //Trace.log("DIALOG STATE OBSERVER node=${node.id} flag=$showBranchingDialog")
-    }
 
     val bubbleColor = when {
         isBranchPoint && node.message?.author?.type == AuthorType.USER -> Color(0xFFF3D6DC) // Rosish
@@ -59,14 +53,25 @@ fun MessageBubble(state: AppState, node: Node, childCount: Int) {
         else -> Color(0xFFFFF9C4) // Assistant - yellowish
     }
 
+    val onBranchArrowClick = {
+        if (node.children.size <= 2) {
+            scope.launch { state.chatManager.selectOtherBranch(node) }
+            showBranchingDialog = false
+            Trace.log("BRANCH REVERT: cursor=${state.chatManager.currentChat.cursorNodeId}, version=${state.chatManager.version}")
+        } else {
+            showBranchingDialog = true
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .onPointerEvent(PointerEventType.Press) {
                 if (it.button?.isSecondary == true) {
                     showBranchingDialog = true
-                    Trace.log("RIGHT CLICK NODE = ${node.id}, flag = $showBranchingDialog")
                 }
+            }.onGloballyPositioned {
+                bubblePosition = it.positionInWindow()
             }
     ) {
         when (node.message?.author?.type ?: AuthorType.SYSTEM) {
@@ -75,14 +80,7 @@ fun MessageBubble(state: AppState, node: Node, childCount: Int) {
                 node = node,
                 bubbleColor = bubbleColor,
                 isBranchPoint = isBranchPoint,
-                onBranchArrowClick = {
-                    if (node.children.size == 2) {
-                        scope.launch { state.chatManager.selectOtherBranch(node) }
-                        showBranchingDialog = false
-                    } else {
-                        showBranchingDialog = true
-                    }
-                }
+                onBranchArrowClick = onBranchArrowClick
             )
 
             AuthorType.ASSISTANT -> ExpertMessageBubble(
@@ -90,14 +88,7 @@ fun MessageBubble(state: AppState, node: Node, childCount: Int) {
                 node = node,
                 bubbleColor = bubbleColor,
                 isBranchPoint = isBranchPoint,
-                onBranchArrowClick = {
-                    if (node.children.size == 2) {
-                        scope.launch { state.chatManager.selectOtherBranch(node) }
-                        showBranchingDialog = false
-                    } else {
-                        showBranchingDialog = true
-                    }
-                }
+                onBranchArrowClick = onBranchArrowClick
             )
 
             AuthorType.SYSTEM ->
@@ -111,7 +102,7 @@ fun MessageBubble(state: AppState, node: Node, childCount: Int) {
     // Branching dialog -------------------------------------------------------
     if (node.children.isNotEmpty() && showBranchingDialog) {
        Trace.log("DIALOG STATE node=${node.id} children=${node.children.size}")
-        BranchingDialog(
+        BranchingPopup(
             state = state,
             node = node,
             onDismiss = {
@@ -126,17 +117,6 @@ fun MessageBubble(state: AppState, node: Node, childCount: Int) {
 }
 
 // ----------------------------------------------------------------------------------------
-
-@Composable
-private fun SystemMessageBubble(text: String) {
-    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
-        Text(
-            text = text,
-            style = TextStyle(fontSize = 12.sp, color = Color.Gray),
-            modifier = Modifier.padding(10.dp)
-        )
-    }
-}
 
 @Composable
 private fun UserMessageBubble(state: AppState, node: Node, bubbleColor: Color,
@@ -249,5 +229,16 @@ fun ExpertMessageBubble(state: AppState, node: Node, bubbleColor: Color,
                 )
             )
         }
+    }
+}
+
+@Composable
+private fun SystemMessageBubble(text: String) {
+    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
+        Text(
+            text = text,
+            style = TextStyle(fontSize = 12.sp, color = Color.Gray),
+            modifier = Modifier.padding(10.dp)
+        )
     }
 }

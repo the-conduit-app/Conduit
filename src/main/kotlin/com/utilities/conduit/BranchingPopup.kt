@@ -4,21 +4,26 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun BranchingDialog(
+fun BranchingPopup(
     state: AppState,
     node: Node,
     onDismiss: () -> Unit,
@@ -31,10 +36,14 @@ fun BranchingDialog(
         .mapNotNull { childId -> currentChat.nodes[childId] }
         .filterNot { child -> ChatUtils.leadsToCursor(currentChat, child) }
 
-    Dialog(onDismissRequest = { onDismiss() }) {
+    Popup(
+        alignment = Alignment.TopStart,
+        onDismissRequest = onDismiss,
+        properties = PopupProperties(focusable = true)
+    ) {
         Surface(
             shape = MaterialTheme.shapes.medium, tonalElevation = 6.dp, shadowElevation = 8.dp,
-            modifier = Modifier.width(720.dp)
+            modifier = Modifier.widthIn(min = 220.dp, max = 420.dp)
         ) {
             val onBranchFromHere: () -> Unit =
                 if (candidateBranches.isEmpty()) {
@@ -50,33 +59,35 @@ fun BranchingDialog(
                     }
                 }
 
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
+            Column {
                 Text(
-                    text = "Branches",
-                    style = MaterialTheme.typography.titleLarge
+                    text = "Start new branch from here",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onBranchFromHere)
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    style = MaterialTheme.typography.bodyMedium
                 )
 
-                Spacer(Modifier.height(8.dp))
+                if (candidateBranches.isNotEmpty()) {
+                    HorizontalDivider()
 
-                // Menu of available branches
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    LazyColumn(modifier = Modifier.fillMaxWidth().heightIn(max = 180.dp)) {
-                        item {
-                            Text(
-                                text = "Branch from here",
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable(onClick = onBranchFromHere)
-                                    .padding(horizontal = 10.dp, vertical = 6.dp),
-                                style = MaterialTheme.typography.bodyMedium,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
+                    Text(
+                        text = "Or select existing branch",
+                        modifier = Modifier.padding(
+                            horizontal = 16.dp,
+                            vertical = 8.dp
+                        ),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    LazyColumn(
+                        modifier = Modifier.heightIn(max = 240.dp)
+                    ) {
                         items(candidateBranches) { branch ->
-                            val message = branch.message
+
+                        val message = branch.message
                             val title = message?.title ?: "Unknown"
                             val date = message?.timestamp?.let {
                                 SimpleDateFormat("MMM d", Locale.getDefault()).format(Date(it))

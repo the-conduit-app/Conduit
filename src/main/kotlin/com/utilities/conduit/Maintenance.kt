@@ -6,11 +6,10 @@ package com.utilities.conduit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.time.Duration.Companion.milliseconds
+
 object Maintenance {
     private var maintenanceJob: Job? = null
     private var state: AppState? = null
@@ -19,15 +18,19 @@ object Maintenance {
         state = appState
         val chatsList = appState.chatsList
 
-        if (appState.chatManager.currentlyGeneratingExpert != null)
+        if (appState.chatManager.isGenerating) {
+            Trace.log("MAINT: SKIP — generation active")
             return
+        }
 
+        Trace.log("MAINT: START")
         maintenanceJob?.cancel()
         maintenanceJob = scope.launch(Dispatchers.Default) {
             try {
-                runTitleMaintJob(appState, chatsList)
+                runTitleMaintenanceJob(appState, chatsList)
+                Trace.log("MAINT: ROUND COMPLETE")
             } catch (e: CancellationException) {
-                Trace.log("Current maintenance round cancelled")
+                Trace.log("MAINT: CANCELLED - Current maintenance round cancelled")
             } finally {
                 maintenanceJob = null
             }
@@ -35,8 +38,11 @@ object Maintenance {
     }
 
     fun cancel() {
+        val job = maintenanceJob ?: return
+
+        Trace.log("MAINT: CANCEL requested")
         state?.systemExpert?.abortResponse()
-        maintenanceJob?.cancel()
+        job.cancel()
         maintenanceJob = null
     }
 
@@ -46,7 +52,7 @@ object Maintenance {
     }
 
     // Rename a *single* anonymous chat, if found, and return
-     suspend fun runTitleMaintJob(state: AppState, chatsList: ChatsList) {
+     suspend fun runTitleMaintenanceJob(state: AppState, chatsList: ChatsList) {
         val systemExpert = state.systemExpert
 
         if (systemExpert.sessionPtr == null) {
@@ -70,8 +76,14 @@ object Maintenance {
             if (newTitle.equals(item.chat.title, ignoreCase = true))
                 continue
 
-            chatsList.rename(item, newTitle)
-            chatsList.setNeedsHumanReview(item.chat.id, true)
+            val updatedChat = chatsList.rename(item, newTitle, needsHumanReview = true)
+            if (updatedChat == null) {
+                Trace.log("Rename to '$newTitle' failed; maintenance round ending")
+                return
+            }
+            if (updatedChat.id == state.chatManager.currentChat.id) {
+                withContext(Dispatchers.Main) { state.chatManager.currentChat = updatedChat }
+            }
 
             return
         }
