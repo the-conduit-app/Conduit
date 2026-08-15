@@ -40,13 +40,19 @@ fun AppRightView(state: AppState, modifier: Modifier) {
             Column(modifier = Modifier.fillMaxSize()) {
                 ChatView(state)
             }
-            ChatViewNotification(
-                state = state,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
+
+            // Important! If invisible, don't show the element at all or Compose won't
+            // react to actions underneath, and we can't tell why easily
+            // A life lesson in hiding: Just cuz you can't see it don't mean it ain't there
+            if (state.notification.opacity > 0f) {
+                ChatViewNotification(
+                    state = state,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
         }
 
         val appActions = LocalActions.current
-        InputArea(state,) { userPrompt -> appActions.onSend(userPrompt) }
+        InputArea(state) { userPrompt -> appActions.onSend(userPrompt) }
     }
 }

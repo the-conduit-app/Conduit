@@ -16,12 +16,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 
 @Composable
-fun PulsingBranchIcon(modifier: Modifier = Modifier, pulseDuration: Int = 1000, onClick: (() -> Unit)? = null) {
+fun PulsingBranchIcon(
+    modifier: Modifier = Modifier,
+    pulseDuration: Int = 1000,
+    onClick: (() -> Unit)? = null
+) {
     val transition = rememberInfiniteTransition()
 
+    val pulse by transition.animateFloat(
+        initialValue = 0.9f,
+        targetValue = 1.1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = pulseDuration,
+                easing = EaseInOut
+            ),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
     val opacity by transition.animateFloat(
-        initialValue = 0.15f,
-        targetValue = 0.85f,
+        initialValue = 0.5f,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
             animation = tween(
                 durationMillis = pulseDuration,
@@ -35,7 +51,11 @@ fun PulsingBranchIcon(modifier: Modifier = Modifier, pulseDuration: Int = 1000, 
         imageVector = Icons.AutoMirrored.Filled.CallSplit,
         contentDescription = "Branches",
         modifier = modifier
-            .graphicsLayer { alpha = opacity }
+            .graphicsLayer {
+                scaleX = pulse
+                scaleY = pulse
+                alpha = opacity
+            }
             .clickable(enabled = onClick != null) {
                 onClick?.invoke()
             }

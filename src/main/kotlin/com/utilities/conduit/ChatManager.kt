@@ -18,6 +18,8 @@ class ChatManager(
 
     var version by mutableIntStateOf(0) // For Compose
         private set
+    var nodeAddedVersion by mutableIntStateOf(0) // Similar but for autoscroll on addNode
+        private set
 
     var currentChat by mutableStateOf(createChat())
 
@@ -59,6 +61,7 @@ class ChatManager(
 
         withContext(Dispatchers.Main) {
             ++version
+            ++nodeAddedVersion
         } // recomp
 
         ChatUtils.saveChatToDisk(chat)
@@ -79,23 +82,17 @@ class ChatManager(
         setCursor(nodeIter)
     }
 
-    // When a node has <= 2 branches, clicking on the branch icon arrow doesn't
-    // bring up the branch selection menu, but immediately switches to the only other branch
-    suspend fun selectOtherBranch(node: Node) {
-        var nodeIter = node.children
-            .mapNotNull { currentChat.nodes[it] }
-            .firstOrNull { !ChatUtils.leadsToCursor(currentChat, it) }
-            ?: return
+    suspend fun cycleBranch(node: Node) {
+        val childNodes = node.children.mapNotNull { currentChat.nodes[it] }
+        if (childNodes.isEmpty()) return
 
-        while (true) {
-            if (nodeIter.children.size != 1) {
-                setCursor(nodeIter)
-                return
-            }
-
-            nodeIter = currentChat.nodes[nodeIter.children[0]]
-                ?: return
+        // Find which child currently contains the cursor.
+        val currentIndex = childNodes.indexOfFirst {
+            ChatUtils.leadsToCursor(currentChat, it)
         }
+        val nextIndex = if (currentIndex == -1)  0 else (currentIndex + 1) % childNodes.size
+
+        selectBranch(childNodes[nextIndex])
     }
 
     suspend fun setCursor(node: Node) {

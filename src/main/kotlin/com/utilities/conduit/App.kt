@@ -75,7 +75,7 @@ fun App(exitApplication: () -> Unit) {
     }
     DisposableEffect(Unit) {
         onDispose {
-            UserActivityMonitor.stop()
+            //UserActivityMonitor.stop()
         }
     }
 
