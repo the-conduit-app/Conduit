@@ -67,7 +67,7 @@ val ConduitContextMenuRepresentation = object : ContextMenuRepresentation
                         menuItems.forEachIndexed { index, item ->
                             val isCurrent = item.label.startsWith("✓")
                             val label = if (isCurrent) item.label.removePrefix("✓") else item.label
-                            val isNewBranch = label.startsWith("Start new bra")
+                            val isNewBranch = item.label.startsWith("Start new")
 
                             Row(
                                 modifier = Modifier

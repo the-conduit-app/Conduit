@@ -121,6 +121,8 @@ object AppUtils {
     }
 }
 
+// -------------------------------------------------------------------------------------------
+
 object ChatUtils {
     private val chatUtilsMutex = Mutex() // locking for save etc.
 
@@ -215,12 +217,12 @@ object ChatUtils {
                 text = prompt
             )
 
-            Trace.log("TITLE GEN START session=${systemExpert.sessionPtr}")
+            //Trace.log("TITLE GEN START session=${systemExpert.sessionPtr}")
             val result = StringBuilder()
             systemExpert.getResponse(messages).collect { token ->
                 result.append(token)
             }
-            Trace.log("TITLE GEN END session=${systemExpert.sessionPtr}")
+            //Trace.log("TITLE GEN END session=${systemExpert.sessionPtr}")
 
             val newTitle = result.toString().trim()
             return newTitle.ifEmpty { oldTitle }
@@ -251,20 +253,20 @@ object ChatUtils {
                 )
             )
 
-            Trace.log("HISTORY SUMMARY START session=${systemExpert.sessionPtr}")
+            // Trace.log("HISTORY SUMMARY START session=${systemExpert.sessionPtr}")
 
             val result = StringBuilder()
             try {
                 systemExpert.getResponse(messages).collect { token ->
                     result.append(token)
                 }
-                Trace.log("HISTORY SUMMARY END session=${systemExpert.sessionPtr}")
+                //Trace.log("HISTORY SUMMARY END session=${systemExpert.sessionPtr}")
             } catch (e: CancellationException) {
-                Trace.log("HISTORY SUMMARY ABORTED session=${systemExpert.sessionPtr}")
+                //Trace.log("HISTORY SUMMARY ABORTED session=${systemExpert.sessionPtr}")
                 throw e
             }
 
-            Trace.log("HISTORY SUMMARY END session=${systemExpert.sessionPtr}")
+            //Trace.log("HISTORY SUMMARY END session=${systemExpert.sessionPtr}")
 
             return result.toString().trim()
         }

@@ -23,14 +23,14 @@ object Maintenance {
             return
         }
 
-        Trace.log("MAINT: START")
+        //Trace.log("MAINT: START")
         maintenanceJob?.cancel()
         maintenanceJob = scope.launch(Dispatchers.Default) {
             try {
                 runTitleMaintenanceJob(appState, chatsList)
-                Trace.log("MAINT: ROUND COMPLETE")
+                //Trace.log("MAINT: ROUND COMPLETE")
             } catch (e: CancellationException) {
-                Trace.log("MAINT: CANCELLED - Current maintenance round cancelled")
+                //Trace.log("MAINT: CANCELLED - Current maintenance round cancelled")
             } finally {
                 maintenanceJob = null
             }

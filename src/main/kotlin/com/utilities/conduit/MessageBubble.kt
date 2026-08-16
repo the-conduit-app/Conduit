@@ -5,56 +5,73 @@ import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.NonCancellable.children
-import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MessageBubble(
     node: Node,
-    isBranchPoint: Boolean = false,
-    contextMenuItems: () -> List<ContextMenuItem>
+    isBranchable: Boolean = false,
+    contextMenuItems: (() -> List<ContextMenuItem>)?
 ) {
-    val bubbleColor = when {
-        isBranchPoint && node.message?.author?.type == AuthorType.USER -> Color(0xFFF3D6DC)
-        isBranchPoint && node.message?.author?.type == AuthorType.ASSISTANT -> Color(0xFFFFE8B0)
-        node.message?.author?.type == AuthorType.USER -> Color(0xFFDCF8C6)
-        else -> Color(0xFFFFF9C4)
-    }
-
     when (node.message?.author?.type ?: AuthorType.SYSTEM) {
-        AuthorType.USER -> UserMessageBubble(node = node, bubbleColor = bubbleColor, contextMenuItems = contextMenuItems)
-        AuthorType.ASSISTANT -> ExpertMessageBubble(node = node, bubbleColor = bubbleColor, contextMenuItems = contextMenuItems)
+        AuthorType.USER -> UserMessageBubble(node, isBranchable, contextMenuItems)
+        AuthorType.ASSISTANT -> ExpertMessageBubble(node, isBranchable, contextMenuItems)
         AuthorType.SYSTEM -> SystemMessageBubble(node.message?.text ?: "Hmm... Wonder where this came from!")
     }
 }
 
-
 // ----------------------------------------------------------------------------------------
 
 @Composable
-private fun UserMessageBubble(node: Node, bubbleColor: Color, contextMenuItems: () -> List<ContextMenuItem>) {
+private fun UserMessageBubble(node: Node, isBranchable: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
     val text = node.message?.textInProgress?.value ?: node.message?.text.orEmpty()
-    val title = node.message?.title ?: "Donowatt"
+    val title = node.message?.title ?: "Donowatt" // an unknown amount of power
+
+    val bubbleColor = if (isBranchable)
+        ConduitTheme.Colors.MessageBubble.Branchable.User
+    else
+        ConduitTheme.Colors.MessageBubble.User
+
+    val cornerRadius = if (isBranchable)
+        ConduitTheme.Dimensions.MessageBubble.BranchableCornerRadius
+    else
+        ConduitTheme.Dimensions.MessageBubble.CornerRadius
+
+    val shadowElevation = if (isBranchable)
+        ConduitTheme.Dimensions.MessageBubble.ShadowElevation
+    else
+        0.dp
+
+    val bubble: @Composable () -> Unit = {
+        Text(
+            text = text.trim(),
+            fontSize = if (isBranchable) 15.sp else 14.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .widthIn(max = ConduitTheme.Dimensions.MessageBubble.MaxWidth)
+                .shadow(
+                    elevation = shadowElevation,
+                    shape = RoundedCornerShape(cornerRadius)
+                )
+                .background(
+                    bubbleColor,
+                    RoundedCornerShape(cornerRadius)
+                )
+                .padding(ConduitTheme.Dimensions.MessageBubble.Padding)
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -70,19 +87,10 @@ private fun UserMessageBubble(node: Node, bubbleColor: Color, contextMenuItems: 
             )
         )
 
-        ContextMenuArea(items = contextMenuItems) {
-            Text(
-                text = text.trim(),
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .widthIn(max = 700.dp)
-                    .background(
-                        bubbleColor,
-                        RoundedCornerShape(12.dp)
-                    )
-                    .padding(11.dp)
-            )
+        if (contextMenuItems != null) {
+            ContextMenuArea(items = contextMenuItems) { bubble() }
+        } else {
+            bubble()
         }
     }
 }
@@ -90,14 +98,54 @@ private fun UserMessageBubble(node: Node, bubbleColor: Color, contextMenuItems: 
 // ----------------------------------------------------------------------------------------
 
 @Composable
-private fun ExpertMessageBubble(
-    node: Node,
-    bubbleColor: Color,
-    contextMenuItems: () -> List<ContextMenuItem>
-) {
+private fun ExpertMessageBubble(node: Node, isBranchable: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
     val textInProgress = node.message?.textInProgress?.value
     val text = textInProgress ?: node.message?.text.orEmpty()
     val title = node.message?.title ?: "Donovich"
+
+    val bubbleColor = if (isBranchable)
+        ConduitTheme.Colors.MessageBubble.Branchable.Expert
+    else
+        ConduitTheme.Colors.MessageBubble.Expert
+
+    val cornerRadius = if (isBranchable)
+        ConduitTheme.Dimensions.MessageBubble.BranchableCornerRadius
+    else
+        ConduitTheme.Dimensions.MessageBubble.CornerRadius
+
+    val shadowElevation = if (isBranchable)
+        ConduitTheme.Dimensions.MessageBubble.ShadowElevation
+    else
+        0.dp
+
+    val bubble: @Composable () -> Unit = {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .widthIn(max = ConduitTheme.Dimensions.MessageBubble.MaxWidth)
+                .shadow(
+                    elevation = shadowElevation,
+                    shape = RoundedCornerShape(cornerRadius)
+                )
+                .background(
+                    bubbleColor,
+                    RoundedCornerShape(cornerRadius)
+                )
+                .padding(10.dp)
+        ) {
+            if (textInProgress != null && text.isEmpty()) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Text(
+                    text = text.trim(),
+                    fontSize = if (isBranchable) 15.sp else 14.sp
+                )
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -113,28 +161,10 @@ private fun ExpertMessageBubble(
             )
         )
 
-        ContextMenuArea(
-            items = contextMenuItems
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .widthIn(max = 700.dp)
-                    .background(
-                        bubbleColor,
-                        RoundedCornerShape(12.dp)
-                    )
-                    .padding(10.dp)
-            ) {
-                if (textInProgress != null && text.isEmpty()) {
-                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
-                } else {
-                    Text(
-                        text = text.trim(),
-                        fontSize = 14.sp
-                    )
-                }
-            }
+        if (contextMenuItems != null) {
+            ContextMenuArea(items = contextMenuItems) { bubble() }
+        } else {
+            bubble()
         }
 
         node.message?.responseTime?.let { ts ->

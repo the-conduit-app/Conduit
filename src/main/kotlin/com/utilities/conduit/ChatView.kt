@@ -3,7 +3,6 @@ package com.utilities.conduit
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,8 +22,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import kotlin.collections.forEach
+import kotlin.let
 
 @Composable
 fun ColumnScope.ChatView(state: AppState) {
@@ -63,14 +63,17 @@ fun ColumnScope.ChatView(state: AppState) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 4.dp)
             ) {
+                val version = state.chatManager.version
+
                 items(
                     items = historyNodes,
-                    key = { node -> node.id }
+                    key = { node -> "${node.id}-$version" }
                 ) { node ->
                     ChatNodeRow(
                         state = state,
                         chat = chat,
-                        node = node
+                        node = node,
+                        version
                     )
                 }
             }
@@ -100,50 +103,55 @@ fun ColumnScope.ChatView(state: AppState) {
 // ----------------------------------------------------------------------------------------
 
 @Composable
-private fun ChatNodeRow(state: AppState, chat: Chat, node: Node) {
+private fun ChatNodeRow(state: AppState, chat: Chat, node: Node, version: Int) {
     val scope = rememberCoroutineScope()
     val isCursor = node.id == chat.cursorNodeId
-    val isBranchPoint = node.children.size > 1 || (isCursor && node.children.isNotEmpty())
+    val isBranchable = node.children.size > 1 || (isCursor && node.children.isNotEmpty())
     val isUserNode = node.message?.author?.type == AuthorType.USER
 
-    val menuItems = {
-        // Re-eval to refresh at click time
-        val itemIsCursor = node.id == chat.cursorNodeId
-        val itemChildNodes = node.children.mapNotNull { childId -> chat.nodes[childId] }
+    val menuItems: (() -> List<ContextMenuItem>)? =
+        if (isCursor && node.children.isEmpty()) {
+            null
+        } else {
+            {
+                // Re-eval to refresh at click time
+                val itemIsCursor = node.id == chat.cursorNodeId
+                val itemChildNodes = node.children.mapNotNull { childId -> chat.nodes[childId] }
 
-        buildList {
-            if (!itemIsCursor) {
-                add(
-                    ContextMenuItem("Start new branch from here or select one below") {
-                        scope.launch { state.chatManager.setCursor(node) }
+                buildList {
+                    if (!itemIsCursor) {
+                        add(
+                            ContextMenuItem("Start new branch from here or select one below") {
+                                scope.launch { state.chatManager.setCursor(node) }
+                            }
+                        )
                     }
-                )
-            }
 
-            itemChildNodes.forEachIndexed { index, node ->
-                val title = node.message?.title ?: "Untitled"
-                val isCurrentPath = ChatUtils.leadsToCursor(chat, node)
+                    itemChildNodes.forEach { node ->
+                        val title = node.message?.title ?: "Untitled"
+                        val isCurrentPath = ChatUtils.leadsToCursor(chat, node)
 
-                val text = node.message?.text
-                    ?.replace(Regex("\\s+"), " ")
-                    ?.trim()
-                    ?.let { if (it.length > 50) "${it.take(50)}…" else it }
-                    ?: "Empty"
+                        val text = node.message?.text
+                            ?.replace(Regex("\\s+"), " ")
+                            ?.trim()
+                            ?.let { if (it.length > 50) "${it.take(50)}…" else it }
+                            ?: "Empty"
 
-                val item = buildString {
-                    append(if (isCurrentPath) "✓ " else "  ")
-                    append(title)
-                    append(" : ")
-                    append(text)
+                        val item = buildString {
+                            append(if (isCurrentPath) "✓ " else "  ")
+                            append(title)
+                            append(" : ")
+                            append(text)
+                        }
+
+                        add(
+                            ContextMenuItem(item) {
+                                scope.launch { state.chatManager.selectBranch(node) }
+                            }
+                        )
+                    }
                 }
-
-                add(
-                    ContextMenuItem(item) {
-                        scope.launch { state.chatManager.selectBranch(node) }
-                    }
-                )
             }
-        }
     }
 
     Row(
@@ -156,7 +164,7 @@ private fun ChatNodeRow(state: AppState, chat: Chat, node: Node) {
         }
     ) {
         // Branching user nodes (right aligned) have the branch cycling icon on their left
-        if (isUserNode && isBranchPoint) {
+        if (isUserNode && isBranchable) {
             PulsingBranchIcon(
                 modifier = Modifier.size(20.dp),
                 onClick = {
@@ -169,12 +177,12 @@ private fun ChatNodeRow(state: AppState, chat: Chat, node: Node) {
 
         MessageBubble(
             node = node,
-            isBranchPoint = isBranchPoint,
+            isBranchable = isBranchable,
             contextMenuItems = menuItems
         )
 
         // Branching expert nodes (left aligned) have the branch cycling icon on their right
-        if (!isUserNode && isBranchPoint) {
+        if (!isUserNode && isBranchable) {
             PulsingBranchIcon(
                 modifier = Modifier.size(20.dp),
                 onClick = {
@@ -184,21 +192,5 @@ private fun ChatNodeRow(state: AppState, chat: Chat, node: Node) {
                 }
             )
         }
-    }
-}
-
-// Cycle through the branches on a node
-@Composable
-private fun CycleBranchButton(
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier.size(32.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        PulsingBranchIcon(
-            modifier = Modifier.size(20.dp),
-            onClick = onClick
-        )
     }
 }

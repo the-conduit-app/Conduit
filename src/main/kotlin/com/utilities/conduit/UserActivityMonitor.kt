@@ -22,7 +22,6 @@ fun Modifier.userActivityMonitor(): Modifier =
         }
     }
 
-
 object UserActivityMonitor {
     private const val IDLE_TIMEOUT = 10_000L
 
@@ -58,14 +57,14 @@ object UserActivityMonitor {
         idleJob = appScope.launch {
             delay(IDLE_TIMEOUT.milliseconds)
 
-            Trace.log("UAM: INVOKING IDLE JOB")
+            //Trace.log("UAM: INVOKING IDLE JOB")
             job()
-            Trace.log("UAM: IDLE JOB RETURNED")
+            //Trace.log("UAM: IDLE JOB RETURNED")
         }
     }
 
     fun stop() {
-        Trace.log("UAM: STOP")
+        //Trace.log("UAM: STOP")
         idleJob?.cancel()
         idleJob = null
         idleAction = null
