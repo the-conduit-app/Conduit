@@ -1,5 +1,11 @@
 package com.utilities.conduit
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.background
@@ -13,7 +19,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -26,6 +36,100 @@ import kotlinx.coroutines.launch
 import kotlin.collections.forEach
 import kotlin.let
 
+// Used for Branching animation ------------------------------------------
+
+private data class BranchTransition(
+    val shared: List<Node>,
+    val outgoing: List<Node>,
+    val incoming: List<Node>
+)
+
+private fun getBranchTransition(
+    oldPath: List<Node>,
+    newPath: List<Node>
+): BranchTransition {
+    var sharedCount = 0
+    val maxShared = minOf(oldPath.size, newPath.size)
+
+    while (
+        sharedCount < maxShared &&
+        oldPath[sharedCount].id == newPath[sharedCount].id
+    ) {
+        sharedCount++
+    }
+
+    return BranchTransition(
+        shared = newPath.take(sharedCount),
+        outgoing = oldPath.drop(sharedCount),
+        incoming = newPath.drop(sharedCount)
+    )
+}
+
+@Composable
+private fun BranchAnimatedHistory(
+    state: AppState,
+    chat: Chat,
+    historyNodes: List<Node>,
+    transition: BranchTransition?,
+    version: Int
+) {
+    if (transition == null) {
+        Column {
+            historyNodes.forEach { node ->
+                ChatNodeRow(
+                    state = state,
+                    chat = chat,
+                    node = node,
+                    version = version
+                )
+            }
+        }
+        return
+    }
+
+    Column {
+        // Shared history remains stationary.
+        transition.shared.forEach { node ->
+            ChatNodeRow(
+                state = state,
+                chat = chat,
+                node = node,
+                version = version
+            )
+        }
+
+        // The changing suffix will be animated here.
+        AnimatedContent(
+            targetState = transition.incoming.map { it.id },
+            transitionSpec = {
+                (
+                        slideInHorizontally(
+                            initialOffsetX = { -it }
+                        ) + fadeIn()
+                        ) togetherWith (
+                        slideOutHorizontally(
+                            targetOffsetX = { it }
+                        ) + fadeOut()
+                        )
+            },
+            label = "branch-suffix"
+        ) { _ ->
+            Column {
+                transition.incoming.forEach { node ->
+                    ChatNodeRow(
+                        state = state,
+                        chat = chat,
+                        node = node,
+                        version = version
+                    )
+                }
+            }
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
+
 @Composable
 fun ColumnScope.ChatView(state: AppState) {
     val version = state.chatManager.version // DO NOT REMOVE - recomp trigger
@@ -34,6 +138,24 @@ fun ColumnScope.ChatView(state: AppState) {
 
     // The UI displays the single path from root to the current cursor.
     val historyNodes = ChatUtils.getFullHistory(chat, chat.cursorNodeId)
+
+    //--------------------------------------------------------------------------
+    // Branch-transition diagnostics
+
+    val previousHistoryNodes = remember { mutableStateOf<List<Node>?>(null) }
+    var branchTransition by remember { mutableStateOf<BranchTransition?>(null) }
+
+    LaunchedEffect(historyNodes) {
+        val oldPath = previousHistoryNodes.value
+
+        if (oldPath != null && oldPath.map { it.id } != historyNodes.map { it.id }) {
+            branchTransition = getBranchTransition(oldPath, historyNodes)
+        }
+
+        previousHistoryNodes.value = historyNodes
+    }
+
+    //--------------------------------------------------------------------------
 
     // Title above message bubbles
     Text(
@@ -63,17 +185,13 @@ fun ColumnScope.ChatView(state: AppState) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 4.dp)
             ) {
-                val version = state.chatManager.version
-
-                items(
-                    items = historyNodes,
-                    key = { node -> "${node.id}-$version" }
-                ) { node ->
-                    ChatNodeRow(
+                item(key = "history-$version") {
+                    BranchAnimatedHistory(
                         state = state,
                         chat = chat,
-                        node = node,
-                        version
+                        historyNodes = historyNodes,
+                        transition = branchTransition,
+                        version = version
                     )
                 }
             }
