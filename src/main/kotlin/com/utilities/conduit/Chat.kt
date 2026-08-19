@@ -47,7 +47,7 @@ data class Node(
     val children: MutableList<String> = mutableListOf(),
 
     val message: ChatMessage?, // Payload
-    val historySummary: String? = null
+    var historySummary: String? = null
 ) {
     companion object {
         fun create(

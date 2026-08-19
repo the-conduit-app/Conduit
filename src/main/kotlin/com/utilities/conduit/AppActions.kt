@@ -9,7 +9,6 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
 
 class AppActions(
-    private val scope: CoroutineScope,
     private val state: AppState
 ) {
     fun switchExpert(newExpert: Expert?) {
@@ -36,9 +35,9 @@ class AppActions(
             state.expertsMap[expert.id] = expert
         }
 
-        scope.launch(Dispatchers.IO) {
+        state.scope.launch(Dispatchers.IO) {
             try {
-                newPack.initializeExperts(state, scope)
+                newPack.initializeExperts(state)
                 state.notification.trigger("The current pack is now ${newPack.name}. Please select an expert.")
             }
             catch (e: Exception) {
@@ -59,7 +58,7 @@ class AppActions(
         val expert = findTaggedExpert(userText, state.expertsMap.values.toList())
             ?: state.currentExpert.value
 
-        scope.launch(Dispatchers.IO) {
+        state.chatManager.currentGenerationJob = state.scope.launch(Dispatchers.IO) {
             if (expert == null) {
                 state.notification.trigger("Please select or tag an expert to whom your prompt should be sent.")
                 return@launch
@@ -112,13 +111,19 @@ class AppActions(
             }
 
             val effectiveHistory = ChatUtils.getEffectiveNodeHistory(currentChat, userNode.id)
-            val messages = effectiveHistory.mapNotNull { it.message }
-            val startTime = System.currentTimeMillis()
+            val messages = mutableListOf<ChatMessage>()
+            messages += ChatMessage(
+                author = MessageAuthor(type = AuthorType.USER),
+                text = "Preceding context:\n${effectiveHistory.precedingContext}"
+            )
+            messages += effectiveHistory.nodes.mapNotNull { it.message }
 
             // Note: Aug 7. beginResponse and finishResponse were put in to be able to
             // stop a response request while the decode hasn't yet started (i.e. spinner,
             // not streaming)
             state.chatManager.beginCurrentResponse(expert)
+
+            val startTime = System.currentTimeMillis()
             expert.getResponse(messages)
                 .onCompletion { cause ->
                     val duration = System.currentTimeMillis() - startTime

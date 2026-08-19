@@ -51,6 +51,7 @@ object LlmPortal {
                 close()
             }
             ConduitLib.ABORTED -> {
+                //Trace.log("LLM: conduit_generate ABORTED — closing Flow")
                 close(CancellationException("Aborted by user"))
             }
             else -> {

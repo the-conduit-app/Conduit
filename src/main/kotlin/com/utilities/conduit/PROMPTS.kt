@@ -5,9 +5,6 @@ object PROMPTS {
     val TITLE_GENERATION = """
         Generate a concise, descriptive title for this conversation.
         
-        The current title is:
-        {CURRENT_TITLE}
-        
         If the current title is already accurate and concise, return it unchanged.
         Otherwise, improve it while preserving the original intent whenever possible.
         
@@ -17,17 +14,18 @@ object PROMPTS {
         - Do not use quotation marks.
         - Do not end the title with punctuation.
         - Keep the title under ten words.
+        
+         The current title is:
+        {CURRENT_TITLE}
+        
+        Preceding context:
+        {PRECEDING_CONTEXT}
+        
     """.trimIndent()
 
     val HISTORY_SUMMARY_GENERATION = """
         Create a concise summary of the conversation up to and including the final
         message in the conversation below.
-
-        Previous summary:
-        {PREVIOUS_SUMMARY}
-    
-        Conversation since that summary:
-        {CONVERSATION}
     
         The new summary will be used as persistent context when continuing the
         conversation from this point. Preserve the information that would be
@@ -47,5 +45,6 @@ object PROMPTS {
         - Do not use quotation marks.
         - Do not mention that you are generating a summary.
         - Be concise while preserving important context.
+       
     """.trimIndent()
 }

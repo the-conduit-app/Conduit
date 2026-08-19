@@ -52,7 +52,6 @@ object AppUtils {
                 Paths.get(getAppPath(), modelPath).toString()
     }
 
-
     /**
      * Reads all .json files in the packs directory and parses them into Pack objects
      * IMPORTANT: NO PACK EXPERT INITIALIZATIONS (Hence not time-consuming)
@@ -80,6 +79,43 @@ object AppUtils {
         }
     }
 
+    // Returns a prompt wrapped in ChatML
+    fun buildPrompt(expert: Expert, messages: List<ChatMessage>): String {
+        return buildString {
+
+            expert.seedPrompt
+                ?.takeIf { it.isNotBlank() }
+                ?.let {
+                    append("<|im_start|>user\n")
+                    append(it)
+                    append("\n<|im_end|>\n")
+                }
+
+            messages.forEach { msg ->
+                val role = when (msg.author.type) {
+                    AuthorType.USER      -> "user"
+                    AuthorType.ASSISTANT -> "assistant"
+                    AuthorType.SYSTEM    -> "system"
+                }
+
+                append("<|im_start|>")
+                append(role)
+                append('\n')
+
+                if (msg.author.type == AuthorType.ASSISTANT) {
+                    val nickname = msg.title?.substringBefore("·")?.trim()
+                    if (!nickname.isNullOrEmpty())
+                        append("${nickname}: ")
+                }
+
+                append(msg.text)
+                append("\n<|im_end|>\n")
+            }
+
+            append("<|im_start|>assistant\n")
+        }
+    }
+
     fun formatDateRange(
         creation: Long,
         modification: Long
@@ -95,7 +131,6 @@ object AppUtils {
             "${created.format(fmt)} – ${modified.format(fmt)}"
         }
     }
-
 
     // This is used to append the date to a message bubble header for the 1st user prompt
     // of a day (E.g. You - July 32) in any chat (Ref: AppActions:onSend)
@@ -154,119 +189,155 @@ object ChatUtils {
     }
 
     // Only used for composing the full chat views (Text and Tree)
+    // All nodes from root to given node (including the given node)
     fun getFullHistory(chat: Chat, nodeId: String?): List<Node> {
-        val history = mutableListOf<Node>()
-        var currentId = nodeId
+        val historyNodes = mutableListOf<Node>()
+        var currentNodeId = nodeId
 
-        while (currentId != null) {
-            val node = chat.nodes[currentId] ?: break
-            history.add(node)
-            currentId = node.parentId
+        while (currentNodeId != null) {
+            val node = chat.nodes[currentNodeId] ?: break
+            historyNodes.add(node)
+            currentNodeId = node.parentId
         }
-        return history.reversed()
+        return historyNodes.reversed()
     }
 
-    // Return a list of nodes that make up the history of the current node
-    // from THE NEAREST SUMMARIZED UPSTREAM NODE (or root node) to the named node.
-    // Only used for inference and not for UI (ignore CONDUIT message nodes).
-    fun getEffectiveNodeHistory(chat: Chat, nodeId: String?): List<Node> {
-        val history = mutableListOf<Node>()
-        var currentId = nodeId
+    // Same as above, but stops upward traversal at any encountered node that has
+    // a non-null historySummary.
+    //
+    // Return the unsummarized suffix of the history, starting at the nearest
+    // upstream node that has a historySummary (or the root if none exists),
+    // through the named node.
+    //
+    // previousSummary is the summary of everything BEFORE that returned
+    // suffix. If no summary exists, it contains the "no previous summary"
+    // sentinel.
+    //
+    // E.g: Suppose B' has a summary in AB'CDE.
+    // getEffectiveNodeHistory(E) returns:
+    //     { previousSummary = B'.summary, nodes = [B', C, D, E] }
 
-        while (currentId != null) {
-            val node = chat.nodes[currentId] ?: break
-            val authorType = node.message?.author?.type
-            if (authorType == AuthorType.USER || authorType == AuthorType.ASSISTANT) {
-                history.add(node)
-            }
-            if (node.historySummary != null) {
+    data class EffectiveHistory(
+        val precedingContext: String,
+        val nodes: List<Node>
+    )
+    fun getEffectiveNodeHistory(chat: Chat, nodeId: String?): EffectiveHistory {
+        val historyNodes = mutableListOf<Node>()
+        var currentNodeId = nodeId
+        var previousSummary = "No previous context exists before this point"
+
+        while (currentNodeId != null) {
+            val node = chat.nodes[currentNodeId] ?: break
+            historyNodes.add(node)
+            node.historySummary?.let {
+                previousSummary = it
                 break
             }
-            currentId = node.parentId
+            currentNodeId = node.parentId
         }
-        return history.reversed()
+        return EffectiveHistory(
+            precedingContext = previousSummary,
+            nodes = historyNodes.reversed()
+        )
     }
 
     suspend fun generateChatTitle(systemExpert: Expert, chat: Chat): String {
         chatUtilsMutex.withLock {
-            val oldTitle : String = chat.title
+            val oldTitle = chat.title
             val maxTextLen = 250
-
-            if (systemExpert.sessionPtr == null) {
-                error("Generating chat title for ${chat.title} return early (sysExpert = ${systemExpert.sessionPtr})")
-            }
-
-            var messages = getEffectiveNodeHistory(chat, chat.cursorNodeId)
+            val sessionPtr = systemExpert.sessionPtr ?: error(
+                "Generating chat title for ${chat.title} return early (sysExpert = ${systemExpert.sessionPtr})"
+            )
+            val effectiveHistory = getEffectiveNodeHistory(chat, chat.cursorNodeId)
+            val messages = effectiveHistory.nodes
                 .mapNotNull { it.message }
                 .map { message ->
-                    if (message.author.type == AuthorType.ASSISTANT && message.text.length > maxTextLen) {
+                    if (
+                        message.author.type == AuthorType.ASSISTANT &&
+                        message.text.length > maxTextLen
+                    ) {
                         message.copy(text = message.text.take(maxTextLen) + "...")
                     } else {
                         message
                     }
                 }
+                .toMutableList()
 
-            val currentTitle = if (oldTitle.equals("Welcome to Conduit", ignoreCase = true))
-                "NO CURRENT TITLE"
-            else
-                oldTitle
-
-            val prompt = PROMPTS.TITLE_GENERATION.replace("{CURRENT_TITLE}", currentTitle)
             messages += ChatMessage(
-                author = MessageAuthor(type = AuthorType.SYSTEM),
-                text = prompt
+                author = MessageAuthor(type = AuthorType.USER),
+                text = PROMPTS.TITLE_GENERATION
             )
 
-            //Trace.log("TITLE GEN START session=${systemExpert.sessionPtr}")
+            val prompt = AppUtils.buildPrompt(systemExpert, messages)
+                .replace("{CURRENT_TITLE}", oldTitle)
+                .replace("{PREVIOUS_SUMMARY}", effectiveHistory.precedingContext)
+
+            Trace.log("TITLE GEN START session=$sessionPtr")
+
             val result = StringBuilder()
-            systemExpert.getResponse(messages).collect { token ->
+            LlmPortal.getResponse(sessionPtr, prompt).collect { token ->
                 result.append(token)
             }
-            //Trace.log("TITLE GEN END session=${systemExpert.sessionPtr}")
+
+            Trace.log("TITLE GEN END session=$sessionPtr")
 
             val newTitle = result.toString().trim()
             return newTitle.ifEmpty { oldTitle }
         }
     }
 
-    suspend fun generateHistorySummary(systemExpert: Expert, chat: Chat, node: Node): String {
+    suspend fun generateHistorySummary(
+        systemExpert: Expert,
+        chat: Chat,
+        node: Node
+    ): String {
         chatUtilsMutex.withLock {
-            val history = getEffectiveNodeHistory(chat, node.id) + node
-
-            val previousSummary =
-                history.firstOrNull()?.historySummary.orEmpty()
-
-            val conversation = history
-                .mapNotNull { it.message }
-                .joinToString("\n\n") { message ->
-                    "${message.author.type}: ${message.text}"
-                }
-
-            val prompt = PROMPTS.HISTORY_SUMMARY_GENERATION
-                .replace("{PREVIOUS_SUMMARY}", previousSummary)
-                .replace("{CONVERSATION}", conversation)
-
-            val messages = listOf(
-                ChatMessage(
-                    author = MessageAuthor(type = AuthorType.SYSTEM),
-                    text = prompt
+            val sessionPtr = systemExpert.sessionPtr
+                ?: error(
+                    "Generating history summary for ${chat.title} return early " +
+                            "(sysExpert = ${systemExpert.sessionPtr})"
                 )
+
+            val effectiveHistory = getEffectiveNodeHistory(chat, node.id)
+
+            val messages = mutableListOf<ChatMessage>()
+
+            // Context summarized before the nodes below.
+            messages += ChatMessage(
+                author = MessageAuthor(type = AuthorType.USER),
+                text = "Preceding context:\n${effectiveHistory.precedingContext}"
             )
 
-            // Trace.log("HISTORY SUMMARY START session=${systemExpert.sessionPtr}")
+            // The summary for `node` is up to, but does not include, `node`.
+            messages += effectiveHistory.nodes
+                .dropLast(1)
+                .mapNotNull { it.message }
+
+            // Tell the model what to do after presenting the context/conversation.
+            messages += ChatMessage(
+                author = MessageAuthor(type = AuthorType.USER),
+                text = PROMPTS.HISTORY_SUMMARY_GENERATION
+            )
+
+            val prompt = AppUtils.buildPrompt(systemExpert, messages)
+
+            Trace.log(
+                "MAINT: HISTORY SUMMARY START session=$sessionPtr node=${node.id}"
+            )
 
             val result = StringBuilder()
             try {
-                systemExpert.getResponse(messages).collect { token ->
+                LlmPortal.getResponse(sessionPtr, prompt).collect { token ->
                     result.append(token)
                 }
-                //Trace.log("HISTORY SUMMARY END session=${systemExpert.sessionPtr}")
             } catch (e: CancellationException) {
-                //Trace.log("HISTORY SUMMARY ABORTED session=${systemExpert.sessionPtr}")
+                Trace.log("MAINT: HISTORY SUMMARY ABORTED node=${node.id}")
                 throw e
             }
 
-            //Trace.log("HISTORY SUMMARY END session=${systemExpert.sessionPtr}")
+            Trace.log(
+                "MAINT: HISTORY SUMMARY END session=$sessionPtr node=${node.id}"
+            )
 
             return result.toString().trim()
         }

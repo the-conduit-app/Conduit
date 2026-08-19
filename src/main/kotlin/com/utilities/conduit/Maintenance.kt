@@ -1,77 +1,124 @@
-// Various Low priority maint jobs
-// 1. runTitleMaintenance: Periodically scan all chats and rename potential candidates automatically
-//
 package com.utilities.conduit
 
+// Various Low priority maintenance jobs
+// 1. runTitleMaintenance: Periodically scan all chats and rename potential candidates automatically
+// 2. generate internal navigation summaries for branching nodes
+// 3. Create and update user model
+
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.time.Duration.Companion.milliseconds
 
-object Maintenance {
-    private var maintenanceJob: Job? = null
-    private var state: AppState? = null
+// Global modifier to detect (and pass thru user activity)
+fun Modifier.userActivityMonitor(state: AppState): Modifier =
+    this.onPreviewKeyEvent {
+        state.lastUserActivity = System.currentTimeMillis()
+        Maintenance.onUserActivity()
+        false
+    }.pointerInput(Unit) {
+        awaitPointerEventScope {
+            while (true) {
+                awaitPointerEvent()
 
-    fun start(appState: AppState, scope: CoroutineScope) {
-        state = appState
-        val chatsList = appState.chatsList
-
-        if (appState.chatManager.isGenerating) {
-            Trace.log("MAINT: SKIP — generation active")
-            return
-        }
-
-        //Trace.log("MAINT: START")
-        maintenanceJob?.cancel()
-        maintenanceJob = scope.launch(Dispatchers.Default) {
-            try {
-                runTitleMaintenanceJob(appState, chatsList)
-                //Trace.log("MAINT: ROUND COMPLETE")
-            } catch (e: CancellationException) {
-                //Trace.log("MAINT: CANCELLED - Current maintenance round cancelled")
-            } finally {
-                maintenanceJob = null
+                state.lastUserActivity = System.currentTimeMillis()
+                Maintenance.onUserActivity()
             }
         }
     }
 
-    fun cancel() {
-        val job = maintenanceJob ?: return
+object Maintenance {
+    private const val IDLE_TIMEOUT = 5_000L
+    private var maintenanceJob: Job? = null
+    private var state: AppState? = null
 
-        Trace.log("MAINT: CANCEL requested")
-        state?.systemExpert?.abortResponse()
-        job.cancel()
-        maintenanceJob = null
+    suspend fun start(state: AppState, scope: CoroutineScope) {
+        Maintenance.state = state
+        //Trace.log("Maint: STARTING")
+        while (currentCoroutineContext().isActive) {
+            delay(IDLE_TIMEOUT.milliseconds)
+            if (state.chatManager.isGenerating
+                || System.currentTimeMillis() - state.lastUserActivity < IDLE_TIMEOUT) {
+                continue
+            }
+
+            maintenanceJob = scope.launch(Dispatchers.Default) {
+                try {
+                    runMaintenance(state)
+                } catch (e: CancellationException) {
+                    Trace.log("MAINT: CANCELLED")
+                } finally {
+                    maintenanceJob = null
+                }
+            }
+            maintenanceJob?.join()
+        }
     }
 
-    fun stop() {
+    fun onUserActivity() {
         maintenanceJob?.cancel()
-        maintenanceJob = null
+    }
+
+    fun cancel() {
+        state?.systemExpert?.abortResponse()
+        maintenanceJob?.cancel()
+    }
+
+    suspend fun stop() {
+        val job = maintenanceJob ?: return
+
+        Trace.log("MAINT: STOPPING")
+        Maintenance.cancel()
+        job.cancel()
+        job.join()
+        Trace.log("MAINT: STOPPED")
+    }
+
+    private suspend fun runMaintenance(state: AppState) {
+        //Trace.log("RunMaint: STARTING")
+        currentCoroutineContext().ensureActive()
+        runTitleMaintenance(state)
+        currentCoroutineContext().ensureActive()
+        runHistorySummaryMaintenance(state)
+        //Trace.log("RunMaint: Finished")
     }
 
     // Rename a *single* anonymous chat, if found, and return
-     suspend fun runTitleMaintenanceJob(state: AppState, chatsList: ChatsList) {
+    suspend fun runTitleMaintenance(state: AppState) {
         val systemExpert = state.systemExpert
 
         if (systemExpert.sessionPtr == null) {
             Trace.log("Maintenance early ret - sysexpert.session = ${systemExpert.sessionPtr}")
             return
         }
+        //Trace.log("RunTitlemaint CGE = ${state.chatManager.currentlyGeneratingExpert}")
 
+        val chatsList = state.chatsList
         for (item in chatsList.items.toList()) {
             if (!item.chat.title.equals("Welcome to Conduit", ignoreCase = true))
                 continue
 
+            //Trace.log("RunTitlemaint ${item.chat.title} numnodes = ${item.chat.nodes.size}")
+
             if (item.chat.nodes.size < 3)
                 continue
+
             if (state.chatManager.currentlyGeneratingExpert != null)
                 return
 
-            Trace.log("Rename generating new title")
+            //Trace.log("Rename generating new title")
             val newTitle = ChatUtils.generateChatTitle(systemExpert, item.chat)
-            Trace.log("Rename generated new title = $newTitle")
+            //Trace.log("Rename generated new title = $newTitle")
 
             if (newTitle.equals(item.chat.title, ignoreCase = true))
                 continue
@@ -86,6 +133,45 @@ object Maintenance {
             }
 
             return
+        }
+    }
+
+    private suspend fun runHistorySummaryMaintenance(state: AppState) {
+        val systemExpert = state.systemExpert
+
+        if (systemExpert.sessionPtr == null) {
+            Trace.log("MAINT: summary skip — system expert unavailable")
+            return
+        }
+
+        val chatsList = state.chatsList
+        for (item in chatsList.items.toList()) {
+            val chat = item.chat
+
+            for (node in chat.nodes.values) {
+                if (state.chatManager.currentlyGeneratingExpert != null) {
+                    Trace.log("Summary Generation break due to currently generating expert")
+                    return
+                }
+
+                if (node.children.size < 2)
+                    continue
+                if (node.historySummary != null)
+                    continue
+
+                //Trace.log("MAINT: generating history summary for node ${node.id} in chat ${chat.title}")
+
+                val summary = ChatUtils.generateHistorySummary(systemExpert, chat, node)
+                if (summary.isBlank())
+                    continue
+
+                node.historySummary = summary
+                ChatUtils.saveChatToDisk(chat)
+
+                //Trace.log("MAINT: generated history summary for node ${node.id}")
+
+                return
+            }
         }
     }
 }

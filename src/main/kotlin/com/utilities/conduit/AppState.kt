@@ -30,13 +30,17 @@ class AppState(
     var leftPanelMode by mutableStateOf(LeftPanelMode.LIST)
     val focusInput = mutableStateOf(0)
 
+    var lastUserActivity = System.currentTimeMillis()
+
     companion object {
         fun createSystemExpert() = Expert(
             id = "SYSTEM.ID",
             type = ExpertType.LOCAL,
             nickname = "Conduit",
             expertise = "General",
-            modelPath = "llm/gemma-2-9b-it-Q4_K_M.gguf"
+            modelPath = "llm/gemma-2-9b-it-Q4_K_M.gguf",
+            seedPrompt = "You are a general purpose expert. You assist with various administrative tasks " +
+                    "like summarizing chats, generating titles, the user model, etc."
         )
 
         // One new AppState per invocation
@@ -58,7 +62,16 @@ class AppState(
     }
 
     suspend fun shutdown() = withContext(Dispatchers.IO) {
+        Trace.log("APP: SHUTDOWN BEGIN")
+
+        Maintenance.stop()
+        Trace.log("APP: MAINT STOPPED")
+
+        chatManager.stopGeneration()
+        Trace.log("APP: GENERATION STOPPED")
+
+        Trace.log("APP: DESTROYING CONDUIT")
         LlmPortal.conduitLib.conduit_destroy(conduitPtr)
-        UserActivityMonitor.stop()
+        Trace.log("APP: CONDUIT DESTROYED")
     }
 }

@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -15,6 +16,7 @@ class ChatManager(
     val systemExpert: Expert)
 {
     private val mutex = Mutex()
+    var currentGenerationJob: Job? = null
 
     var version by mutableIntStateOf(0) // For Compose
         private set
@@ -35,10 +37,19 @@ class ChatManager(
 
     fun finishCurrentResponse() {
         currentlyGeneratingExpert = null
+        currentGenerationJob = null
     }
 
     fun abortCurrentResponse() {
         currentlyGeneratingExpert?.abortResponse()
+    }
+
+    suspend fun stopGeneration() {
+        Trace.log("CHAT: STOPPING generation job=$currentGenerationJob expert=$currentlyGeneratingExpert")
+        currentlyGeneratingExpert?.abortResponse()
+        Trace.log("CHAT: ABORT SENT")
+        currentGenerationJob?.join()
+        Trace.log("CHAT: GENERATION JOINED")
     }
 
     suspend fun addNode(node: Node): ChatsListItem = mutex.withLock {

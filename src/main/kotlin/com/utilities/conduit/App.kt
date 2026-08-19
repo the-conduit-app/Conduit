@@ -18,12 +18,24 @@ val LocalActions = staticCompositionLocalOf<AppActions> { error("No AppActions p
 val AppJson = Json { prettyPrint = true; allowComments = true; ignoreUnknownKeys = true }
 
 @Composable
-fun App(exitApplication: () -> Unit) {
+fun App() {
     val scope = rememberCoroutineScope()
+    Trace.log("App launched")
 
     val maxTokensPerResponse = 2048L
     val conduitPtr = remember { LlmPortal.createConduit(maxTokensPerResponse) }
     val state = remember { AppState.createNew(conduitPtr, scope = scope) }
+
+//    // Stress test helper
+//    scope.launch {
+//        CpuHammer.run(10_000)
+//    }
+//
+//    scope.launch {
+//        SessionHammer.run(
+//            conduitPtr, AppUtils.getAbsoluteModelPath("llm/gemma-2-9b-it-Q4_K_M.gguf")
+//        )
+//    }
 
     LaunchedEffect(Unit) {
         state.chatsList.build()        // load existing chats in the chats dir
@@ -35,12 +47,12 @@ fun App(exitApplication: () -> Unit) {
 
         val defaultPack = packs.find { it.id == "Default" } ?: error("Default pack not found")
         defaultPack.select(state)
-        defaultPack.initializeExperts(state, scope) // may launch several model.inits
+        defaultPack.initializeExperts(state) // may launch several model.inits
 
         // Launch the system expert
         state.systemExpert.modelPath?.let { modelPath ->
             val absoluteModelPath = AppUtils.getAbsoluteModelPath(modelPath)
-            scope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
                 try {
                     state.systemExpert.sessionPtr = LlmPortal.initialize(state.conduitPtr, absoluteModelPath)
                 } catch (e: Exception) {
@@ -51,54 +63,27 @@ fun App(exitApplication: () -> Unit) {
 
         val echoExpert = defaultPack.experts.find { it.modelPath == InternalExperts.SIMPLE_ECHO }
         state.currentExpert.value = echoExpert
+        Maintenance.start(state, scope)
     }
     DisposableEffect(Unit) {
-        Runtime.getRuntime().addShutdownHook(
-            Thread {
-                runBlocking {
-                    state.shutdown()
-                }
-            }
-        )
-        onDispose { }
-    }
+        val hook = Thread {
+            scope.launch { state.shutdown() }
+        }
+        Runtime.getRuntime().addShutdownHook(hook)
 
-    // -----------------------------------------------------------------------------------------
-
-    // Monitoring user activity for maint jobs (renaming chats, etc.)
-    LaunchedEffect(Unit) {
-        UserActivityMonitor.start(
-            scope,
-            onIdleJob = { Maintenance.start(state, scope) },
-            onActivity = { Maintenance.cancel() }
-        )
-    }
-    DisposableEffect(Unit) {
         onDispose {
-            //UserActivityMonitor.stop()
+            Runtime.getRuntime().removeShutdownHook(hook)
         }
     }
 
     //------------------------------------------------------------------------------------------
 
-    val windowState = rememberWindowState(
-        width = 1280.dp,
-        height = 800.dp
-    )
-
-    Window(
-        state = windowState,
-        title = "Conduit Workspace",
-        onCloseRequest = { exitApplication() }
-    ) {
-        CompositionLocalProvider(LocalActions provides AppActions(scope, state)) {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .userActivityMonitor()
-            ) {
-                MainScreen(state)
-            }
+    CompositionLocalProvider(LocalActions provides AppActions(state)) {
+        Box(Modifier
+            .fillMaxSize()
+            .userActivityMonitor(state)
+        ) {
+            MainScreen(state)
         }
     }
 }

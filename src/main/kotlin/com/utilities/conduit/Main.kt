@@ -11,7 +11,16 @@ fun main() {
     copyAssetsToFilesDir()
 
     application {
-        App(exitApplication = ::exitApplication)
+        Window(
+            state = rememberWindowState(
+                width = 1280.dp,
+                height = 800.dp
+            ),
+            title = "Conduit Workspace",
+            onCloseRequest = ::exitApplication
+        ) {
+            App()
+        }
     }
 }
 

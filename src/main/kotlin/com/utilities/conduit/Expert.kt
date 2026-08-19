@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.sun.jna.Pointer
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.util.*
@@ -22,13 +23,6 @@ class Expert(
     val modelPath: String? = null,
     val seedPrompt: String? = null,
 ) {
-    @Transient
-    private val handler: ExpertHandler = when (type) {
-        ExpertType.INTERNAL -> InternalExpertHandler
-        ExpertType.LOCAL    -> LocalExpertHandler
-        ExpertType.REMOTE   -> throw NotImplementedError("Remote experts not yet supported")
-    }
-
     // Runtime state shared by all Experts using the same model.
     var sessionPtr by mutableStateOf<Pointer?>(null)
     val isReady: Boolean
@@ -37,12 +31,37 @@ class Expert(
             else -> true
         }
 
+    fun getResponse(messages: List<ChatMessage>): Flow<String> {
+        return when (type) {
+            ExpertType.INTERNAL -> {
+                val prompt = messages.lastOrNull { it.author.type == AuthorType.USER }
+                    ?.text
+                    ?: "?"
+                EchoPortal.getResponse(this, prompt)
+            }
+            ExpertType.LOCAL -> {
+                val sessionPtr = sessionPtr ?: error("Expert '${nickname}': LLM session not found.")
 
-    fun getResponse(messages: List<ChatMessage>): Flow<String> =
-        handler.generateResponse(this, messages)
+                val prompt: String = AppUtils.buildPrompt(this, messages)
+                LlmPortal.getResponse(sessionPtr, prompt)
+            } else -> {
+                flowOf("?")
+            }
+        }
+    }
 
     fun abortResponse() {
-        handler.abortResponse(this)
+        when (type) {
+            ExpertType.INTERNAL -> {
+                EchoPortal.abortResponse()
+            }
+            ExpertType.LOCAL -> {
+                sessionPtr?.let {
+                    LlmPortal.abortResponse(it)
+                }
+            }
+            else -> {}
+        }
     }
 }
 
