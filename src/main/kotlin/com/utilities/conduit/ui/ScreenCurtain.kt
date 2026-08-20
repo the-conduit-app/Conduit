@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.ui
 
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
@@ -8,10 +8,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable.isActive
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlin.time.Duration.Companion.milliseconds
 
 // Overlay for showing/hiding what's behind (using opacity)
 class ScreenCurtain (private val scope: CoroutineScope) {

@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.chat
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
@@ -22,6 +22,8 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.utilities.conduit.AppState
+import com.utilities.conduit.AppUtils
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 

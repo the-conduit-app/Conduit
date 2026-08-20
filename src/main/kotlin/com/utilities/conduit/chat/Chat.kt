@@ -1,9 +1,7 @@
-package com.utilities.conduit
+package com.utilities.conduit.chat
 
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.util.*

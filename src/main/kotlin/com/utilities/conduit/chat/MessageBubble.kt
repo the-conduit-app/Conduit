@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.chat
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.util.*
+import com.utilities.conduit.ui.ConduitTheme
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

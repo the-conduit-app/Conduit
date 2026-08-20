@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.chat
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -12,6 +12,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.utilities.conduit.AppState
 
 // Shown as an overlay (higher z-level) at the very top of the parent ChatView (inside it)
 // The visibility of this panel is controlled by state.notification.opacity which

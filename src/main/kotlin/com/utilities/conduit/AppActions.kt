@@ -1,11 +1,19 @@
 package com.utilities.conduit
 
 import com.utilities.conduit.AppUtils.makeOptionalDateTag
-import kotlinx.coroutines.CoroutineScope
+import com.utilities.conduit.chat.AuthorType
+import com.utilities.conduit.chat.ChatMessage
+import com.utilities.conduit.chat.ChatUtils
+import com.utilities.conduit.chat.ChatsListItem
+import com.utilities.conduit.chat.MessageAuthor
+import com.utilities.conduit.chat.MessageStatus
+import com.utilities.conduit.chat.Node
+import com.utilities.conduit.chat.NodeType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.collections.mapNotNull
 import kotlin.coroutines.cancellation.CancellationException
 
 class AppActions(

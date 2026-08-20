@@ -1,16 +1,16 @@
-package com.utilities.conduit
+package com.utilities.conduit.portals
 
+import com.sun.jna.Native
 import com.sun.jna.Pointer
-import com.utilities.conduit.LlmPortal.conduitLib
+import com.utilities.conduit.AppUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import java.io.File
-import java.lang.Thread.interrupted
 import kotlin.coroutines.cancellation.CancellationException
 
 object LlmPortal {
     private val conduitLibPath = AppUtils.getNativeLibPath("libconduit.dylib")
-    val conduitLib: ConduitLib = com.sun.jna.Native.load(conduitLibPath, ConduitLib::class.java)
+    val conduitLib: ConduitLib = Native.load(conduitLibPath, ConduitLib::class.java)
 
     fun createConduit(maxTokens: Long): Pointer = conduitLib.conduit_create(maxTokens)
             ?: error("Failed to create Conduit")

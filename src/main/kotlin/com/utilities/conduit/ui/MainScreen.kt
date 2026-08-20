@@ -1,9 +1,10 @@
-package com.utilities.conduit
+package com.utilities.conduit.ui
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.utilities.conduit.AppState
 
 @Composable
 fun MainScreen(state: AppState) {

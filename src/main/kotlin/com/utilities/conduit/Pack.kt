@@ -1,13 +1,11 @@
 package com.utilities.conduit
 
-import com.utilities.conduit.AppUtils.getAppPath
-import kotlinx.coroutines.CoroutineScope
+import com.utilities.conduit.portals.LlmPortal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import java.nio.file.Paths
 
 @Serializable
 data class Pack(

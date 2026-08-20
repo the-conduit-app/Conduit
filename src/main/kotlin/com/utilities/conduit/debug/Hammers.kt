@@ -1,6 +1,7 @@
-package com.utilities.conduit
+package com.utilities.conduit.debug
 
 import com.sun.jna.Pointer
+import com.utilities.conduit.portals.LlmPortal
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch

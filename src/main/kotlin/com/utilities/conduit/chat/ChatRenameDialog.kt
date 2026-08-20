@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.chat
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

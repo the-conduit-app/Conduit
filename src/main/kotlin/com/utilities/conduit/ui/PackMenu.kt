@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -21,6 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import com.utilities.conduit.AppState
+import com.utilities.conduit.LocalActions
+import com.utilities.conduit.Pack
+
 @Composable
 fun PackMenu(state: AppState) {
     val appActions = LocalActions.current

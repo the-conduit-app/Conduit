@@ -1,12 +1,13 @@
-package com.utilities.conduit
+package com.utilities.conduit.chat
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import com.utilities.conduit.AppJson
 import com.utilities.conduit.AppUtils.getAppPath
-import com.utilities.conduit.ChatUtils.makeChatFileName
+import com.utilities.conduit.chat.ChatUtils.makeChatFileName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -16,7 +17,6 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.attribute.BasicFileAttributes
 import java.util.*
-import kotlin.collections.copy
 
 data class ChatsListItem(
     val chat: Chat,
@@ -99,7 +99,7 @@ class ChatsList(
             }
             if (index < 0) return false
 
-            val fileName = ChatUtils.makeChatFileName(item.chat.id, item.chat.title)
+            val fileName = makeChatFileName(item.chat.id, item.chat.title)
             val chatDir = Paths.get(getAppPath(), "chats")
             val deletedDir = chatDir.resolve("deleted")
 

@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.chat
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -10,16 +10,16 @@ import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,6 +32,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.utilities.conduit.AppState
+import com.utilities.conduit.AppUtils
+import com.utilities.conduit.ui.ConduitContextMenuRepresentation
+import com.utilities.conduit.ui.PulsingBranchIcon
 import kotlinx.coroutines.launch
 import kotlin.collections.forEach
 import kotlin.let
@@ -90,38 +94,24 @@ private fun BranchAnimatedHistory(
     Column {
         // Shared history remains stationary.
         transition.shared.forEach { node ->
-            ChatNodeRow(
-                state = state,
-                chat = chat,
-                node = node,
-                version = version
-            )
+            key(node.id, chat.cursorNodeId) {
+                ChatNodeRow(state, chat, node, version)
+            }
         }
 
         // The changing suffix will be animated here.
         AnimatedContent(
-            targetState = transition.incoming.map { it.id },
+            targetState = transition.incoming,
             transitionSpec = {
                 (
-                        slideInHorizontally(
-                            initialOffsetX = { -it }
-                        ) + fadeIn()
-                        ) togetherWith (
-                        slideOutHorizontally(
-                            targetOffsetX = { it }
-                        ) + fadeOut()
-                        )
+                        slideInHorizontally(initialOffsetX = { -it }) + fadeIn()) togetherWith (
+                        slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
+                )
             },
-            label = "branch-suffix"
-        ) { _ ->
+            label = "branch-suffix") { incomingNodes ->
             Column {
-                transition.incoming.forEach { node ->
-                    ChatNodeRow(
-                        state = state,
-                        chat = chat,
-                        node = node,
-                        version = version
-                    )
+                incomingNodes.forEach {
+                    node -> ChatNodeRow(state, chat, node, version)
                 }
             }
         }
@@ -134,7 +124,7 @@ private fun BranchAnimatedHistory(
 fun ColumnScope.ChatView(state: AppState) {
     val version = state.chatManager.version // DO NOT REMOVE - recomp trigger
     val chat = state.chatManager.currentChat
-    val listState = rememberLazyListState()
+    val scrollState = rememberScrollState()
 
     // The UI displays the single path from root to the current cursor.
     val historyNodes = ChatUtils.getFullHistory(chat, chat.cursorNodeId)
@@ -153,6 +143,20 @@ fun ColumnScope.ChatView(state: AppState) {
         }
 
         previousHistoryNodes.value = historyNodes
+    }
+
+    // Auto-scroll to bottom on addNode only (not branch switching etc.)
+    LaunchedEffect(state.chatManager.nodeAddedVersion) {
+        if (historyNodes.isNotEmpty()) {
+            scrollState.scrollTo(scrollState.maxValue)
+        }
+    }
+
+    val generatingMessage = historyNodes.lastOrNull()?.message?.takeIf { it.textInProgress.value != null }
+    LaunchedEffect(generatingMessage?.textInProgress?.value) {
+        if (generatingMessage != null) {
+            scrollState.scrollTo(scrollState.maxValue)
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -178,22 +182,20 @@ fun ColumnScope.ChatView(state: AppState) {
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            LazyColumn(
-                state = listState,
-                contentPadding = PaddingValues(bottom = 10.dp),
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .verticalScroll(scrollState)
                     .padding(horizontal = 16.dp, vertical = 4.dp)
+                    .padding(bottom = 10.dp)
             ) {
-                item(key = "history-$version") {
-                    BranchAnimatedHistory(
-                        state = state,
-                        chat = chat,
-                        historyNodes = historyNodes,
-                        transition = branchTransition,
-                        version = version
-                    )
-                }
+                BranchAnimatedHistory(
+                    state = state,
+                    chat = chat,
+                    historyNodes = historyNodes,
+                    transition = branchTransition,
+                    version = version
+                )
             }
 
             if (state.rightScreenCurtain.isActive) {
@@ -209,13 +211,6 @@ fun ColumnScope.ChatView(state: AppState) {
             }
         }
     }
-
-    // Auto-scroll to bottom on addNode only (not branch switching etc.)
-    LaunchedEffect(state.chatManager.nodeAddedVersion) {
-        if (historyNodes.isNotEmpty()) {
-            listState.scrollToItem(historyNodes.lastIndex)
-        }
-    }
 }
 
 // ----------------------------------------------------------------------------------------
@@ -226,6 +221,11 @@ private fun ChatNodeRow(state: AppState, chat: Chat, node: Node, version: Int) {
     val isCursor = node.id == chat.cursorNodeId
     val isBranchable = node.children.size > 1 || (isCursor && node.children.isNotEmpty())
     val isUserNode = node.message?.author?.type == AuthorType.USER
+
+//    Trace.log(
+//        "NODE: ${node.id.take(4)} cursor=${chat.cursorNodeId?.take(4)} " +
+//                "isCursor=$isCursor children=${node.children.size} branchable=$isBranchable"
+//    )
 
     val menuItems: (() -> List<ContextMenuItem>)? =
         if (isCursor && node.children.isEmpty()) {

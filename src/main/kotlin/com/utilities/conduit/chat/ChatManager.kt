@@ -1,9 +1,11 @@
-package com.utilities.conduit
+package com.utilities.conduit.chat
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.utilities.conduit.Expert
+import com.utilities.conduit.debug.Trace
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -11,9 +13,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
+// TODO - remove scope and systemExpert params
 class ChatManager(
     private val scope: CoroutineScope,
-    val systemExpert: Expert)
+    val systemExpert: Expert
+)
 {
     private val mutex = Mutex()
     var currentGenerationJob: Job? = null

@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.portals
 
 import com.sun.jna.Callback
 import com.sun.jna.Library

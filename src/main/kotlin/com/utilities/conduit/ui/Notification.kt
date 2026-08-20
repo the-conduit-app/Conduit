@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.ui
 
 import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween

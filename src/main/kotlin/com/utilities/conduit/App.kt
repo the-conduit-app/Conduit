@@ -4,12 +4,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.rememberWindowState
+import com.utilities.conduit.debug.Trace
+import com.utilities.conduit.portals.LlmPortal
+import com.utilities.conduit.ui.MainScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
@@ -20,7 +19,6 @@ val AppJson = Json { prettyPrint = true; allowComments = true; ignoreUnknownKeys
 @Composable
 fun App() {
     val scope = rememberCoroutineScope()
-    Trace.log("App launched")
 
     val maxTokensPerResponse = 2048L
     val conduitPtr = remember { LlmPortal.createConduit(maxTokensPerResponse) }

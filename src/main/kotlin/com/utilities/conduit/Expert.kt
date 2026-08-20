@@ -4,6 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.sun.jna.Pointer
+import com.utilities.conduit.chat.AuthorType
+import com.utilities.conduit.chat.ChatMessage
+import com.utilities.conduit.portals.EchoPortal
+import com.utilities.conduit.portals.LlmPortal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.Serializable

@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.debug
 
 import java.util.concurrent.atomic.AtomicInteger
 

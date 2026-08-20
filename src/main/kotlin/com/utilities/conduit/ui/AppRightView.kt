@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.ui
 
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -11,6 +11,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import com.utilities.conduit.AppState
+import com.utilities.conduit.LocalActions
+import com.utilities.conduit.chat.ChatControlsView
+import com.utilities.conduit.chat.ChatView
+import com.utilities.conduit.chat.ChatViewNotification
 import kotlinx.coroutines.launch
 
 @Composable

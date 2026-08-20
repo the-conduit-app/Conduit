@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.ui
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp

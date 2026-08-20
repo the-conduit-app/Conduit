@@ -2,11 +2,18 @@ package com.utilities.conduit
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.sun.jna.Pointer
+import com.utilities.conduit.chat.ChatManager
+import com.utilities.conduit.chat.ChatsList
+import com.utilities.conduit.debug.Trace
+import com.utilities.conduit.portals.LlmPortal
+import com.utilities.conduit.ui.LeftPanelMode
+import com.utilities.conduit.ui.Notification
+import com.utilities.conduit.ui.ScreenCurtain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -19,7 +26,7 @@ class AppState(
     val expertsMap: SnapshotStateMap<String, Expert>,
     val systemExpert: Expert,
     val chatManager: ChatManager
-    ) {
+) {
     var chatsList by mutableStateOf(ChatsList())
     var availablePacks by mutableStateOf(emptyList<Pack>())
     val notification = Notification(scope)

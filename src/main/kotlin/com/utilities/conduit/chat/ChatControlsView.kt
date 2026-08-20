@@ -1,10 +1,14 @@
-package com.utilities.conduit
+package com.utilities.conduit.chat
 
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.utilities.conduit.AppState
+import com.utilities.conduit.ui.ExpertsPanelView
+import com.utilities.conduit.LocalActions
+import com.utilities.conduit.ui.PackMenu
 
 // The area above the Chat Text Window, with the Packs Menu and Experts
 @Composable

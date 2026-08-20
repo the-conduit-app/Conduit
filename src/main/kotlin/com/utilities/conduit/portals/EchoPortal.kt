@@ -1,8 +1,9 @@
 /* All kinds of Internal Echo Experts. They all have a modelPath like
  * ":internal:SimpleEcho"
  */
-package com.utilities.conduit
+package com.utilities.conduit.portals
 
+import com.utilities.conduit.Expert
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
