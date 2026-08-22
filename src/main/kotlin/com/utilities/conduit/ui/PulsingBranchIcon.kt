@@ -1,9 +1,11 @@
 package com.utilities.conduit.ui
 
 import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
@@ -55,6 +57,11 @@ fun PulsingBranchIcon(
         )
     )
 
+    val direction by animateFloatAsState(
+        targetValue = if (isHovered) 1f else -1f,
+        animationSpec = tween(durationMillis = 2000, easing = FastOutSlowInEasing)
+    )
+
     val rotation by transition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
@@ -75,7 +82,7 @@ fun PulsingBranchIcon(
                 scaleX = scale
                 scaleY = scale
                 alpha = opacity
-                rotationZ = if (isHovered) -rotation else rotation
+                rotationZ = rotation * direction
             }
             .hoverable(interactionSource)
             .clickable(
@@ -86,19 +93,4 @@ fun PulsingBranchIcon(
                 onClick?.invoke()
             }
     )
-
-//    Icon(
-//        imageVector = ConduitIcons.CycleBranches,
-//        contentDescription = "Branches",
-//        modifier = modifier
-//            .graphicsLayer {
-//                scaleX = scale
-//                scaleY = scale
-//                alpha = opacity
-//                rotationZ = rotation
-//            }
-//            .clickable(enabled = onClick != null) {
-//                onClick?.invoke()
-//            }
-//    )
 }

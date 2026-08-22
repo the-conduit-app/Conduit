@@ -120,6 +120,12 @@ fun ChatsListView(state: AppState) {
                                         )
                                     }
                                 }
+                            },
+                            ContextMenuItem("TreeView") {
+                                scope.launch {
+                                    selectChat(item)
+                                    state.leftPanelMode = LeftPanelMode.TREE
+                                }
                             }
                         )
                     }

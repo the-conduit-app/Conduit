@@ -4,13 +4,15 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.isShiftPressed
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
 
@@ -24,15 +26,9 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
     val isGenerating = state.chatManager.isGenerating
 
     // value incremented by ChatsListView when selecting a new chat (to force recomp)
-    LaunchedEffect(state.focusInput.value, isGenerating) {
-        ////println("INPUT FOCUS: expert changed to ${state.currentExpert.value?.nickname}")
-        if (state.leftPanelMode != LeftPanelMode.LIST)
-            focusRequester.requestFocus()
-    }
     // User is free to switch experts via the Experts panel (for next prompt) during generation
-    LaunchedEffect(state.currentExpert.value) {
-        if (state.leftPanelMode != LeftPanelMode.LIST)
-            focusRequester.requestFocus()
+    LaunchedEffect(state.focusInput.value, state.currentExpert.value, isGenerating) {
+        focusRequester.requestFocus()
     }
 
     Row(
@@ -50,30 +46,28 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
             enabled = !isGenerating,
             placeholder = {
                 val name = state.currentExpert.value?.nickname ?: "an Expert"
-                Text("Type a message to $name...")
+                androidx.compose.material3.Text("Type a message to $name...")
             },
             modifier = Modifier
                 .weight(1f)
                 .heightIn(min = 60.dp, max = 180.dp)
                 .focusRequester(focusRequester)
-                .onPreviewKeyEvent { ev ->
+                .onKeyEvent { ev ->
                     when {
                         ev.key == Key.Escape -> {
                             text = ""
                             true
                         }
+                        ev.isShiftPressed -> false
 
-                        ev.key == Key.Enter && !ev.isShiftPressed -> {
+                        ev.key == Key.Enter -> {
                             if (text.isNotBlank() && !isGenerating) {
                                 onSend(text)
                                 text = ""
                             }
                             true
                         }
-                        ev.key == Key.Enter && ev.isShiftPressed -> {
-                            println("SHIFT ENTER: ${ev.type}")
-                            false
-                        }
+
                         else -> false
                     }
                 }
