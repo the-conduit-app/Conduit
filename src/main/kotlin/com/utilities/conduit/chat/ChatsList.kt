@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import com.utilities.conduit.AppJson
+import com.utilities.conduit.ui.AppJson
 import com.utilities.conduit.AppUtils.getAppPath
 import com.utilities.conduit.chat.ChatUtils.makeChatFileName
 import kotlinx.coroutines.Dispatchers

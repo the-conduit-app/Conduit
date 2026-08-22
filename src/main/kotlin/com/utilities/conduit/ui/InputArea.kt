@@ -1,9 +1,6 @@
 package com.utilities.conduit.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -96,9 +93,9 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
             }
         ) {
             if (isGenerating) {
-                Icon(Icons.Default.Stop, contentDescription = "Stop")
+                Icon(ConduitIcons.Stop, contentDescription = "Stop")
             } else {
-                Icon(Icons.Default.ArrowUpward, contentDescription = "Send")
+                Icon(ConduitIcons.ArrowUpward, contentDescription = "Send")
             }
         }
     }

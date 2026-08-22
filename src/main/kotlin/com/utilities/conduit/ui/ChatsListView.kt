@@ -1,4 +1,4 @@
-package com.utilities.conduit.chat
+package com.utilities.conduit.ui
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
@@ -24,6 +24,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
 import com.utilities.conduit.AppUtils
+import com.utilities.conduit.chat.ChatUtils
+import com.utilities.conduit.chat.ChatsListItem
+import com.utilities.conduit.ui.sounds.Tick
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 
@@ -47,6 +50,18 @@ fun ChatsListView(state: AppState) {
 
     val enabled = !state.chatManager.isGenerating
     var showRenameDialog by remember { mutableStateOf<ChatsListItem?>(null) }
+
+    suspend fun selectChat(item: ChatsListItem) {
+        if (item.chat.id == state.chatManager.currentChat.id) return
+        Tick.play()
+
+        state.rightScreenCurtain.show()
+        state.chatManager.currentChat = item.chat
+        if (item.chat.needsHumanReview)
+            chatsList.setNeedsHumanReview(item.chat.id, false)
+        state.rightScreenCurtain.hide()
+        state.focusInput.value++ // Trigger recomp
+    }
 
     Box(
         modifier = Modifier
@@ -78,14 +93,7 @@ fun ChatsListView(state: AppState) {
 
                         if (currentIndex >= 0 && newIndex in chatsList.items.indices) {
                             val item = chatsList.items[newIndex]
-
-                            state.rightScreenCurtain.show()
-                            state.chatManager.currentChat = item.chat
-                            chatsList.setNeedsHumanReview(item.chat.id, false)
-                            state.rightScreenCurtain.hide()
-                            state.focusInput.value++
-
-                            //listState.animateScrollToItem(newIndex)
+                            selectChat(item)
                         }
                     }
                     true
@@ -127,11 +135,7 @@ fun ChatsListView(state: AppState) {
                             )
                             .clickable(enabled = enabled) {
                                 scope.launch {
-                                    state.rightScreenCurtain.show()
-                                    state.chatManager.currentChat = item.chat
-                                    state.chatsList.setNeedsHumanReview(item.chat.id, false)
-                                    state.rightScreenCurtain.hide()
-                                    state.focusInput.value++ // just to trigger recomp of input area
+                                    selectChat(item)
                                 }
                             }
                             .padding(horizontal = 4.dp, vertical = 4.dp),
@@ -170,7 +174,8 @@ fun ChatsListView(state: AppState) {
                     scope.launch {
                         val updatedChat = state.chatsList.rename(item, newTitle)
                         if (updatedChat != null && updatedChat.id == state.chatManager.currentChat.id) {
-                            state.chatManager.currentChat = updatedChat
+                            //state.chatManager.currentChat = updatedChat
+                            selectChat(item.copy(chat = updatedChat))
                         }
                     }
                     showRenameDialog = null

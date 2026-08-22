@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
-import com.utilities.conduit.LocalActions
 import com.utilities.conduit.Pack
 
 @Composable
@@ -43,7 +40,7 @@ fun PackMenu(state: AppState) {
         ) {
             Text("Pack: ${currentPack?.name ?: "Select"}")
             Spacer(modifier = Modifier.width(8.dp))
-            Icon(Icons.Default.ArrowDropDown, null)
+            Icon(ConduitIcons.ArrowDropDown, null)
         }
     }
 

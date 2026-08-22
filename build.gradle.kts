@@ -17,7 +17,7 @@ dependencies {
     implementation(libs.compose.foundation)
     implementation(libs.compose.material3)
     implementation(libs.compose.ui.tooling)
-    implementation(libs.compose.material.icons.extended)
+    implementation(compose.components.resources)
 
     // KotlinX
     implementation(libs.kotlinx.coroutines.core)
@@ -25,17 +25,17 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.kotlinx.logger)
 
+    implementation(libs.kotlinx.coroutines.swing)
+
     // Tools & Native
     implementation(libs.jna)
     implementation(libs.jna.platform)
-
-    // Remove direct implementation("de.kherud:llama:4.2.0")
-    // if you are now using JNA to bridge the custom dylib.
 }
 
 compose.desktop {
     application {
         mainClass = "com.utilities.conduit.MainKt"
+
         jvmArgs("--enable-native-access=ALL-UNNAMED")
     }
 }

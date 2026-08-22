@@ -3,6 +3,7 @@ package com.utilities.conduit.portals
 import com.sun.jna.Native
 import com.sun.jna.Pointer
 import com.utilities.conduit.AppUtils
+import com.utilities.conduit.debug.Trace
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import java.io.File
@@ -35,6 +36,7 @@ object LlmPortal {
 
     // ---------------------------------------------------------------------------------
     fun getResponse(sessionPtr: Pointer, prompt: String): Flow<String> = callbackFlow {
+        //Trace.log("Sending prompt: $prompt")
         val callback = object : ConduitTokenCallback {
             override fun invoke(text: String?, userData: Pointer?) {
                 trySend(text?: "")
@@ -62,6 +64,8 @@ object LlmPortal {
 
     fun abortResponse(sessionPtr: Pointer) {
         requireNotNull(sessionPtr) { "LlmPortal couldn't find a session to abort" }
+        Trace.log("Aborting response: $sessionPtr")
+
         conduitLib.conduit_abort_generation(sessionPtr)
     }
 }

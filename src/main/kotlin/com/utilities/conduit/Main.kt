@@ -1,11 +1,14 @@
 package com.utilities.conduit
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import com.utilities.conduit.ui.App
 import java.io.File
-import kotlin.system.exitProcess
 
 fun main() {
     copyAssetsToFilesDir()
@@ -19,7 +22,13 @@ fun main() {
             title = "Conduit Workspace",
             onCloseRequest = ::exitApplication
         ) {
-            App()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    //.background(Color(0xFF252A2E))
+            ) {
+                App()
+            }
         }
     }
 }

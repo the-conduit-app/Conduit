@@ -1,4 +1,4 @@
-package com.utilities.conduit.chat
+package com.utilities.conduit.ui
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -34,8 +34,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
 import com.utilities.conduit.AppUtils
-import com.utilities.conduit.ui.ConduitContextMenuRepresentation
-import com.utilities.conduit.ui.PulsingBranchIcon
+import com.utilities.conduit.chat.AuthorType
+import com.utilities.conduit.chat.Chat
+import com.utilities.conduit.chat.ChatUtils
+import com.utilities.conduit.chat.Node
 import kotlinx.coroutines.launch
 import kotlin.collections.forEach
 import kotlin.let
@@ -125,6 +127,7 @@ fun ColumnScope.ChatView(state: AppState) {
     val version = state.chatManager.version // DO NOT REMOVE - recomp trigger
     val chat = state.chatManager.currentChat
     val scrollState = rememberScrollState()
+    var fullMessageText by remember { mutableStateOf<String?>(null) }
 
     // The UI displays the single path from root to the current cursor.
     val historyNodes = ChatUtils.getFullHistory(chat, chat.cursorNodeId)
@@ -222,11 +225,6 @@ private fun ChatNodeRow(state: AppState, chat: Chat, node: Node, version: Int) {
     val isBranchable = node.children.size > 1 || (isCursor && node.children.isNotEmpty())
     val isUserNode = node.message?.author?.type == AuthorType.USER
 
-//    Trace.log(
-//        "NODE: ${node.id.take(4)} cursor=${chat.cursorNodeId?.take(4)} " +
-//                "isCursor=$isCursor children=${node.children.size} branchable=$isBranchable"
-//    )
-
     val menuItems: (() -> List<ContextMenuItem>)? =
         if (isCursor && node.children.isEmpty()) {
             null
@@ -284,7 +282,7 @@ private fun ChatNodeRow(state: AppState, chat: Chat, node: Node, version: Int) {
         // Branching user nodes (right aligned) have the branch cycling icon on their left
         if (isUserNode && isBranchable) {
             PulsingBranchIcon(
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier.size(32.dp),
                 onClick = {
                     scope.launch {
                         state.chatManager.cycleBranch(node)
@@ -295,8 +293,9 @@ private fun ChatNodeRow(state: AppState, chat: Chat, node: Node, version: Int) {
 
         MessageBubble(
             node = node,
+            isCursor = isCursor,
             isBranchable = isBranchable,
-            contextMenuItems = menuItems
+            contextMenuItems = menuItems,
         )
 
         // Branching expert nodes (left aligned) have the branch cycling icon on their right

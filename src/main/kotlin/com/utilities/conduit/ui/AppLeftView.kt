@@ -11,9 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,8 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
-import com.utilities.conduit.chat.ChatTreeView
-import com.utilities.conduit.chat.ChatsListView
 import kotlinx.coroutines.launch
 
 enum class LeftPanelMode {
@@ -77,7 +72,7 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
                                 }
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Add,
+                                    imageVector = ConduitIcons.Add,
                                     contentDescription = "New chat"
                                 )
                             }
@@ -96,8 +91,8 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
                                 }
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Menu,
-                                    contentDescription = "Show chat list"
+                                    imageVector = ConduitIcons.Menu,
+                                    contentDescription = "Show chat list",
                                 )
                             }
                         }

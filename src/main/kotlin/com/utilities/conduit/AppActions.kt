@@ -1,5 +1,8 @@
 package com.utilities.conduit
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.utilities.conduit.AppUtils.makeOptionalDateTag
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.ChatMessage
@@ -9,6 +12,8 @@ import com.utilities.conduit.chat.MessageAuthor
 import com.utilities.conduit.chat.MessageStatus
 import com.utilities.conduit.chat.Node
 import com.utilities.conduit.chat.NodeType
+import com.utilities.conduit.debug.Trace
+import com.utilities.conduit.ui.FullMessageOverlayState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
@@ -17,8 +22,20 @@ import kotlin.collections.mapNotNull
 import kotlin.coroutines.cancellation.CancellationException
 
 class AppActions(
-    private val state: AppState
+    private val state: AppState,
+    private val fullMessageOverlayState: FullMessageOverlayState
 ) {
+    // For showing full large message content in an overlay panel separately
+    var fullMessageText by mutableStateOf<String?>(null)
+        private set
+
+    fun showFullMessage(text: String) {
+        fullMessageText = text
+    }
+    fun dismissFullMessage() {
+        fullMessageText = null
+    }
+
     fun switchExpert(newExpert: Expert?) {
         if (state.currentExpert.value == newExpert) return
         state.currentExpert.value = newExpert
@@ -103,7 +120,9 @@ class AppActions(
                 )
             )
 
+            //Trace.log("BEFORE user add: cursor=${state.chatManager.currentChat.cursorNodeId}")
             val chatListItem: ChatsListItem = state.chatManager.addNode(userNode)
+            //Trace.log("AFTER user add: cursor=${state.chatManager.currentChat.cursorNodeId}")
 
             if (needsChatListInsertion) { // first node in chat
                 withContext(Dispatchers.Main) {
@@ -111,7 +130,10 @@ class AppActions(
                 }
             }
 
+            //Trace.log("BEFORE response add: cursor=${state.chatManager.currentChat.cursorNodeId}")
             val item = state.chatManager.addNode(responseNode)
+            //Trace.log("AFTER response add: cursor=${state.chatManager.currentChat.cursorNodeId}")
+
 
             withContext(Dispatchers.Main) {
                 state.chatsList.touch(item)

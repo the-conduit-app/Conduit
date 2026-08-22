@@ -72,6 +72,7 @@ object Maintenance {
     }
 
     fun cancel() {
+        Trace.log("Maintenance: cancel")
         state?.systemExpert?.abortResponse()
         maintenanceJob?.cancel()
     }
@@ -79,11 +80,11 @@ object Maintenance {
     suspend fun stop() {
         val job = maintenanceJob ?: return
 
-        Trace.log("MAINT: STOPPING")
+        //Trace.log("MAINT: STOPPING")
         Maintenance.cancel()
         job.cancel()
         job.join()
-        Trace.log("MAINT: STOPPED")
+        //Trace.log("MAINT: STOPPED")
     }
 
     private suspend fun runMaintenance(state: AppState) {

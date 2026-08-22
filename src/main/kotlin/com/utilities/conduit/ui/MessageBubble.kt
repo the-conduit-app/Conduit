@@ -1,13 +1,18 @@
-package com.utilities.conduit.chat
+package com.utilities.conduit.ui
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -16,18 +21,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.utilities.conduit.ui.ConduitTheme
+import com.utilities.conduit.chat.AuthorType
+import com.utilities.conduit.chat.Node
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MessageBubble(
     node: Node,
+    isCursor: Boolean,
     isBranchable: Boolean = false,
     contextMenuItems: (() -> List<ContextMenuItem>)?
 ) {
     when (node.message?.author?.type ?: AuthorType.SYSTEM) {
-        AuthorType.USER -> UserMessageBubble(node, isBranchable, contextMenuItems)
-        AuthorType.ASSISTANT -> ExpertMessageBubble(node, isBranchable, contextMenuItems)
+        AuthorType.USER -> UserMessageBubble(node, isCursor, isBranchable, contextMenuItems)
+        AuthorType.ASSISTANT -> ExpertMessageBubble(node, isCursor, isBranchable, contextMenuItems)
         AuthorType.SYSTEM -> SystemMessageBubble(node.message?.text ?: "Hmm... Wonder where this came from!")
     }
 }
@@ -35,9 +42,11 @@ fun MessageBubble(
 // ----------------------------------------------------------------------------------------
 
 @Composable
-private fun UserMessageBubble(node: Node, isBranchable: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
-    val text = node.message?.textInProgress?.value ?: node.message?.text.orEmpty()
+private fun UserMessageBubble(node: Node, isCursor: Boolean, isBranchable: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
+    val textInProgress = node.message?.textInProgress?.value
+    val text = textInProgress ?: node.message?.text.orEmpty()
     val title = node.message?.title ?: "Donowatt" // an unknown amount of power
+    var hasMore by remember { mutableStateOf(false) }
 
     val bubbleColor = if (isBranchable)
         ConduitTheme.Colors.MessageBubble.Branchable.User
@@ -55,9 +64,7 @@ private fun UserMessageBubble(node: Node, isBranchable: Boolean, contextMenuItem
         0.dp
 
     val bubble: @Composable () -> Unit = {
-        Text(
-            text = text.trim(),
-            fontSize = if (isBranchable) 15.sp else 14.sp,
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .widthIn(max = ConduitTheme.Dimensions.MessageBubble.MaxWidth)
@@ -69,8 +76,29 @@ private fun UserMessageBubble(node: Node, isBranchable: Boolean, contextMenuItem
                     bubbleColor,
                     RoundedCornerShape(cornerRadius)
                 )
-                .padding(ConduitTheme.Dimensions.MessageBubble.Padding)
-        )
+                .padding(ConduitTheme.Dimensions.MessageBubble.Padding),
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(
+                text = text.trim(),
+                fontSize = if (isBranchable) 15.sp else 14.sp,
+                maxLines = if (textInProgress == null && !isCursor) 5 else Int.MAX_VALUE,
+                onTextLayout = { result ->
+                    hasMore = textInProgress == null && result.hasVisualOverflow
+                }
+            )
+
+            if (hasMore && !isCursor) {
+                val appActions = LocalActions.current
+                Text(
+                    text = "… More",
+                    fontSize = 12.sp,
+                    modifier = Modifier.clickable {
+                        appActions.showFullMessage(text)
+                    }
+                )
+            }
+        }
     }
 
     Column(
@@ -98,10 +126,11 @@ private fun UserMessageBubble(node: Node, isBranchable: Boolean, contextMenuItem
 // ----------------------------------------------------------------------------------------
 
 @Composable
-private fun ExpertMessageBubble(node: Node, isBranchable: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
+private fun ExpertMessageBubble(node: Node, isCursor: Boolean, isBranchable: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
     val textInProgress = node.message?.textInProgress?.value
     val text = textInProgress ?: node.message?.text.orEmpty()
     val title = node.message?.title ?: "Donovich"
+    var hasMore by remember { mutableStateOf(false) }
 
     val bubbleColor = if (isBranchable)
         ConduitTheme.Colors.MessageBubble.Branchable.Expert
@@ -139,10 +168,31 @@ private fun ExpertMessageBubble(node: Node, isBranchable: Boolean, contextMenuIt
                     strokeWidth = 2.dp
                 )
             } else {
-                Text(
-                    text = text.trim(),
-                    fontSize = if (isBranchable) 15.sp else 14.sp
-                )
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.Start
+                )  {
+                    Text(
+                        text = text.trim(),
+                        fontSize = if (isBranchable) 15.sp else 14.sp,
+                        maxLines = if (textInProgress == null && !isCursor) 5 else Int.MAX_VALUE,
+                        onTextLayout = { result ->
+                            hasMore = textInProgress == null && result.hasVisualOverflow
+                        }
+                    )
+
+                    if (hasMore && !isCursor) {
+                        val appActions = LocalActions.current
+                        //Trace.log("Expert More: reading GlassHostController")
+                        Text(
+                            text = "… More",
+                            fontSize = 12.sp,
+                            modifier = Modifier.clickable {
+                                appActions.showFullMessage(text)
+                            }
+                        )
+                    }
+                }
             }
         }
     }

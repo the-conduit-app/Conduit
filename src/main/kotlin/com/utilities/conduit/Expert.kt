@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import com.sun.jna.Pointer
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.ChatMessage
+import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.EchoPortal
 import com.utilities.conduit.portals.LlmPortal
 import kotlinx.coroutines.flow.Flow
@@ -55,6 +56,7 @@ class Expert(
     }
 
     fun abortResponse() {
+        Trace.log("Expert Aborting Response: ${sessionPtr}")
         when (type) {
             ExpertType.INTERNAL -> {
                 EchoPortal.abortResponse()

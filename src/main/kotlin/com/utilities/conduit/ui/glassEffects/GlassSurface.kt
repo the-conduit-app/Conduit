@@ -1,10 +1,13 @@
 package org.example.glassEffects
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,21 +26,33 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toComposeImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import conduit.generated.resources.Res
+import conduit.generated.resources.background
+import jdk.internal.org.commonmark.internal.Bracket.image
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.skia.RuntimeEffect
 import org.jetbrains.skia.Data
+import org.jetbrains.skia.FilterTileMode
+import org.jetbrains.skia.ImageFilter
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import org.jetbrains.skia.Shader
-
+/*
 data class GlassBackdrop(
     val image: ImageBitmap,
     val coordinates: LayoutCoordinates
 )
 val LocalGlassBackdrop = staticCompositionLocalOf<GlassBackdrop?> { null }
+val LocalGlassHostController = staticCompositionLocalOf<GlassHostController> {
+    error("GlassHostController not provided")
+}
 
 @Composable
 fun GlassSurface(
@@ -52,22 +67,44 @@ fun GlassSurface(
 ) {
     val shape = RoundedCornerShape(cornerRadius)
     val backdrop = LocalGlassBackdrop.current
-    var coordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    var coordinates by remember {
+        mutableStateOf<LayoutCoordinates?>(null)
+    }
+
+    backdrop?.image?.let { image ->
+        println(
+            "GLASS IMAGE=${image.width}x${image.height}"
+        )
+    }
 
     Box(
         modifier = modifier
+            .width(400.dp)
+            .height(300.dp)
             .clip(shape)
-            .onGloballyPositioned { coordinates = it }
-            .background(Color.White.copy(alpha = tintAlpha))
+            .onGloballyPositioned {
+                coordinates = it
+            }
+            .background(Color.LightGray.copy(alpha = 1f))
             .border(
-                width = 1.dp,
-                color = Color.White.copy(alpha = borderAlpha),
-                shape = shape
+                1.dp,
+                Color.White.copy(alpha = borderAlpha),
+                shape
             )
     ) {
-        backdrop?.image?.let { image ->
+//        Image(
+//
+//            painter = painterResource(Res.drawable.background),
+//            contentDescription = null,
+//            modifier = Modifier
+//                .matchParentSize()
+//                .clip(shape),
+//            contentScale = ContentScale.Crop
+//        )
 
+        backdrop?.image?.let { image ->
             coordinates?.let { surfaceCoordinates ->
+
                 val hostCoordinates = backdrop.coordinates
 
                 val topLeft = hostCoordinates.localPositionOf(
@@ -81,33 +118,43 @@ fun GlassSurface(
                     right = topLeft.x + surfaceCoordinates.size.width,
                     bottom = topLeft.y + surfaceCoordinates.size.height
                 )
+            }
+        }
 
                 Canvas(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .matchParentSize()
                         .clip(shape)
                         .graphicsLayer {
-                            scaleX = scale
-                            scaleY = scale
                             renderEffect = BlurEffect(
                                 radiusX = blurRadius,
-                                radiusY = blurRadius
+                                radiusY = blurRadius,
                             )
                         }
                 ) {
                     drawIntoCanvas { canvas ->
-                        val paint = Paint()
 
-                        paint.shader = makeLensShader(
-                            image = image,
-                            width = size.width,
-                            height = size.height,
-                            sourceRect = bounds,
-                            strength = lensStrength
-                        )
+                        val paint = org.jetbrains.skia.Paint()
 
-                        canvas.drawRect(
-                            Rect(0f, 0f, size.width, size.height),
+                        val skiaImage =
+                            org.jetbrains.skia.Image.makeFromBitmap(
+                                image.asSkiaBitmap()
+                            )
+
+                        canvas.nativeCanvas.drawImageRect(
+                            skiaImage,
+                            org.jetbrains.skia.Rect(
+                                bounds.left,
+                                bounds.top,
+                                bounds.right,
+                                bounds.bottom
+                            ),
+                            org.jetbrains.skia.Rect(
+                                0f,
+                                0f,
+                                size.width,
+                                size.height
+                            ),
                             paint
                         )
                     }
@@ -118,7 +165,7 @@ fun GlassSurface(
         Box(
             modifier = Modifier.matchParentSize()
         ) {
-            content()
+            //content()
         }
     }
 }
@@ -183,3 +230,83 @@ private fun makeLensShader(
         null
     )
 }
+
+private fun blurImage(
+    image: ImageBitmap,
+    sourceRect: Rect,
+    sigma: Float
+): ImageBitmap {
+    val skiaImage = image.asSkiaBitmap()
+        .let { org.jetbrains.skia.Image.makeFromBitmap(it) }
+
+    val width = sourceRect.width.toInt()
+    val height = sourceRect.height.toInt()
+
+    val surface = org.jetbrains.skia.Surface.makeRasterN32Premul(
+        width,
+        height
+    )
+
+    val paint = org.jetbrains.skia.Paint().apply {
+        imageFilter = ImageFilter.makeBlur(
+            sigmaX = sigma,
+            sigmaY = sigma,
+            mode = FilterTileMode.CLAMP
+        )
+    }
+
+    surface.canvas.drawImageRect(
+        skiaImage,
+        org.jetbrains.skia.Rect(
+            sourceRect.left,
+            sourceRect.top,
+            sourceRect.right,
+            sourceRect.bottom
+        ),
+        org.jetbrains.skia.Rect(
+            0f,
+            0f,
+            width.toFloat(),
+            height.toFloat()
+        ),
+        paint
+    )
+
+    surface.flush()
+
+    return surface.makeImageSnapshot().toComposeImageBitmap()
+}
+
+private fun subsetImage(
+    image: ImageBitmap,
+    sourceRect: Rect
+): org.jetbrains.skia.Bitmap
+{
+    val source = image.asSkiaBitmap()
+
+    val left = sourceRect.left.toInt()
+    val top = sourceRect.top.toInt()
+    val right = sourceRect.right.toInt()
+    val bottom = sourceRect.bottom.toInt()
+
+    val width = right - left
+    val height = bottom - top
+
+    val destination = org.jetbrains.skia.Bitmap()
+    destination.allocN32Pixels(width, height)
+
+    check(
+        source.extractSubset(
+            destination,
+            org.jetbrains.skia.IRect.makeLTRB(
+                left,
+                top,
+                right,
+                bottom
+            )
+        )
+    )
+
+    return destination
+}
+*/

@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -16,19 +17,28 @@ import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-
+import com.utilities.conduit.debug.Trace
+import jdk.internal.org.commonmark.internal.Bracket.image
+/*
 @Composable
 fun GlassHost(
     modifier: Modifier = Modifier,
+    controller: GlassHostController,
     content: @Composable () -> Unit
 ) {
     var capturedImage by remember { mutableStateOf<ImageBitmap?>(null) }
     var hostCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
-    CapturedContent(
+    Trace.log("GlassSurface RECEIVED controller=${controller.hashCode()}")
+
+    CaptureBackground(
         modifier = modifier,
+        captureRequestVersion = controller.captureRequestVersion,
         onPositioned = { hostCoordinates = it },
-        onCaptured = { capturedImage = it }
+        onCaptureComplete = { image ->
+            capturedImage = image
+            controller.captureCompleted()
+        }
     ) {
         CompositionLocalProvider(
             LocalGlassBackdrop provides
@@ -36,18 +46,38 @@ fun GlassHost(
                         hostCoordinates?.let { coordinates ->
                             GlassBackdrop(image, coordinates)
                         }
-                    }
+                    },
+            LocalGlassHostController provides controller
         ) {
+            Trace.log("GlassHost PROVIDING controller=${controller.hashCode()}")
             content()
         }
     }
 }
 
+class GlassHostController {
+    internal var captureRequestVersion by mutableIntStateOf(0)
+        private set
+
+    private var onCaptureComplete: (() -> Unit)? = null
+
+    fun captureBackground(onCaptureComplete: () -> Unit) {
+        this.onCaptureComplete = onCaptureComplete
+        captureRequestVersion++
+    }
+
+    internal fun captureCompleted() {
+        onCaptureComplete?.invoke()
+        onCaptureComplete = null
+    }
+}
+
 @Composable
-private fun CapturedContent(
+private fun CaptureBackground(
     modifier: Modifier = Modifier,
+    captureRequestVersion: Int,
     onPositioned: (LayoutCoordinates) -> Unit,
-    onCaptured: (ImageBitmap) -> Unit,
+    onCaptureComplete: (ImageBitmap) -> Unit,
     content: @Composable () -> Unit
 ) {
     val graphicsLayer = rememberGraphicsLayer()
@@ -71,15 +101,14 @@ private fun CapturedContent(
         content()
     }
 
-    LaunchedEffect(ready) {
-        if (ready) {
-            withFrameNanos { }
+    LaunchedEffect(ready, captureRequestVersion) {
+        if (!ready) return@LaunchedEffect
 
-            if (graphicsLayer.size.width > 0f &&
-                graphicsLayer.size.height > 0f
-            ) {
-                onCaptured(graphicsLayer.toImageBitmap())
-            }
+        withFrameNanos { }
+
+        if (graphicsLayer.size.width > 0f && graphicsLayer.size.height > 0f) {
+            onCaptureComplete(graphicsLayer.toImageBitmap())
         }
     }
 }
+*/

@@ -1,22 +1,8 @@
 package com.utilities.conduit
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateMap
-import com.sun.jna.Pointer
 import com.utilities.conduit.chat.AuthorType
-import com.utilities.conduit.chat.ChatManager
 import com.utilities.conduit.chat.ChatMessage
-import com.utilities.conduit.chat.ChatsList
-import com.utilities.conduit.debug.Trace
-import com.utilities.conduit.portals.LlmPortal
-import com.utilities.conduit.ui.LeftPanelMode
-import com.utilities.conduit.ui.Notification
-import com.utilities.conduit.ui.ScreenCurtain
-import kotlinx.coroutines.CoroutineScope
+import com.utilities.conduit.ui.AppJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.TimeZone

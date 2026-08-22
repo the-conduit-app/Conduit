@@ -1,6 +1,6 @@
 package com.utilities.conduit.chat
 
-import com.utilities.conduit.AppJson
+import com.utilities.conduit.ui.AppJson
 import com.utilities.conduit.AppUtils
 import com.utilities.conduit.Expert
 import com.utilities.conduit.portals.LlmPortal
@@ -129,7 +129,7 @@ object ChatUtils {
 
             val prompt = AppUtils.buildPrompt(systemExpert, messages)
                 .replace("{CURRENT_TITLE}", oldTitle)
-                .replace("{PREVIOUS_SUMMARY}", effectiveHistory.precedingContext)
+                .replace("{PRECEDING_CONTEXT}", effectiveHistory.precedingContext)
 
             Trace.log("TITLE GEN START session=$sessionPtr")
 

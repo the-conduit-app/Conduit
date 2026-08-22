@@ -1,12 +1,13 @@
-package com.utilities.conduit
+package com.utilities.conduit.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.zIndex
+import com.utilities.conduit.*
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
-import com.utilities.conduit.ui.MainScreen
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,17 +24,6 @@ fun App() {
     val maxTokensPerResponse = 2048L
     val conduitPtr = remember { LlmPortal.createConduit(maxTokensPerResponse) }
     val state = remember { AppState.createNew(conduitPtr, scope = scope) }
-
-//    // Stress test helper
-//    scope.launch {
-//        CpuHammer.run(10_000)
-//    }
-//
-//    scope.launch {
-//        SessionHammer.run(
-//            conduitPtr, AppUtils.getAbsoluteModelPath("llm/gemma-2-9b-it-Q4_K_M.gguf")
-//        )
-//    }
 
     LaunchedEffect(Unit) {
         state.chatsList.build()        // load existing chats in the chats dir
@@ -76,12 +66,29 @@ fun App() {
 
     //------------------------------------------------------------------------------------------
 
-    CompositionLocalProvider(LocalActions provides AppActions(state)) {
-        Box(Modifier
-            .fillMaxSize()
-            .userActivityMonitor(state)
+    val fullMessageOverlayState = remember { FullMessageOverlayState() }
+
+    CompositionLocalProvider(
+        LocalActions provides AppActions(state, fullMessageOverlayState)
+    ) {
+        val appActions = LocalActions.current
+
+        Box(
+            Modifier
+                .fillMaxSize()
+                .userActivityMonitor(state)
         ) {
             MainScreen(state)
+
+            appActions.fullMessageText?.let { text ->
+                FullMessagePanel(
+                    modifier = Modifier.zIndex(1f),
+                    text = text,
+                    onDismiss = {
+                        appActions.dismissFullMessage()
+                    }
+                )
+            }
         }
     }
 }

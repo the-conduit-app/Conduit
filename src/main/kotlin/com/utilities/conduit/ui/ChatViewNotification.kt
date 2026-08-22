@@ -1,4 +1,4 @@
-package com.utilities.conduit.chat
+package com.utilities.conduit.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn

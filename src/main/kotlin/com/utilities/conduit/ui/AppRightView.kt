@@ -1,7 +1,5 @@
 package com.utilities.conduit.ui
 
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,13 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import com.utilities.conduit.AppState
-import com.utilities.conduit.LocalActions
-import com.utilities.conduit.chat.ChatControlsView
-import com.utilities.conduit.chat.ChatView
-import com.utilities.conduit.chat.ChatViewNotification
-import kotlinx.coroutines.launch
 
 @Composable
 fun AppRightView(state: AppState, modifier: Modifier) {
@@ -24,16 +16,16 @@ fun AppRightView(state: AppState, modifier: Modifier) {
 
     Column(
         modifier = modifier
-            .pointerInput(Unit) {
-                awaitEachGesture {
-                    awaitFirstDown(requireUnconsumed = false)
-                    scope.launch {
-                        state.leftScreenCurtain.show()
-                        state.leftPanelMode = LeftPanelMode.TREE
-                        state.leftScreenCurtain.hide()
-                    }
-                }
-            }
+//            .pointerInput(Unit) {
+//                awaitEachGesture {
+//                    awaitFirstDown(requireUnconsumed = false)
+//                    scope.launch {
+//                        state.leftScreenCurtain.show()
+//                        state.leftPanelMode = LeftPanelMode.TREE
+//                        state.leftScreenCurtain.hide()
+//                    }
+//                }
+//            }
     ) {
         ChatControlsView(state)
 
