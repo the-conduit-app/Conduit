@@ -1,0 +1,35 @@
+// This is adapted from the Default Pack
+// It contains references to LLM files that you must download, verify and THEN place in
+// the correct ../llm/ directory
+{
+  "id": "Sample.ID",
+  "name": "Sample",
+  "description": "A Sample pack of experts (two pseudo)",
+  "experts": [
+    {
+      "id": "001",
+      "type": "LOCAL",
+      "nickname": "Gem",
+      "expertise": "General",
+      "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
+      "seedPrompt": "Your name is Gem. You are an all-round expert."
+    },
+    {
+      "id": "002",
+      "type": "LOCAL",
+      "nickname": "Babe",
+      "expertise": "Babbling",
+      "modelPath": "llm/SmolLM2-135M-Instruct-Q4_K_M.gguf", 
+      "seedPrompt": "Your name is Babe. You are not really an expert at anything yet."
+    },
+    {
+      "id": "004",
+      "type": "LOCAL",
+      "nickname": "Archie",
+      "expertise": "Buildings",
+      "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
+      "seedPrompt": "Your name is Archie. You are an expert building architect."
+    }
+  ]
+}
+

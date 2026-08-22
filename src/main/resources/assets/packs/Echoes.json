@@ -1,0 +1,49 @@
+// A pack of Echoes
+{
+  "id": "Echo",
+  "name": "Echo",
+  "description": "A pack of echoing experts",
+  "experts": [
+    {
+      "id": "ECHO.SIMPLE.ID",
+      "type": "INTERNAL",
+      "nickname": "Simple",
+      "expertise": "Echoing",
+      "modelPath": ":simpleEcho",
+      "seedPrompt": ""
+    },
+    {
+      "id": "ECHO.ROTTEN.ID",
+      "type": "INTERNAL",
+      "nickname": "Rotten",
+      "expertise": "Echoing",
+      "modelPath": ":rottenEcho",
+      "seedPrompt": ""
+    },
+    {
+      "id": "ECHO.SALAD.ID",
+      "type": "INTERNAL",
+      "nickname": "Salad",
+      "expertise": "Echoing",
+      "modelPath": ":saladEcho",
+      "seedPrompt": ""
+    },
+    {
+      "id": "ECHO.SILLY.ID",
+      "type": "INTERNAL",
+      "nickname": "Silly",
+      "expertise": "Echoing",
+      "modelPath": ":sillyEcho",
+      "seedPrompt": ""
+    },
+    {
+      "id": "ECHO.WORDREV.ID",
+      "type": "INTERNAL",
+      "nickname": "Ohce",
+      "expertise": "Echoing",
+      "modelPath": ":wordReverseEcho",
+      "seedPrompt": ""
+    }
+  ]
+}
+

@@ -1,0 +1,45 @@
+// This is the Default pack, bundled with the Conduit App.
+// It contains references to LLM files that you must download, verify and THEN place in
+// Conduit App's llm/ directory
+{
+  "name": "Default",
+  "description": "A pack of experts",
+  "experts": [
+    {
+      "type": "INTERNAL",
+      "nickname": "Simple",
+      "expertise": "Echoing",
+      "modelPath": ":simpleEcho",
+      "seedPrompt": ""
+    },
+    {
+      "type": "LOCAL",
+      "nickname": "Gem",
+      "expertise": "General",
+      "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
+      "seedPrompt": "Your name is Gem. You are an all-round expert."
+    },
+    {
+      "type": "LOCAL",
+      "nickname": "Larry",
+      "expertise": "Law",
+      "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
+      "seedPrompt": "Your name is Larry. You are an expert Lawywer."
+    },
+    {
+      "type": "LOCAL",
+      "nickname": "Finn",
+      "expertise": "Finance",
+      "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
+      "seedPrompt": "Your name is Finn. You are an expert accountant."
+    },
+    {
+      "type": "LOCAL",
+      "nickname": "Archie",
+      "expertise": "Buildings",
+      "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
+      "seedPrompt": "Your name is Archie. You are an expert building architect."
+    }
+  ]
+}
+
