@@ -30,6 +30,9 @@ dependencies {
     // Tools & Native
     implementation(libs.jna)
     implementation(libs.jna.platform)
+
+    // Kuiver Treeview
+    implementation("io.github.justdeko:kuiver:0.4.1")
 }
 
 compose.desktop {
