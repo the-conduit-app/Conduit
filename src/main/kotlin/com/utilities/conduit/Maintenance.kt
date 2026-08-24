@@ -22,6 +22,11 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 
+// Important note about Maint jobs (see ChatManager also):
+// When generating with SystemExpert, these jobs do NOT call
+// ChatManager.onBeginResponse() etc. Instead, they cancel their running
+// sessions and yield whenever another generation is requested.
+
 // Global modifier to detect (and pass thru user activity)
 fun Modifier.userActivityMonitor(state: AppState): Modifier =
     this.onPreviewKeyEvent {

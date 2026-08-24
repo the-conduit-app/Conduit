@@ -12,7 +12,6 @@ import com.utilities.conduit.chat.MessageAuthor
 import com.utilities.conduit.chat.MessageStatus
 import com.utilities.conduit.chat.Node
 import com.utilities.conduit.chat.NodeType
-import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.ui.FullMessageOverlayState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
@@ -151,7 +150,7 @@ class AppActions(
             // Note: Aug 7. beginResponse and finishResponse were put in to be able to
             // stop a response request while the decode hasn't yet started (i.e. spinner,
             // not streaming)
-            state.chatManager.beginCurrentResponse(expert)
+            state.chatManager.onBeginCurrentResponse(expert)
 
             val startTime = System.currentTimeMillis()
             expert.getResponse(messages)
@@ -182,7 +181,7 @@ class AppActions(
                     if (status == MessageStatus.INTERRUPTED) {
                         state.notification.trigger("Response interrupted by user.")
                     }
-                    state.chatManager.finishCurrentResponse()
+                    state.chatManager.onFinishCurrentResponse()
                 }
                 .collect { chunk ->
                     withContext(Dispatchers.Main) {

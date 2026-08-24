@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberCursorPositionProvider
 
-val ConduitContextMenuRepresentation = object : ContextMenuRepresentation
+val ChatMessageContextMenuRepresentation = object : ContextMenuRepresentation
 {
     @Composable
     override fun Representation(

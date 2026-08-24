@@ -19,7 +19,7 @@ fun ConduitTreeEdge(
 ) {
     Canvas(Modifier.fillMaxSize()) {
         val dy = end.y - start.y
-        val controlOffset = dy * 0.45f
+        val controlOffset = -dy * 0.45f
 
         val control2 = Offset(
             end.x,

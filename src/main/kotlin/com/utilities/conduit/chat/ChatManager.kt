@@ -30,16 +30,24 @@ class ChatManager(
     var currentChat by mutableStateOf(createChat())
 
     var currentlyGeneratingExpert: Expert? by mutableStateOf(null)
+
+    // IMPORTANT NOTE ABOUT THIS VAR:
+    // It is ONLY set for explicit user generate requests (onSend, etc.).
+    // It is NOT set for internal SystemExpert requests.
+    // Auto-generation is cancellable, while user-initiated requests
+    // (rename suggestions, response requests, etc.) are blocking.
+    // Therefore, this variable can safely be observed for node animation
+    // in TreeView.
     val isGenerating: Boolean
         get() = currentlyGeneratingExpert != null
 
     fun createChat(): Chat = Chat.create("Welcome to Conduit")
 
-    fun beginCurrentResponse(expert: Expert) {
+    fun onBeginCurrentResponse(expert: Expert) {
         currentlyGeneratingExpert = expert
     }
 
-    fun finishCurrentResponse() {
+    fun onFinishCurrentResponse() {
         currentlyGeneratingExpert = null
         currentGenerationJob = null
     }

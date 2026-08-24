@@ -33,7 +33,10 @@ enum class LeftPanelMode {
 }
 
 @Composable
-fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
+fun AppLeftView(
+    state: AppState,
+    modifier: Modifier = Modifier
+) {
     val scope = rememberCoroutineScope()
 
     Box(modifier = modifier) {

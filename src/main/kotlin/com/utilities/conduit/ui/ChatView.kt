@@ -178,7 +178,7 @@ fun ColumnScope.ChatView(state: AppState) {
     )
 
     CompositionLocalProvider(
-        LocalContextMenuRepresentation provides ConduitContextMenuRepresentation
+        LocalContextMenuRepresentation provides ChatMessageContextMenuRepresentation
     ) {
         Box(
             modifier = Modifier

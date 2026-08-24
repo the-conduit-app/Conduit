@@ -38,7 +38,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import conduit.generated.resources.Res
-import conduit.generated.resources.background
+import conduit.generated.resources.plasma_s1
 import org.jetbrains.compose.resources.painterResource
 
 class FullMessageOverlayState {
@@ -94,7 +94,7 @@ fun FullMessagePanel(
         ) {
             // Plasma
             Image(
-                painter = painterResource(Res.drawable.background),
+                painter = painterResource(Res.drawable.plasma_s1),
                 contentDescription = null,
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop

@@ -1,20 +1,18 @@
 package com.utilities.conduit.ui.treeView
 
+import androidx.compose.animation.core.InfiniteTransition
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,54 +21,56 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.dk.kuiver.model.KuiverNode
 import conduit.generated.resources.Res
 import conduit.generated.resources.treeViewNode
 import org.jetbrains.compose.resources.painterResource
+import androidx.compose.runtime.State
+import com.utilities.conduit.ui.treeView.NodeAnimations.nodeBlinking
+import com.utilities.conduit.ui.treeView.NodeAnimations.nodePulsing
+import com.utilities.conduit.ui.treeView.NodeAnimations.nodeRotation
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ConduitTreeNode(
-    node: KuiverNode,
+    kuiverNode: KuiverNode,
+    isActive: Boolean,
     isCursor: Boolean = false,
-    onHoverChanged: (Boolean) -> Unit = {},
+    onHoverChanged: (Boolean, Offset) -> Unit = { _, _ -> },
     onClick: () -> Unit = {}
 ) {
     var isHovered by remember { mutableStateOf(false) }
+    var coordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
     val infiniteTransition = rememberInfiniteTransition(label = "cursor")
 
-    val cursorAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.2f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(500),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "cursorAlpha"
-    )
-    val hoverScale by animateFloatAsState(
-        targetValue = if (isHovered) 1.25f else 1f,
-        animationSpec = tween(500),
-        label = "hoverScale"
-    )
 
     Box(
         modifier = Modifier
             .size(24.dp)
-            .onPointerEvent(PointerEventType.Enter) {
-                isHovered = true
+            .onGloballyPositioned {
+                coordinates = it
             }
-            .onPointerEvent(PointerEventType.Exit) {
+            .onPointerEvent(PointerEventType.Enter) { event ->
+                isHovered = true
+                coordinates?.let {
+                    val localPosition = event.changes.first().position
+                    val rootPosition = it.localToRoot(localPosition)
+                    onHoverChanged(true, rootPosition)
+                }
+            }
+            .onPointerEvent(PointerEventType.Exit) { event ->
                 isHovered = false
+                onHoverChanged(false, Offset.Zero)
             }
             .pointerInput(Unit) {
                 detectTapGestures(
@@ -83,9 +83,10 @@ fun ConduitTreeNode(
             modifier = Modifier
                 .fillMaxSize()
                 .graphicsLayer {
-                    scaleX = hoverScale
-                    scaleY = hoverScale
-                    alpha = if (isCursor) cursorAlpha else 1f
+                    scaleX = if (isHovered) nodePulsing else 1f
+                    scaleY = if (isHovered) nodePulsing else 1f
+                    alpha = if (isCursor) nodeBlinking else 1f
+                    rotationZ = if (isActive) nodeRotation else 0f
                 },
             contentAlignment = Alignment.Center
         ) {
@@ -110,27 +111,75 @@ fun ConduitTreeNode(
     }
 }
 
-@Composable
-fun TidyTreeCursorNode() {
-    val infiniteTransition = rememberInfiniteTransition(label = "cursor")
+private object NodeAnimations {
 
-    val cursorAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.0f,
+    val nodeRotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 500,
+                easing = LinearEasing
+            )
+        ),
+        label = "nodeRotation"
+    )
+
+    val nodeBlinking by infiniteTransition.animateFloat(
+        initialValue = 0.2f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            animation = tween(700),
+            animation = tween(500),
             repeatMode = RepeatMode.Reverse
         ),
         label = "cursorAlpha"
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .border(
-                width = 2.dp,
-                color = Color.White.copy(alpha = cursorAlpha),
-                shape = CircleShape
-            )
+    val nodePulsing by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.25f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(500),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "nodePulse"
     )
+
+    @Composable
+    fun rotation(transition: InfiniteTransition): State<Float> =
+        transition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(
+                    durationMillis = 1000,
+                    easing = LinearEasing
+                )
+            ),
+            label = "nodeRotation"
+        )
+
+    @Composable
+    fun blink(transition: InfiniteTransition): State<Float> =
+        transition.animateFloat(
+            initialValue = 0.2f,
+            targetValue = 1f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(500),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "nodeBlink"
+        )
+
+    @Composable
+    fun generatingPulse(transition: InfiniteTransition): State<Float> =
+        transition.animateFloat(
+            initialValue = 1f,
+            targetValue = 1.12f,
+            animationSpec = infiniteRepeatable(
+                animation = tween(500),
+                repeatMode = RepeatMode.Reverse
+            ),
+            label = "nodeGeneratingPulse"
+        )
 }
