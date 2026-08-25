@@ -39,8 +39,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.dk.kuiver.model.KuiverNode
+import com.utilities.conduit.chat.ChatUtils.leadsToCursor
 import conduit.generated.resources.Res
 import conduit.generated.resources.treeViewNode
+import kotlinx.coroutines.NonCancellable.isActive
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalComposeUiApi::class)

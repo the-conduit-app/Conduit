@@ -1,10 +1,13 @@
 package com.utilities.conduit.ui
 
+import androidx.compose.foundation.ContextMenuArea
+import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import com.dk.kuiver.RelayoutPolicy
 import com.dk.kuiver.model.KuiverEdge
@@ -22,6 +25,7 @@ import com.utilities.conduit.chat.Node
 import com.utilities.conduit.ui.treeView.ConduitTreeEdge
 import com.utilities.conduit.ui.treeView.ConduitTreeNode
 import com.utilities.conduit.ui.treeView.hierarchical
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatTreeView(
@@ -32,6 +36,7 @@ fun ChatTreeView(
     val messagePanel = LocalMessagePanel.current
     val nodesOnCursorPath = activePathIds(chat)
     val appActions = LocalActions.current
+    val scope = rememberCoroutineScope()
 
     val kuiver = remember(chat, state.chatManager.nodeAddedVersion) {
         buildKuiver {
@@ -94,28 +99,47 @@ fun ChatTreeView(
                 val isActive = conduitNode?.message?.textInProgress?.value != null
 
                 if (conduitNode != null) {
-                    ConduitTreeNode(
-                        kuiverNode = kuiverNode,
-                        isCursor = kuiverNode.id == cursorNodeId,
-                        isActive = isActive,
-                        leadsToCursor = nodesOnCursorPath.contains(conduitNode.id),
-                        onHoverChanged = { hovered, position ->
-                            if (hovered) {
-                                messagePanel.show(
-                                    text = conduitNode.message?.text ?: "",
-                                    position = position
-                                )
-                            } else {
-                                messagePanel.hide()
-                            }
-                        },
 
-                        onClick = {
-                            if (conduitNode.id in nodesOnCursorPath) {
-                                appActions.scrollChatToNode(conduitNode.id)
+                    @Composable
+                    fun renderNode() {
+                        ConduitTreeNode(
+                            kuiverNode = kuiverNode,
+                            isCursor = kuiverNode.id == cursorNodeId,
+                            isActive = isActive,
+                            leadsToCursor = nodesOnCursorPath.contains(conduitNode.id),
+                            onHoverChanged = { hovered, position ->
+                                if (hovered) {
+                                    messagePanel.show(text = conduitNode.message?.text ?: "", position = position)
+                                } else {
+                                    messagePanel.hide()
+                                }
+                            },
+                            onClick = {
+                                if (nodesOnCursorPath.contains(conduitNode.id)) {
+                                    appActions.scrollChatToNode(conduitNode.id)
+                                }
                             }
+                        )
+                    }
+
+                    if (nodesOnCursorPath.contains(conduitNode.id)) {
+                        renderNode()
+                    } else {
+                        ContextMenuArea(
+                            items = {
+                                listOf(
+                                    ContextMenuItem("Teleport to here?") {
+                                        messagePanel.hide()
+                                        scope.launch {
+                                            state.chatManager.setCursor(conduitNode)
+                                        }
+                                    }
+                                )
+                            }
+                        ) {
+                            renderNode()
                         }
-                    )
+                    }
                 }
             },
 
