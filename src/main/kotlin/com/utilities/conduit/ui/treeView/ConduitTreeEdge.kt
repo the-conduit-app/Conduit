@@ -9,13 +9,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import com.utilities.conduit.chat.ChatUtils.leadsToCursor
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
 @Composable
 fun ConduitTreeEdge(
     start: Offset,
-    end: Offset
+    end: Offset,
+    leadsToCursor: Boolean
 ) {
     Canvas(Modifier.fillMaxSize()) {
         val dy = end.y - start.y
@@ -42,7 +44,8 @@ fun ConduitTreeEdge(
         drawPath(
             path = path,
             color = Color.DarkGray,
-            style = Stroke(width = 1.5f)
+            style = Stroke(width = 1.5f),
+            alpha = if (leadsToCursor) 1f else 0.25f
         )
     }
 }

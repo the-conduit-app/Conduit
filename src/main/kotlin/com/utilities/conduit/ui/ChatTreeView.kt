@@ -1,31 +1,13 @@
 package com.utilities.conduit.ui
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntRect
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import androidx.compose.ui.window.PopupPositionProvider
-import androidx.compose.ui.window.PopupProperties
 import com.dk.kuiver.RelayoutPolicy
+import com.dk.kuiver.model.KuiverEdge
 import com.dk.kuiver.model.buildKuiver
 import com.dk.kuiver.model.edge
 import com.dk.kuiver.model.layout.LayoutConfig
@@ -35,12 +17,11 @@ import com.dk.kuiver.renderer.KuiverInteractionCallbacks
 import com.dk.kuiver.renderer.KuiverViewer
 import com.dk.kuiver.renderer.KuiverViewerConfig
 import com.utilities.conduit.AppState
+import com.utilities.conduit.chat.Chat
+import com.utilities.conduit.chat.Node
 import com.utilities.conduit.ui.treeView.ConduitTreeEdge
 import com.utilities.conduit.ui.treeView.ConduitTreeNode
 import com.utilities.conduit.ui.treeView.hierarchical
-import kotlinx.coroutines.NonCancellable.isActive
-import java.awt.SystemColor.text
-import kotlin.math.roundToInt
 
 @Composable
 fun ChatTreeView(
@@ -49,6 +30,8 @@ fun ChatTreeView(
     val chat = state.chatManager.currentChat
     val nodeAddedVersion = state.chatManager.nodeAddedVersion
     val messagePanel = LocalMessagePanel.current
+    val nodesOnCursorPath = activePathIds(chat)
+    val appActions = LocalActions.current
 
     val kuiver = remember(chat, state.chatManager.nodeAddedVersion) {
         buildKuiver {
@@ -85,7 +68,11 @@ fun ChatTreeView(
         mutableStateOf(chat.cursorNodeId)
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val rootHeader = makeNodeHeader(chat.nodes[chat.rootNodeId])
 
         KuiverViewer(
             state = kuiverState,
@@ -111,7 +98,7 @@ fun ChatTreeView(
                         kuiverNode = kuiverNode,
                         isCursor = kuiverNode.id == cursorNodeId,
                         isActive = isActive,
-
+                        leadsToCursor = nodesOnCursorPath.contains(conduitNode.id),
                         onHoverChanged = { hovered, position ->
                             if (hovered) {
                                 messagePanel.show(
@@ -124,19 +111,53 @@ fun ChatTreeView(
                         },
 
                         onClick = {
-                            // cursorNodeId = kuiverNode.id // Testing
+                            if (conduitNode.id in nodesOnCursorPath) {
+                                appActions.scrollChatToNode(conduitNode.id)
+                            }
                         }
                     )
                 }
             },
 
-            edgeContent = { _, start, end ->
+            edgeContent = { edge: KuiverEdge, start, end ->
                 ConduitTreeEdge(
                     start = start,
-                    end = end
+                    end = end,
+                    leadsToCursor = (edge.fromId in nodesOnCursorPath && edge.toId in nodesOnCursorPath)
                 )
             }
         )
-
     }
+}
+
+private fun activePathIds(chat: Chat): Set<String> {
+    val path = mutableSetOf<String>()
+    var id = chat.cursorNodeId
+
+    while (id != null) {
+        path += id
+        id = chat.nodes[id]?.parentId
+    }
+
+    return path
+}
+
+// Makes a title like "You: Explain the Riemann..." or "Gem (Default pack): "..."
+// although note that a root node necessarily has to originate from the user
+// Use node.message.title: node.message.text.take(25)...
+private fun makeNodeHeader(node: Node?): String {
+    val title = node?.message?.title?.takeIf { it.isNotBlank() } ?: "Donohue"
+    val firstLine = node?.message?.text
+        ?.lineSequence()
+        ?.firstOrNull()
+        ?.trim()
+        ?: "Donowatt"
+
+    val message = if (firstLine.length > 25) {
+        firstLine.take(25) + "..."
+    } else {
+        firstLine
+    }
+
+    return "$title: $message"
 }

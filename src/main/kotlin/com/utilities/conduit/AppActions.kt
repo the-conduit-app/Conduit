@@ -35,6 +35,11 @@ class AppActions(
         fullMessageText = null
     }
 
+    // Invoked when a tree node is clicked
+    var scrollChatToNodeRequest by mutableStateOf<String?>(null)
+        private set
+    fun scrollChatToNode(nodeId: String) { scrollChatToNodeRequest = nodeId }
+
     fun switchExpert(newExpert: Expert?) {
         if (state.currentExpert.value == newExpert) return
         state.currentExpert.value = newExpert

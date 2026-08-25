@@ -11,8 +11,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,15 +35,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.dk.kuiver.model.KuiverNode
 import conduit.generated.resources.Res
 import conduit.generated.resources.treeViewNode
 import org.jetbrains.compose.resources.painterResource
-import androidx.compose.runtime.State
-import com.utilities.conduit.ui.treeView.NodeAnimations.nodeBlinking
-import com.utilities.conduit.ui.treeView.NodeAnimations.nodePulsing
-import com.utilities.conduit.ui.treeView.NodeAnimations.nodeRotation
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -46,13 +49,17 @@ fun ConduitTreeNode(
     kuiverNode: KuiverNode,
     isActive: Boolean,
     isCursor: Boolean = false,
+    leadsToCursor: Boolean = false,
     onHoverChanged: (Boolean, Offset) -> Unit = { _, _ -> },
     onClick: () -> Unit = {}
 ) {
     var isHovered by remember { mutableStateOf(false) }
     var coordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
-    val infiniteTransition = rememberInfiniteTransition(label = "cursor")
 
+    val infiniteTransition = NodeAnimations.infiniteTransition()
+    val nodeRotation = NodeAnimations.rotateNode(infiniteTransition)
+    val nodeBlinking = NodeAnimations.blinkNode(infiniteTransition)
+    val nodePulsing = NodeAnimations.pulseNode(infiniteTransition)
 
     Box(
         modifier = Modifier
@@ -79,13 +86,16 @@ fun ConduitTreeNode(
             },
         contentAlignment = Alignment.Center
     ) {
+        var finalAlpha = if (isCursor) nodeBlinking else 1f
+        finalAlpha *= if(leadsToCursor) 1f else 0.1f
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .graphicsLayer {
                     scaleX = if (isHovered) nodePulsing else 1f
                     scaleY = if (isHovered) nodePulsing else 1f
-                    alpha = if (isCursor) nodeBlinking else 1f
+                    alpha = finalAlpha
                     rotationZ = if (isActive) nodeRotation else 0f
                 },
             contentAlignment = Alignment.Center
@@ -102,84 +112,58 @@ fun ConduitTreeNode(
                     .fillMaxSize()
                     .background(Color.White.copy(alpha = 0.24f))
             )
-
-//            Text(
-//                text = node.id,
-//                style = TextStyle(fontSize = 8.sp)
-//            )
         }
     }
 }
 
 private object NodeAnimations {
-
-    val nodeRotation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 500,
-                easing = LinearEasing
-            )
-        ),
-        label = "nodeRotation"
-    )
-
-    val nodeBlinking by infiniteTransition.animateFloat(
-        initialValue = 0.2f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(500),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "cursorAlpha"
-    )
-
-    val nodePulsing by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 1.25f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(500),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "nodePulse"
-    )
-
     @Composable
-    fun rotation(transition: InfiniteTransition): State<Float> =
-        transition.animateFloat(
+    fun infiniteTransition() = rememberInfiniteTransition(label = "infinite")
+
+    // Clockwise
+    @Composable
+    fun rotateNode(transition: InfiniteTransition): Float {
+        val rotation by transition.animateFloat(
             initialValue = 0f,
             targetValue = 360f,
             animationSpec = infiniteRepeatable(
                 animation = tween(
-                    durationMillis = 1000,
+                    durationMillis = 500,
                     easing = LinearEasing
                 )
             ),
             label = "nodeRotation"
         )
+        return rotation
+    }
 
+    // Use for opaque-transparent-opaque-...
     @Composable
-    fun blink(transition: InfiniteTransition): State<Float> =
-        transition.animateFloat(
+    fun blinkNode(transition: InfiniteTransition): Float {
+        val blinking by transition.animateFloat(
             initialValue = 0.2f,
             targetValue = 1f,
             animationSpec = infiniteRepeatable(
-                animation = tween(500),
+                animation = tween(250),
                 repeatMode = RepeatMode.Reverse
             ),
-            label = "nodeBlink"
+            label = "cursorAlpha"
         )
+        return blinking
+    }
 
+    // Use for size big-small-big-...
     @Composable
-    fun generatingPulse(transition: InfiniteTransition): State<Float> =
-        transition.animateFloat(
+    fun pulseNode(transition: InfiniteTransition): Float {
+        val pulsing by transition.animateFloat(
             initialValue = 1f,
-            targetValue = 1.12f,
+            targetValue = 1.25f,
             animationSpec = infiniteRepeatable(
                 animation = tween(500),
                 repeatMode = RepeatMode.Reverse
             ),
-            label = "nodeGeneratingPulse"
+            label = "nodePulse"
         )
+        return pulsing
+    }
 }
