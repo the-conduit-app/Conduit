@@ -89,7 +89,7 @@ fun ConduitTreeNode(
         contentAlignment = Alignment.Center
     ) {
         var finalAlpha = if (isCursor) nodeBlinking else 1f
-        finalAlpha *= if(leadsToCursor) 1f else 0.1f
+        finalAlpha *= if(leadsToCursor) 1f else 0.25f
 
         Box(
             modifier = Modifier
@@ -107,12 +107,6 @@ fun ConduitTreeNode(
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Fit
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.White.copy(alpha = 0.24f))
             )
         }
     }
