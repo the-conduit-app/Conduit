@@ -393,7 +393,6 @@ private fun ChatNodeRow(
         MessageBubble(
             node = node,
             isCursor = isCursor,
-            isBranchable = isBranchable,
             contextMenuItems = menuItems
         )
 

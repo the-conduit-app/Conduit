@@ -3,6 +3,7 @@ package com.utilities.conduit.ui
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,22 +20,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.Node
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyles
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MessageBubble(
     node: Node,
     isCursor: Boolean,
-    isBranchable: Boolean = false,
     contextMenuItems: (() -> List<ContextMenuItem>)?
 ) {
     when (node.message?.author?.type ?: AuthorType.SYSTEM) {
-        AuthorType.USER -> UserMessageBubble(node, isCursor, isBranchable, contextMenuItems)
-        AuthorType.ASSISTANT -> ExpertMessageBubble(node, isCursor, isBranchable, contextMenuItems)
+        AuthorType.USER -> UserMessageBubble(node, isCursor, contextMenuItems)
+        AuthorType.ASSISTANT -> ExpertMessageBubble(node, isCursor, contextMenuItems)
         AuthorType.SYSTEM -> SystemMessageBubble(node.message?.text ?: "Hmm... Wonder where this came from!")
     }
 }
@@ -42,61 +44,47 @@ fun MessageBubble(
 // ----------------------------------------------------------------------------------------
 
 @Composable
-private fun UserMessageBubble(node: Node, isCursor: Boolean, isBranchable: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
+private fun UserMessageBubble(node: Node, isCursor: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
     val textInProgress = node.message?.textInProgress?.value
     val text = textInProgress ?: node.message?.text.orEmpty()
     val title = node.message?.title ?: "Donowatt" // an unknown amount of power
     var hasMore by remember { mutableStateOf(false) }
 
-    val bubbleColor = if (isBranchable)
-        ConduitTheme.Colors.MessageBubble.Branchable.User
-    else
-        ConduitTheme.Colors.MessageBubble.User
-
-    val cornerRadius = if (isBranchable)
-        ConduitTheme.Dimensions.MessageBubble.BranchableCornerRadius
-    else
-        ConduitTheme.Dimensions.MessageBubble.CornerRadius
-
-    val shadowElevation = if (isBranchable)
-        ConduitTheme.Dimensions.MessageBubble.ShadowElevation
-    else
-        0.dp
-
     val bubble: @Composable () -> Unit = {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .widthIn(max = ConduitTheme.Dimensions.MessageBubble.MaxWidth)
-                .shadow(
-                    elevation = shadowElevation,
-                    shape = RoundedCornerShape(cornerRadius)
-                )
-                .background(
-                    bubbleColor,
-                    RoundedCornerShape(cornerRadius)
-                )
-                .padding(ConduitTheme.Dimensions.MessageBubble.Padding),
-            horizontalAlignment = Alignment.End
+        MessageBubbleSurface(
+            color = Color.Green,
+            cornerRadius = 12.dp
         ) {
-            Text(
-                text = text.trim(),
-                fontSize = if (isBranchable) 15.sp else 14.sp,
-                maxLines = if (textInProgress == null && !isCursor) 5 else Int.MAX_VALUE,
-                onTextLayout = { result ->
-                    hasMore = textInProgress == null && result.hasVisualOverflow
-                }
-            )
-
-            if (hasMore && !isCursor) {
-                val appActions = LocalActions.current
-                Text(
-                    text = "… More",
-                    fontSize = 12.sp,
-                    modifier = Modifier.clickable {
-                        appActions.showFullMessage(text)
-                    }
+            if (textInProgress != null && text.isEmpty()) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    strokeWidth = 2.dp
                 )
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = text.trim(),
+                        fontSize = 14.sp,
+                        maxLines = if (textInProgress == null && !isCursor) 5 else Int.MAX_VALUE,
+                        onTextLayout = { result ->
+                            hasMore = (textInProgress == null && result.hasVisualOverflow)
+                        }
+                    )
+
+                    if (hasMore && !isCursor) {
+                        val appActions = LocalActions.current
+                        Text(
+                            text = "… More",
+                            fontSize = 12.sp,
+                            modifier = Modifier.clickable {
+                                appActions.showFullMessage(text)
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -126,41 +114,16 @@ private fun UserMessageBubble(node: Node, isCursor: Boolean, isBranchable: Boole
 // ----------------------------------------------------------------------------------------
 
 @Composable
-private fun ExpertMessageBubble(node: Node, isCursor: Boolean, isBranchable: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
+private fun ExpertMessageBubble(node: Node, isCursor: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
     val textInProgress = node.message?.textInProgress?.value
     val text = textInProgress ?: node.message?.text.orEmpty()
     val title = node.message?.title ?: "Donovich"
     var hasMore by remember { mutableStateOf(false) }
 
-    val bubbleColor = if (isBranchable)
-        ConduitTheme.Colors.MessageBubble.Branchable.Expert
-    else
-        ConduitTheme.Colors.MessageBubble.Expert
-
-    val cornerRadius = if (isBranchable)
-        ConduitTheme.Dimensions.MessageBubble.BranchableCornerRadius
-    else
-        ConduitTheme.Dimensions.MessageBubble.CornerRadius
-
-    val shadowElevation = if (isBranchable)
-        ConduitTheme.Dimensions.MessageBubble.ShadowElevation
-    else
-        0.dp
-
     val bubble: @Composable () -> Unit = {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .widthIn(max = ConduitTheme.Dimensions.MessageBubble.MaxWidth)
-                .shadow(
-                    elevation = shadowElevation,
-                    shape = RoundedCornerShape(cornerRadius)
-                )
-                .background(
-                    bubbleColor,
-                    RoundedCornerShape(cornerRadius)
-                )
-                .padding(10.dp)
+        MessageBubbleSurface(
+            color = Color(0xFFFFFF00),
+            cornerRadius = ConduitTheme.Dimensions.MessageBubble.CornerRadius
         ) {
             if (textInProgress != null && text.isEmpty()) {
                 CircularProgressIndicator(
@@ -171,10 +134,10 @@ private fun ExpertMessageBubble(node: Node, isCursor: Boolean, isBranchable: Boo
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.Start
-                )  {
+                ) {
                     Text(
                         text = text.trim(),
-                        fontSize = if (isBranchable) 15.sp else 14.sp,
+                        fontSize = 14.sp,
                         maxLines = if (textInProgress == null && !isCursor) 5 else Int.MAX_VALUE,
                         onTextLayout = { result ->
                             hasMore = textInProgress == null && result.hasVisualOverflow
@@ -183,7 +146,6 @@ private fun ExpertMessageBubble(node: Node, isCursor: Boolean, isBranchable: Boo
 
                     if (hasMore && !isCursor) {
                         val appActions = LocalActions.current
-                        //Trace.log("Expert More: reading GlassHostController")
                         Text(
                             text = "… More",
                             fontSize = 12.sp,
@@ -228,6 +190,41 @@ private fun ExpertMessageBubble(node: Node, isCursor: Boolean, isBranchable: Boo
         }
     }
 }
+
+@Composable
+private fun MessageBubbleSurface(
+    color: Color,
+    cornerRadius: Dp,
+    content: @Composable () -> Unit
+) {
+    val shape = RoundedCornerShape(cornerRadius)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(
+                elevation = 4.dp,
+                shape = shape
+            )
+            .background(
+                color = color.copy(alpha = .5f),
+                shape = shape
+            )
+            .border(
+                width = 1.dp,
+                color = Color.Red.copy(alpha = 1f),
+                shape = shape
+            )
+            .padding(10.dp)
+    ) {
+        content()
+    }
+}
+
+
+
+// ---------------------------------------------------------------------------------
+// Below likely deprecated
 
 @Composable
 private fun SystemMessageBubble(text: String) {
