@@ -93,14 +93,18 @@ object Maintenance {
     }
 
     private suspend fun runMaintenance(state: AppState) {
-        //Trace.log("RunMaint: STARTING")
         currentCoroutineContext().ensureActive()
         runTitleMaintenance(state)
+
         currentCoroutineContext().ensureActive()
         runHistorySummaryMaintenance(state)
-        //Trace.log("RunMaint: Finished")
-    }
 
+//        currentCoroutineContext().ensureActive()
+//        runChatSummaryMaintenance(state)
+//
+//        currentCoroutineContext().ensureActive()
+//        runUserModelMaintenance(state)
+    }
     // Rename a *single* anonymous chat, if found, and return
     suspend fun runTitleMaintenance(state: AppState) {
         val systemExpert = state.systemExpert

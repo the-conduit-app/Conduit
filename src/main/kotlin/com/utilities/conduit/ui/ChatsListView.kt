@@ -27,11 +27,16 @@ import com.utilities.conduit.AppUtils
 import com.utilities.conduit.chat.ChatUtils
 import com.utilities.conduit.chat.ChatsListItem
 import com.utilities.conduit.ui.sounds.Tick
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun ChatsListView(state: AppState) {
+    val rightViewOpacity = LocalRightViewOpacity.current
+    val leftViewOpacity = LocalLeftViewOpacity.current
+
     val chatsList = state.chatsList
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -55,11 +60,11 @@ fun ChatsListView(state: AppState) {
         if (item.chat.id == state.chatManager.currentChat.id) return
         Tick.play()
 
-        state.rightScreenCurtain.show()
+        rightViewOpacity.hide()
         state.chatManager.currentChat = item.chat
         if (item.chat.needsHumanReview)
             chatsList.setNeedsHumanReview(item.chat.id, false)
-        state.rightScreenCurtain.hide()
+        rightViewOpacity.show()
         state.focusInput.value++ // Trigger recomp
     }
 
@@ -180,7 +185,6 @@ fun ChatsListView(state: AppState) {
                     scope.launch {
                         val updatedChat = state.chatsList.rename(item, newTitle)
                         if (updatedChat != null && updatedChat.id == state.chatManager.currentChat.id) {
-                            //state.chatManager.currentChat = updatedChat
                             selectChat(item.copy(chat = updatedChat))
                         }
                     }

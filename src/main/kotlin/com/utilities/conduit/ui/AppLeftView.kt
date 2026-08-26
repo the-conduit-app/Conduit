@@ -17,15 +17,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
 import kotlinx.coroutines.launch
+
+val LocalLeftViewOpacity = compositionLocalOf<ViewOpacity> {
+    error("LocalLeftViewOpacity not provided")
+}
 
 enum class LeftPanelMode {
     LIST,
@@ -33,13 +39,11 @@ enum class LeftPanelMode {
 }
 
 @Composable
-fun AppLeftView(
-    state: AppState,
-    modifier: Modifier = Modifier
-) {
+fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
+    val opacity = LocalLeftViewOpacity.current
     val scope = rememberCoroutineScope()
 
-    Box(modifier = modifier) {
+    Box(modifier = modifier.alpha(opacity.value)) {
         Column(modifier = Modifier.fillMaxSize()) {
 
             // Header -------------------------------------------------------------
@@ -54,6 +58,7 @@ fun AppLeftView(
                     text = when (state.leftPanelMode) {
                         LeftPanelMode.LIST -> "Chats"
                         LeftPanelMode.TREE -> state.chatManager.currentChat.title
+                            .let { if (it.length > 30) it.take(27) + "..." else it }
                     },
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
@@ -87,9 +92,9 @@ fun AppLeftView(
                                 modifier = Modifier.size(24.dp),
                                 onClick = {
                                     scope.launch {
-                                        state.leftScreenCurtain.show()
+                                        //opacity.hide()
                                         state.leftPanelMode = LeftPanelMode.LIST
-                                        state.leftScreenCurtain.hide()
+                                        //opacity.show()
                                     }
                                 }
                             ) {
@@ -110,16 +115,6 @@ fun AppLeftView(
                 LeftPanelMode.LIST -> ChatsListView(state)
                 LeftPanelMode.TREE -> ChatTreeView(state)
             }
-        }
-
-        if (state.leftScreenCurtain.isActive) {
-            val screenColor = Color(0xFFF2F2F2)
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .alpha(state.leftScreenCurtain.opacity)
-                    .background(screenColor)
-            )
         }
     }
 }

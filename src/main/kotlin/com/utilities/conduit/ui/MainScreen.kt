@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
 import kotlin.math.roundToInt
+
 @Composable
 fun MainScreen(state: AppState) {
     val scope = rememberCoroutineScope()
@@ -35,12 +36,16 @@ fun MainScreen(state: AppState) {
     val messagePanel = remember {
         MessagePanel(scope)
     }
+    val rightViewOpacity = remember { ViewOpacity() }
+    val leftViewOpacity = remember { ViewOpacity() }
 
     var leftFraction by remember { mutableStateOf(0.35f) }
     var totalWidth by remember { mutableIntStateOf(0) }
 
     CompositionLocalProvider(
-        LocalMessagePanel provides messagePanel
+        LocalMessagePanel provides messagePanel,
+        LocalRightViewOpacity provides rightViewOpacity,
+        LocalLeftViewOpacity provides leftViewOpacity
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Row(

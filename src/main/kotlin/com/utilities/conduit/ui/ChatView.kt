@@ -62,98 +62,6 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.milliseconds
 
-// Used for Branching animation ------------------------------------------
-
-private data class BranchTransition(
-    val shared: List<Node>,
-    val outgoing: List<Node>,
-    val incoming: List<Node>
-)
-
-private fun getBranchTransition(
-    oldPath: List<Node>,
-    newPath: List<Node>
-): BranchTransition {
-    var sharedCount = 0
-    val maxShared = minOf(oldPath.size, newPath.size)
-
-    while (
-        sharedCount < maxShared &&
-        oldPath[sharedCount].id == newPath[sharedCount].id
-    ) {
-        sharedCount++
-    }
-
-    return BranchTransition(
-        shared = newPath.take(sharedCount),
-        outgoing = oldPath.drop(sharedCount),
-        incoming = newPath.drop(sharedCount)
-    )
-}
-
-@Composable
-private fun BranchAnimatedHistory(
-    state: AppState,
-    chat: Chat,
-    historyNodes: List<Node>,
-    transition: BranchTransition?,
-    version: Int,
-    highlightedNodeId: String?,
-    onNodePositioned: (String, Int) -> Unit
-) {
-    if (transition == null) {
-        Column {
-            historyNodes.forEach { node ->
-                ChatNodeRow(
-                    state = state,
-                    chat = chat,
-                    node = node,
-                    version = version,
-                    isHighlighted = node.id == highlightedNodeId,
-                    onPositioned = { y ->
-                        onNodePositioned(node.id, y)
-                    }
-                )
-            }
-        }
-        return
-    }
-
-    Column {
-        // Shared history remains stationary.
-        transition.shared.forEach { node ->
-            key(node.id, chat.cursorNodeId) {
-                ChatNodeRow(state, chat, node, version,
-                    isHighlighted = node.id == highlightedNodeId,
-                    onPositioned = { y -> onNodePositioned(node.id, y) }
-                )
-            }
-        }
-
-        // The changing suffix will be animated here.
-        AnimatedContent(
-            targetState = transition.incoming,
-            transitionSpec = {
-                (
-                        slideInHorizontally(initialOffsetX = { -it }) + fadeIn()) togetherWith (
-                        slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
-                )
-            },
-            label = "branch-suffix") { incomingNodes ->
-            Column {
-                incomingNodes.forEach {
-                    node -> ChatNodeRow(state, chat, node, version,
-                        isHighlighted = node.id == highlightedNodeId,
-                        onPositioned = { y -> onNodePositioned(node.id, y) }
-                    )
-                }
-            }
-        }
-    }
-}
-
-// -------------------------------------------------------------------------
-
 @Composable
 fun ColumnScope.ChatView(state: AppState) {
     val version = state.chatManager.version // DO NOT REMOVE - recomp trigger
@@ -274,7 +182,97 @@ fun ColumnScope.ChatView(state: AppState) {
     }
 }
 
-// ----------------------------------------------------------------------------------------
+// Used for Branching animation ------------------------------------------
+
+private data class BranchTransition(
+    val shared: List<Node>,
+    val outgoing: List<Node>,
+    val incoming: List<Node>
+)
+
+private fun getBranchTransition(
+    oldPath: List<Node>,
+    newPath: List<Node>
+): BranchTransition {
+    var sharedCount = 0
+    val maxShared = minOf(oldPath.size, newPath.size)
+
+    while (
+        sharedCount < maxShared &&
+        oldPath[sharedCount].id == newPath[sharedCount].id
+    ) {
+        sharedCount++
+    }
+
+    return BranchTransition(
+        shared = newPath.take(sharedCount),
+        outgoing = oldPath.drop(sharedCount),
+        incoming = newPath.drop(sharedCount)
+    )
+}
+
+@Composable
+private fun BranchAnimatedHistory(
+    state: AppState,
+    chat: Chat,
+    historyNodes: List<Node>,
+    transition: BranchTransition?,
+    version: Int,
+    highlightedNodeId: String?,
+    onNodePositioned: (String, Int) -> Unit
+) {
+    if (transition == null) {
+        Column {
+            historyNodes.forEach { node ->
+                ChatNodeRow(
+                    state = state,
+                    chat = chat,
+                    node = node,
+                    version = version,
+                    isHighlighted = node.id == highlightedNodeId,
+                    onPositioned = { y ->
+                        onNodePositioned(node.id, y)
+                    }
+                )
+            }
+        }
+        return
+    }
+
+    Column {
+        // Shared history remains stationary.
+        transition.shared.forEach { node ->
+            key(node.id, chat.cursorNodeId) {
+                ChatNodeRow(state, chat, node, version,
+                    isHighlighted = node.id == highlightedNodeId,
+                    onPositioned = { y -> onNodePositioned(node.id, y) }
+                )
+            }
+        }
+
+        // The changing suffix will be animated here.
+        AnimatedContent(
+            targetState = transition.incoming,
+            transitionSpec = {
+                (
+                        slideInHorizontally(initialOffsetX = { -it }) + fadeIn()) togetherWith (
+                        slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
+                        )
+            },
+            label = "branch-suffix") { incomingNodes ->
+            Column {
+                incomingNodes.forEach {
+                        node -> ChatNodeRow(state, chat, node, version,
+                    isHighlighted = node.id == highlightedNodeId,
+                    onPositioned = { y -> onNodePositioned(node.id, y) }
+                )
+                }
+            }
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
 
 @Composable
 private fun ChatNodeRow(

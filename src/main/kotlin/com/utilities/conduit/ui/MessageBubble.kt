@@ -17,15 +17,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.Node
-import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyles
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -202,26 +205,59 @@ private fun MessageBubbleSurface(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(
-                elevation = 4.dp,
-                shape = shape
+            .dropShadow(
+                shape = shape,
+                shadow = Shadow(
+                    radius = 2.dp,
+                    color = Color.Black.copy(alpha = 0.25f),
+                    offset = DpOffset(0.dp, 2.dp)
+                )
             )
+            .clip(shape)
             .background(
                 color = color.copy(alpha = .5f),
                 shape = shape
             )
             .border(
                 width = 1.dp,
-                color = Color.Red.copy(alpha = 1f),
+                color = Color.LightGray,
                 shape = shape
             )
-            .padding(10.dp)
+            .padding(8.dp)
     ) {
         content()
     }
 }
 
-
+//@Composable
+//private fun MessageBubbleSurface(
+//    color: Color,
+//    cornerRadius: Dp,
+//    content: @Composable () -> Unit
+//) {
+//    val shape = RoundedCornerShape(cornerRadius)
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .shadow(
+//                elevation = 4.dp,
+//                shape = shape
+//            )
+//            .background(
+//                color = color.copy(alpha = .5f),
+//                shape = shape
+//            )
+//            .border(
+//                width = 1.dp,
+//                color = Color.LightGray.copy(alpha = 1f),
+//                shape = shape
+//            )
+//            .padding(6.dp)
+//    ) {
+//        content()
+//    }
+//}
 
 // ---------------------------------------------------------------------------------
 // Below likely deprecated

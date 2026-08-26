@@ -7,6 +7,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -27,11 +29,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s1
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyles
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import kotlin.math.roundToInt
+
+// This is used for showing messages on hover over Tree nodes in TreeView (nowhere else currently)
 
 val LocalMessagePanel = staticCompositionLocalOf<MessagePanel> {
     error("MessagePanel not provided")
@@ -40,6 +45,9 @@ val LocalMessagePanel = staticCompositionLocalOf<MessagePanel> {
 class MessagePanel(private val scope: CoroutineScope) {
 
     var text by mutableStateOf("")
+        private set
+
+    var title by mutableStateOf("")
         private set
 
     var position by mutableStateOf(Offset.Zero)
@@ -51,12 +59,14 @@ class MessagePanel(private val scope: CoroutineScope) {
     private var job: Job? = null
 
     fun show(
+        title: String,
         text: String,
         position: Offset
     ) {
         job?.cancel()
 
         this.text = text
+        this.title = title
         this.position = position
 
         job = scope.launch {
@@ -84,7 +94,6 @@ class MessagePanel(private val scope: CoroutineScope) {
         }
     }
 }
-
 
 @Composable
 fun MessagePanelView(
@@ -138,10 +147,18 @@ fun MessagePanelView(
                 )
                 .background(Color.White.copy(alpha = 0.50f))
                 .widthIn(max = 400.dp)
-                .padding(20.dp)
+                .padding(start = 20.dp, end = 20.dp, top = 6.dp, bottom = 20.dp)
         ) {
             var hasOverflow by remember(panel.text) { mutableStateOf(false) }
             Column {
+                if (panel.title.isNotEmpty()) {
+                    Text(
+                        text = panel.title,
+                        fontSize = 10.sp,
+                        color = Color.Gray //// .copy(alpha = .65f)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
                 Text(
                     text = panel.text.trim(),
                     softWrap = true,
