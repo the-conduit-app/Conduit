@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.utilities.conduit.ui.AppJson
-import com.utilities.conduit.AppUtils.getAppPath
+import com.utilities.conduit.AppUtils.getAppDir
 import com.utilities.conduit.chat.ChatUtils.makeChatFileName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
@@ -45,7 +45,7 @@ class ChatsList(
 
     // Build from .../chats/*.json chat files.
     suspend fun build() = withContext(Dispatchers.IO) {
-        val chatDir = Paths.get(getAppPath(), "chats")
+        val chatDir = Paths.get(getAppDir(), "chats")
         val chatsById = mutableMapOf<String, ChatsListItem>()
 
         if (!Files.exists(chatDir)) {
@@ -100,7 +100,7 @@ class ChatsList(
             if (index < 0) return false
 
             val fileName = makeChatFileName(item.chat.id, item.chat.title)
-            val chatDir = Paths.get(getAppPath(), "chats")
+            val chatDir = Paths.get(getAppDir(), "chats")
             val deletedDir = chatDir.resolve("deleted")
 
             val source = chatDir.resolve(fileName)
@@ -138,7 +138,7 @@ class ChatsList(
                     val updatedChat = item.chat.copy(title = newTitle, needsHumanReview = needsHumanReview)
                     ChatUtils.saveChatToDisk(updatedChat) // Ignore returned Item
 
-                    val chatDir = Paths.get(getAppPath(), "chats")
+                    val chatDir = Paths.get(getAppDir(), "chats")
                     val oldFileName = makeChatFileName(item.chat.id, oldTitle)
                     val oldPath = chatDir.resolve(oldFileName)
                     try { Files.delete(oldPath) } catch (e: Exception) { println("Failed to delete old chat: $oldPath") }

@@ -104,7 +104,6 @@ fun ColumnScope.ChatView(state: AppState) {
     LaunchedEffect(appActions.scrollChatToNodeRequest) {
         val nodeId = appActions.scrollChatToNodeRequest ?: return@LaunchedEffect
         val nodeY = nodePositions[nodeId] ?: return@LaunchedEffect
-        Trace.log("TREE SCROLL: node=$nodeId y=$nodeY")
 
         val viewportHeight = scrollState.viewportSize
         val target = nodeY - viewportHeight / 2
@@ -167,17 +166,17 @@ fun ColumnScope.ChatView(state: AppState) {
                 )
             }
 
-            if (state.rightScreenCurtain.isActive) {
-                val screenColor = Color(0xFFF2F2F2)
-
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .matchParentSize()
-                        .alpha(state.rightScreenCurtain.opacity)
-                        .background(screenColor)
-                )
-            }
+//            if (state.rightScreenCurtain.isActive) {
+//                val screenColor = Color(0xFFF2F2F2)
+//
+//                Box(
+//                    modifier = Modifier
+//                        .clip(RoundedCornerShape(12.dp))
+//                        .matchParentSize()
+//                        .alpha(state.rightScreenCurtain.opacity)
+//                        .background(screenColor)
+//                )
+//            }
         }
     }
 }

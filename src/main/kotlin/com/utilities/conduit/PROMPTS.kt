@@ -81,18 +81,29 @@ object PROMPTS {
         Focus on information about the user that is likely to remain useful across
         future conversations, including:
         - user preferences and requirements
-        - important personal facts explicitly provided by the user
+        - important user-provided facts that are likely to be useful in future conversations
         - ongoing projects, goals, plans, and commitments
         - technical environment, tools, and workflows
         - recurring interests or patterns
         - decisions that reveal durable preferences or requirements
     
+        Some long messages may have been truncated. Do not assume that the
+        truncated portions contain any particular information.
+    
         Do not summarize every exchange or preserve ordinary conversational detail.
         Focus on information that could help an assistant better understand and
         assist this user in future conversations.
+        
+        The summary must represent the conversation as a whole, not merely its
+        opening exchange or the assistant's answer to the first question.
+
+        Importantly trace the user's conversation across all messages and identify information
+        that is useful for understanding the user. Give substantially more weight to
+        what the user says, asks, prefers, decides, or reveals than to factual
+        information supplied by the assistant.
     
         Requirements:
-        - Respond with the summary only.
+        - Respond with the summary only. Do not produce an answer to user questions.
         - Do not use quotation marks.
         - Do not mention that you are generating a summary.
         - Do not invent information or infer unsupported personal facts.
@@ -101,6 +112,5 @@ object PROMPTS {
         Conversation:
         
         {CONVERSATION}
-""".trimIndent()
-
+    """.trimIndent()
 }

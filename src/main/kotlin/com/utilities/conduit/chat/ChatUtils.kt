@@ -30,8 +30,6 @@ object ChatUtils {
 
     suspend fun saveChatToDisk(chat: Chat): ChatsListItem {
         chatUtilsMutex.withLock {
-            //chat.syncTransients()
-
             return withContext(Dispatchers.IO) {
                 val file = Paths.get(AppUtils.getChatsDir()).resolve(makeChatFileName(chat.id, chat.title))
 
@@ -45,6 +43,20 @@ object ChatUtils {
                 )
             }
         }
+    }
+
+    // Used to decide whether to present a node as a branching candidate
+    fun leadsToCursor(chat: Chat, node: Node): Boolean {
+        var currentId = chat.cursorNodeId
+
+        while (currentId != null) {
+            if (currentId == node.id) {
+                return true
+            }
+            currentId = chat.nodes[currentId]?.parentId
+        }
+
+        return false
     }
 
     // Only used for composing the full chat views (Text and Tree)
@@ -202,17 +214,66 @@ object ChatUtils {
         }
     }
 
-    // Used to decide whether to present a node as a branching candidate
-    fun leadsToCursor(chat: Chat, node: Node): Boolean {
-        var currentId = chat.cursorNodeId
+    suspend fun generateChatSummary(
+        systemExpert: Expert,
+        chat: Chat
+    ): String {
+        chatUtilsMutex.withLock {
+            val sessionPtr = systemExpert.sessionPtr ?: error(
+                "Generating chat summary for ${chat.title} returned early " +
+                        "(sysExpert = ${systemExpert.sessionPtr})"
+            )
+            val maxAssistantTextLen = 500
+            val maxUserTextLen = 1500
 
-        while (currentId != null) {
-            if (currentId == node.id) {
-                return true
+            val history = getFullHistory(chat, chat.cursorNodeId)
+
+            val conversation = history
+                .mapNotNull { it.message }
+                .joinToString("\n\n") { message ->
+                    val role = when (message.author.type) {
+                        AuthorType.USER -> "USER"
+                        AuthorType.ASSISTANT -> "ASSISTANT"
+                        else -> "SYSTEM"
+                    }
+
+                    val text = when {
+                        message.author.type == AuthorType.ASSISTANT &&
+                                message.text.length > 50 ->
+                            message.text.take(50) + "..."
+
+                        message.author.type == AuthorType.USER &&
+                                message.text.length > 500 ->
+                            message.text.take(500) + "..."
+
+                        else -> message.text
+                    }
+
+                    "$role: $text"
+                }
+
+            val prompt = AppUtils.buildPrompt(
+                systemExpert,
+                listOf(
+                    ChatMessage(
+                        author = MessageAuthor(type = AuthorType.USER),
+                        text = PROMPTS.CHAT_SUMMARY_GENERATION
+                            .replace("{CONVERSATION}", conversation)
+                    )
+                )
+            )
+            Trace.log("CHAT SUMMARY GEN START session=$sessionPtr chat=${chat.id}")
+            Trace.log("Prompt = ${prompt}")
+
+            val result = StringBuilder()
+            LlmPortal.getResponse(sessionPtr, prompt).collect { token ->
+                result.append(token)
             }
-            currentId = chat.nodes[currentId]?.parentId
-        }
 
-        return false
+            Trace.log("CHAT SUMMARY GEN END session=$sessionPtr chat=${chat.id}")
+            Trace.log("SUMMARY Result = ${result.toString()}")
+
+            return result.toString().trim()
+        }
     }
 }

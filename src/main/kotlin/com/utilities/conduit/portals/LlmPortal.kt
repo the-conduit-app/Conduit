@@ -10,7 +10,7 @@ import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
 
 object LlmPortal {
-    private val conduitLibPath = AppUtils.getNativeLibPath("libconduit.dylib")
+    private val conduitLibPath = AppUtils.getNativeLibDir("libconduit.dylib")
     val conduitLib: ConduitLib = Native.load(conduitLibPath, ConduitLib::class.java)
 
     fun createConduit(maxTokens: Long): Pointer = conduitLib.conduit_create(maxTokens)

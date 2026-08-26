@@ -15,7 +15,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 object AppUtils {
-    fun getAppPath(): String {
+    fun getAppDir(): String {
         val os = System.getProperty("os.name").lowercase()
         val home = System.getProperty("user.home")
 
@@ -30,23 +30,23 @@ object AppUtils {
         return path
     }
 
-    fun getNativeLibPath(libName: String): String {
-        return "${getAppPath()}/lib/$libName"
+    fun getNativeLibDir(libName: String): String {
+        return "${getAppDir()}/lib/$libName"
     }
 
     fun getPacksDir(): String {
-        return "${getAppPath()}/packs"
+        return "${getAppDir()}/packs"
     }
 
     fun getChatsDir(): String {
-        return "${getAppPath()}/chats"
+        return "${getAppDir()}/chats"
     }
 
     fun getAbsoluteModelPath(modelPath: String): String {
         return if (Paths.get(modelPath).isAbsolute)
             modelPath
         else
-            Paths.get(getAppPath(), modelPath).toString()
+            Paths.get(getAppDir(), modelPath).toString()
     }
 
     /**
@@ -54,7 +54,7 @@ object AppUtils {
      * IMPORTANT: NO PACK EXPERT INITIALIZATIONS (Hence not time-consuming)
      */
     suspend fun getAvailablePacks(): List<Pack> = withContext(Dispatchers.IO) {
-        val packsDir = Paths.get(getAppPath(), "packs")
+        val packsDir = Paths.get(getAppDir(), "packs")
 
         if (!Files.exists(packsDir))
             return@withContext emptyList()
