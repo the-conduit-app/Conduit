@@ -2,6 +2,7 @@ package com.utilities.conduit.ui
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
+import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
@@ -132,19 +133,23 @@ fun ChatTreeView(
                     if (nodesOnCursorPath.contains(conduitNode.id)) {
                         renderNode()
                     } else {
-                        ContextMenuArea(
-                            items = {
-                                listOf(
-                                    ContextMenuItem("Teleport to here?") {
-                                        messagePanel.hide()
-                                        scope.launch {
-                                            state.chatManager.setCursor(conduitNode)
-                                        }
-                                    }
-                                )
-                            }
+                        CompositionLocalProvider(
+                            LocalContextMenuRepresentation provides ConduitContextMenuRepresentation
                         ) {
-                            renderNode()
+                            ContextMenuArea(
+                                items = {
+                                    listOf(
+                                        ContextMenuItem("Teleport to here?") {
+                                            messagePanel.hide()
+                                            scope.launch {
+                                                state.chatManager.setCursor(conduitNode)
+                                            }
+                                        }
+                                    )
+                                }
+                            ) {
+                                renderNode()
+                            }
                         }
                     }
                 }

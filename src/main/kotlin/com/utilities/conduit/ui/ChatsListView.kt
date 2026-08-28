@@ -2,6 +2,7 @@ package com.utilities.conduit.ui
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
+import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
@@ -27,10 +28,8 @@ import com.utilities.conduit.AppUtils
 import com.utilities.conduit.chat.ChatUtils
 import com.utilities.conduit.chat.ChatsListItem
 import com.utilities.conduit.ui.sounds.Tick
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
-import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun ChatsListView(state: AppState) {
@@ -109,66 +108,69 @@ fun ChatsListView(state: AppState) {
                 key = { _, item -> item.chat.id }
             ) { index, item ->
                 val isCurrent = item.chat.id == state.chatManager.currentChat.id
-
-                ContextMenuArea(
-                    items = {
-                        listOf(
-                            ContextMenuItem("Rename…") {
-                                showRenameDialog = item
-                            },
-                            ContextMenuItem("Delete…") {
-                                scope.launch {
-                                    val removed = state.chatsList.remove(item)
-                                    if (removed && item.chat.id == state.chatManager.currentChat.id) {
-                                        state.notification.trigger(
-                                            "Chat deleted. Continue chatting here to restore it."
-                                        )
+                CompositionLocalProvider(
+                    LocalContextMenuRepresentation provides ConduitContextMenuRepresentation
+                ) {
+                    ContextMenuArea(
+                        items = {
+                            listOf(
+                                ContextMenuItem("Rename…") {
+                                    showRenameDialog = item
+                                },
+                                ContextMenuItem("Delete…") {
+                                    scope.launch {
+                                        val removed = state.chatsList.remove(item)
+                                        if (removed && item.chat.id == state.chatManager.currentChat.id) {
+                                            state.notification.trigger(
+                                                "Chat deleted. Continue chatting here to restore it."
+                                            )
+                                        }
+                                    }
+                                },
+                                ContextMenuItem("TreeView") {
+                                    scope.launch {
+                                        selectChat(item)
+                                        state.leftPanelMode = LeftPanelMode.TREE
                                     }
                                 }
-                            },
-                            ContextMenuItem("TreeView") {
-                                scope.launch {
-                                    selectChat(item)
-                                    state.leftPanelMode = LeftPanelMode.TREE
-                                }
-                            }
-                        )
-                    }
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                if (isCurrent)
-                                    MaterialTheme.colorScheme.surfaceVariant
-                                else
-                                    Color.Transparent
                             )
-                            .clickable(enabled = enabled) {
-                                scope.launch {
-                                    selectChat(item)
-                                }
-                            }
-                            .padding(horizontal = 4.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        }
                     ) {
-                        Text(
-                            text = item.chat.title,
-                            modifier = Modifier.weight(1f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = if (item.chat.needsHumanReview) FontWeight.SemiBold else FontWeight.Normal
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    if (isCurrent)
+                                        MaterialTheme.colorScheme.surfaceVariant
+                                    else
+                                        Color.Transparent
+                                )
+                                .clickable(enabled = enabled) {
+                                    scope.launch {
+                                        selectChat(item)
+                                    }
+                                }
+                                .padding(horizontal = 4.dp, vertical = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = item.chat.title,
+                                modifier = Modifier.weight(1f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = if (item.chat.needsHumanReview) FontWeight.SemiBold else FontWeight.Normal
+                            )
 
-                        Spacer(Modifier.width(8.dp))
+                            Spacer(Modifier.width(8.dp))
 
-                        Text(
-                            text = "(${AppUtils.formatDateRange(item.creationTime, item.modificationTime)})",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
-                        )
+                            Text(
+                                text = "(${AppUtils.formatDateRange(item.creationTime, item.modificationTime)})",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = Color.Gray
+                            )
+                        }
                     }
                 }
             }

@@ -1,20 +1,33 @@
 package com.utilities.conduit.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
+import com.utilities.conduit.ui.sounds.Hsoohw
+import com.utilities.conduit.ui.sounds.Tick
+import com.utilities.conduit.ui.sounds.Whoosh
+import conduit.generated.resources.Res
+import org.jetbrains.compose.resources.painterResource
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Stop
 
 @Composable
 fun InputArea(state: AppState, onSend: (String) -> Unit) {
@@ -35,9 +48,13 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp),
-        verticalAlignment = Alignment.Bottom
+        verticalAlignment = Alignment.CenterVertically
     ) {
         OutlinedTextField(
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedBorderColor = Color(0xFF007F86).copy(alpha = 0.45f),
+                focusedBorderColor = Color(0xFF007F86).copy(alpha = 0.60f)
+            ),
             value = text,
             onValueChange = { text = it },
             singleLine = false,
@@ -56,12 +73,15 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
                     when {
                         ev.key == Key.Escape -> {
                             text = ""
+                            Hsoohw.play()
                             true
                         }
+
                         ev.isShiftPressed -> false
 
                         ev.key == Key.Enter -> {
                             if (text.isNotBlank() && !isGenerating) {
+                                Whoosh.play()
                                 onSend(text)
                                 text = ""
                             }
@@ -81,16 +101,30 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
                 if (isGenerating) {
                     state.chatManager.abortCurrentResponse()
                 } else if (text.isNotBlank()) {
+                    Whoosh.play()
                     onSend(text)
                     text = ""
                 }
-            }
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (isGenerating) {
+                    Color(0xFFD61F2C)
+                } else {
+                    Color(0xFF007C91)
+                },
+                disabledContainerColor = Color(0xFF007C91).copy(alpha = 0.35f),
+                disabledContentColor = Color.White.copy(alpha = 0.4f),
+                contentColor = Color.White
+            )
         ) {
-            if (isGenerating) {
-                Icon(ConduitIcons.Stop, contentDescription = "Stop")
-            } else {
-                Icon(ConduitIcons.ArrowUpward, contentDescription = "Send")
-            }
+            Icon(
+                imageVector = if (isGenerating) {
+                    Icons.Filled.Stop
+                } else {
+                    Icons.Filled.ArrowUpward
+                },
+                contentDescription = if (isGenerating) "Stop" else "Send"
+            )
         }
     }
 }

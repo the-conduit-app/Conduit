@@ -319,7 +319,7 @@ private suspend fun runUserModelMaintenance(state: AppState) {
     }
 
     if (newSummary == null) {
-        Trace.log("MAINT: user model — nothing new")
+        //Trace.log("MAINT: user model — nothing new")
         return
     }
 

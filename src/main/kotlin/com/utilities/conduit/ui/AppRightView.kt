@@ -3,10 +3,15 @@ package com.utilities.conduit.ui
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
@@ -14,8 +19,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
+import conduit.generated.resources.Res
+import conduit.generated.resources.plasma_s1
+import conduit.generated.resources.plasma_s64
+import org.jetbrains.compose.resources.painterResource
 
 val LocalRightViewOpacity = compositionLocalOf<ViewOpacity> {
     error("LocalRightViewOpacity not provided")
@@ -28,6 +40,16 @@ fun AppRightView(state: AppState, modifier: Modifier) {
 
     Column(modifier = modifier) {
         ChatControlsView(state)
+
+        // Horizongal divider
+        Image(
+            painter = painterResource(Res.drawable.plasma_s1),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+        )
 
         Box(
             modifier = Modifier

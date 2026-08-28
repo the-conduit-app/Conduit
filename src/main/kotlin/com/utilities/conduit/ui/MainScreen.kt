@@ -58,31 +58,11 @@ fun MainScreen(state: AppState) {
                     modifier = Modifier.weight(leftFraction)
                 )
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .width(8.dp)
-                        .pointerInput(totalWidth) {
-                            detectDragGestures { change, dragAmount ->
-                                change.consume()
-
-                                if (totalWidth > 0) {
-                                    val deltaFraction = dragAmount.x / totalWidth
-
-                                    leftFraction = (leftFraction + deltaFraction)
-                                        .coerceIn(0.20f, 0.50f)
-                                }
-                            }
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(1.dp)
-                            .background(Color.Gray.copy(alpha = 0.35f))
-                    )
-                }
+                VerticalDivider(
+                    totalWidth = totalWidth,
+                    leftFraction = leftFraction,
+                    onLeftFractionChange = { leftFraction = it }
+                )
 
                 AppRightView(
                     state = state,

@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import org.jetbrains.compose.resources.painterResource
 import conduit.generated.resources.Res
-import conduit.generated.resources.cycleBranches
+import conduit.generated.resources.cycle_branches
 
 @Composable
 fun PulsingBranchIcon(
@@ -75,7 +75,7 @@ fun PulsingBranchIcon(
     )
 
     Image(
-        painter = painterResource(Res.drawable.cycleBranches),
+        painter = painterResource(Res.drawable.cycle_branches),
         contentDescription = "Branches",
         modifier
             .graphicsLayer {

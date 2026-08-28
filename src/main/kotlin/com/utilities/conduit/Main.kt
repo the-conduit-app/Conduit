@@ -8,6 +8,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.utilities.conduit.ui.App
+import com.utilities.conduit.ui.ConduitTheme
 import java.io.File
 
 fun main() {
@@ -22,12 +23,14 @@ fun main() {
             title = "Conduit Workspace",
             onCloseRequest = ::exitApplication
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
+            ConduitTheme {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
                     //.background(Color(0xFF252A2E))
-            ) {
-                App()
+                ) {
+                    App()
+                }
             }
         }
     }

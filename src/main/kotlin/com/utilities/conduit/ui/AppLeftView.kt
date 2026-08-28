@@ -1,5 +1,6 @@
 package com.utilities.conduit.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,9 +9,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,10 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
+import conduit.generated.resources.Res
+import conduit.generated.resources.plasma_s1
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
 
 val LocalLeftViewOpacity = compositionLocalOf<ViewOpacity> {
     error("LocalLeftViewOpacity not provided")
@@ -80,8 +89,9 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
                                 }
                             ) {
                                 Icon(
-                                    imageVector = ConduitIcons.Add,
-                                    contentDescription = "New chat"
+                                    imageVector = Icons.Filled.Add,
+                                    contentDescription = "New chat",
+                                    tint = Color(0xFF007C91)
                                 )
                             }
                         }
@@ -99,8 +109,9 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
                                 }
                             ) {
                                 Icon(
-                                    imageVector = ConduitIcons.Menu,
-                                    contentDescription = "Show chat list",
+                                    imageVector = Icons.Filled.Menu,
+                                    contentDescription = "Chat list",
+                                    tint = Color(0xFF007C91)
                                 )
                             }
                         }
@@ -108,7 +119,15 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
                 }
             }
 
-            HorizontalDivider()
+            // Horizongal divider
+            Image(
+                painter = painterResource(Res.drawable.plasma_s1),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+            )
 
             // Body ---------------------------------------------------------------
             when (state.leftPanelMode) {

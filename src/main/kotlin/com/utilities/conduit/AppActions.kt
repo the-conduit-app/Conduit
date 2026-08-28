@@ -13,6 +13,7 @@ import com.utilities.conduit.chat.MessageStatus
 import com.utilities.conduit.chat.Node
 import com.utilities.conduit.chat.NodeType
 import com.utilities.conduit.ui.FullMessageOverlayState
+import com.utilities.conduit.ui.sounds.Ting
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
@@ -187,6 +188,7 @@ class AppActions(
                         state.notification.trigger("Response interrupted by user.")
                     }
                     state.chatManager.onFinishCurrentResponse()
+                    Ting.play()
                 }
                 .collect { chunk ->
                     withContext(Dispatchers.Main) {

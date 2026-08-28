@@ -126,7 +126,7 @@ private fun ExpertMessageBubble(node: Node, isCursor: Boolean, contextMenuItems:
     val bubble: @Composable () -> Unit = {
         MessageBubbleSurface(
             color = Color(0xFFFFFF00),
-            cornerRadius = ConduitTheme.Dimensions.MessageBubble.CornerRadius
+            cornerRadius = 12.dp
         ) {
             if (textInProgress != null && text.isEmpty()) {
                 CircularProgressIndicator(
@@ -209,13 +209,13 @@ private fun MessageBubbleSurface(
                 shape = shape,
                 shadow = Shadow(
                     radius = 2.dp,
-                    color = Color.Black.copy(alpha = 0.25f),
-                    offset = DpOffset(0.dp, 2.dp)
+                    color = color.copy(alpha = 0.1f),
+                    offset = DpOffset(0.dp, 4.dp)
                 )
             )
             .clip(shape)
             .background(
-                color = color.copy(alpha = .5f),
+                color = color.copy(alpha = .05f),
                 shape = shape
             )
             .border(

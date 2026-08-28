@@ -2,12 +2,6 @@ package com.utilities.conduit.ui
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -15,10 +9,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.LocalContextMenuRepresentation
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,8 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -50,7 +40,6 @@ import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.chat.ChatUtils
 import com.utilities.conduit.chat.Node
-import com.utilities.conduit.debug.Trace
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.collections.forEach
@@ -141,7 +130,7 @@ fun ColumnScope.ChatView(state: AppState) {
     )
 
     CompositionLocalProvider(
-        LocalContextMenuRepresentation provides ChatMessageContextMenuRepresentation
+        LocalContextMenuRepresentation provides ConduitContextMenuRepresentation
     ) {
         Box(
             modifier = Modifier
