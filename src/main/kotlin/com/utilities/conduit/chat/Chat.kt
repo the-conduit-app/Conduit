@@ -67,6 +67,10 @@ enum class NodeType { TEXT, INFO }
 
 // ---------------------------------------------------------------------------
 
+// NOTE: The nick name of the expert and the name of the pack from which this expert came
+// are the ONLY things persisted on disk. So assume that a reader of this class gets
+// a nickname and a pack name separated by a dot. This "title" is manufactured and set in
+// onSend() which is the way users send stuff into Conduit.
 @Serializable
 data class ChatMessage(
     var title: String? = null,

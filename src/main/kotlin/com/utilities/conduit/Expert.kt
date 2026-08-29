@@ -4,8 +4,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.sun.jna.Pointer
-import com.utilities.conduit.chat.AuthorType
-import com.utilities.conduit.chat.ChatMessage
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.EchoPortal
 import com.utilities.conduit.portals.LlmPortal
@@ -36,20 +34,24 @@ class Expert(
             else -> true
         }
 
-    fun getResponse(messages: List<ChatMessage>): Flow<String> {
+    fun getResponse(
+        userModel: String?,
+        chatThusFar: String,
+        prompt: String
+    ): Flow<String> {
         return when (type) {
             ExpertType.INTERNAL -> {
-                val prompt = messages.lastOrNull { it.author.type == AuthorType.USER }
-                    ?.text
-                    ?: "?"
                 EchoPortal.getResponse(this, prompt)
             }
+
             ExpertType.LOCAL -> {
                 val sessionPtr = sessionPtr ?: error("Expert '${nickname}': LLM session not found.")
+                val finalPrompt = AppUtils.buildChatMlPrompt(this.seedPrompt, userModel, chatThusFar, prompt)
 
-                val prompt: String = AppUtils.buildPrompt(this, messages)
-                LlmPortal.getResponse(sessionPtr, prompt)
-            } else -> {
+                LlmPortal.getResponse(sessionPtr, finalPrompt)
+            }
+
+            else -> {
                 flowOf("?")
             }
         }

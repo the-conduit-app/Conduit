@@ -14,11 +14,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
 // TODO - remove scope and systemExpert params
-class ChatManager(
-    private val scope: CoroutineScope,
-    val systemExpert: Expert
-)
-{
+class ChatManager {
     private val mutex = Mutex()
     var currentGenerationJob: Job? = null
 

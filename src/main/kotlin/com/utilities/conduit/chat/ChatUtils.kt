@@ -7,6 +7,7 @@ import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.PROMPTS
 import com.utilities.conduit.debug.Trace
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.newFixedThreadPoolContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -20,6 +21,7 @@ import kotlin.io.path.writeText
 object ChatUtils {
     private val chatUtilsMutex = Mutex() // locking for save etc.
 
+    // N chars from title then uuid
     fun makeChatFileName(chatId: String, chatTitle: String): String {
         val sanitizedTitle = chatTitle
             .take(30)
@@ -28,6 +30,7 @@ object ChatUtils {
         return "${sanitizedTitle}-${chatId}.json"
     }
 
+    // mutexed, writes to disk and blocks until finished
     suspend fun saveChatToDisk(chat: Chat): ChatsListItem {
         chatUtilsMutex.withLock {
             return withContext(Dispatchers.IO) {
@@ -46,6 +49,8 @@ object ChatUtils {
     }
 
     // Used to decide whether to present a node as a branching candidate
+    // If a node is on the current cursor path is used by both TreeView
+    // for rendering, and by the Branching Context menu (check mark etc.)
     fun leadsToCursor(chat: Chat, node: Node): Boolean {
         var currentId = chat.cursorNodeId
 
@@ -59,7 +64,7 @@ object ChatUtils {
         return false
     }
 
-    // Only used for composing the full chat views (Text and Tree)
+    // Only used for views (Text and Tree) and not inference
     // All nodes from root to given node (including the given node)
     fun getFullHistory(chat: Chat, nodeId: String?): List<Node> {
         val historyNodes = mutableListOf<Node>()
@@ -80,198 +85,176 @@ object ChatUtils {
     // upstream node that has a historySummary (or the root if none exists),
     // through the named node.
     //
-    // previousSummary is the summary of everything BEFORE that returned
+    // precedingContext is the summary of everything BEFORE that returned
     // suffix. If no summary exists, it contains the "no previous summary"
     // sentinel.
     //
-    // E.g: Suppose B' has a summary in AB'CDE.
+    // E.g: Suppose B* has a summary in AB'CDE.
     // getEffectiveNodeHistory(E) returns:
-    //     { previousSummary = B'.summary, nodes = [B', C, D, E] }
+    //     { previousSummary = B*.summary, nodes = [B*, C, D, E] }
+    //
+    // THEREFORE: onSend() and generateHistorySummary() invoke it with the parent node.id
 
     data class EffectiveHistory(
-        val precedingContext: String,
+        val boundaryContext: String,
         val nodes: List<Node>
     )
     fun getEffectiveNodeHistory(chat: Chat, nodeId: String?): EffectiveHistory {
         val historyNodes = mutableListOf<Node>()
         var currentNodeId = nodeId
-        var previousSummary = "No previous context exists before this point"
+        var precedingContext = "No previous context exists before this point"
 
         while (currentNodeId != null) {
             val node = chat.nodes[currentNodeId] ?: break
             historyNodes.add(node)
             node.historySummary?.let {
-                previousSummary = it
+                precedingContext = it
                 break
             }
             currentNodeId = node.parentId
         }
         return EffectiveHistory(
-            precedingContext = previousSummary,
+            boundaryContext = precedingContext,
             nodes = historyNodes.reversed()
         )
     }
 
+    // ----------------------------------------------------------------------------
+    // Various automatic generation routines and helpers
+
+    // Infer a chat title from its contents (Using SystemExpert). This is invoked by both the
+    // maint routine for automatic renaming of default chat names, and by the dialog for rename
+    // which features a generate button
     suspend fun generateChatTitle(systemExpert: Expert, chat: Chat): String {
         chatUtilsMutex.withLock {
             val oldTitle = chat.title
-            val maxTextLen = 250
-            val sessionPtr = systemExpert.sessionPtr ?: error(
-                "Generating chat title for ${chat.title} return early (sysExpert = ${systemExpert.sessionPtr})"
+
+            val effectiveHistory: EffectiveHistory = getEffectiveNodeHistory(chat, chat.cursorNodeId)
+
+            // NOTE: boundaryContext is the first effectiveHistory node.historySummary
+            // cuz we stop there
+            val chatThusFar: String = AppUtils.getChatContextAsString(
+                boundaryContext = effectiveHistory.boundaryContext,
+                messages = effectiveHistory.nodes.mapNotNull { it.message },
+                maxAssistantTextLen = 250,
+                maxUserTextLen = 1500
             )
-            val effectiveHistory = getEffectiveNodeHistory(chat, chat.cursorNodeId)
-            val messages = effectiveHistory.nodes
-                .mapNotNull { it.message }
-                .map { message ->
-                    if (
-                        message.author.type == AuthorType.ASSISTANT &&
-                        message.text.length > maxTextLen
-                    ) {
-                        message.copy(text = message.text.take(maxTextLen) + "...")
-                    } else {
-                        message
-                    }
-                }
-                .toMutableList()
+            val titlePrompt = PROMPTS.TITLE_GENERATION.replace("{CURRENT_TITLE}", oldTitle)
 
-            messages += ChatMessage(
-                author = MessageAuthor(type = AuthorType.USER),
-                text = PROMPTS.TITLE_GENERATION
-            )
-
-            val prompt = AppUtils.buildPrompt(systemExpert, messages)
-                .replace("{CURRENT_TITLE}", oldTitle)
-                .replace("{PRECEDING_CONTEXT}", effectiveHistory.precedingContext)
-
-            Trace.log("TITLE GEN START session=$sessionPtr")
-
+            Trace.log("TITLE GEN START for $oldTitle")
             val result = StringBuilder()
-            LlmPortal.getResponse(sessionPtr, prompt).collect { token ->
-                result.append(token)
+            try {
+                systemExpert.getResponse(AppUtils.getUserModel(), chatThusFar, titlePrompt).collect { token ->
+                    result.append(token)
+                }
+            } catch (e: CancellationException) {
+                Trace.log("TITLE GEN ABORTED for $oldTitle")
+                throw e
             }
-
-            Trace.log("TITLE GEN END session=$sessionPtr")
-
             val newTitle = result.toString().trim()
+
+            Trace.log("TITLE GEN END ('$oldTitle', '$newTitle'")
             return newTitle.ifEmpty { oldTitle }
         }
     }
 
-    suspend fun generateHistorySummary(
-        systemExpert: Expert,
-        chat: Chat,
-        node: Node
-    ): String {
+    // Infer a summary of all nodes up to a node's parent (excluding the node itself). This is
+    // then stored and persisted within the node object in the chat by a maint routine.
+    // History summaries are used to compress past context succinctly when we trace upwards
+    // from the cursor to build context for a prompt.
+    suspend fun generateHistorySummary(systemExpert: Expert, chat: Chat, node: Node): String {
         chatUtilsMutex.withLock {
-            val sessionPtr = systemExpert.sessionPtr
-                ?: error(
-                    "Generating history summary for ${chat.title} return early " +
-                            "(sysExpert = ${systemExpert.sessionPtr})"
-                )
+            val effectiveHistory = getEffectiveNodeHistory(chat, node.parentId)
 
-            val effectiveHistory = getEffectiveNodeHistory(chat, node.id)
-
-            val messages = mutableListOf<ChatMessage>()
-
-            // Context summarized before the nodes below.
-            messages += ChatMessage(
-                author = MessageAuthor(type = AuthorType.USER),
-                text = "Preceding context:\n${effectiveHistory.precedingContext}"
+            // The history summary for `node` describes everything leading up to and including
+            // the current node's parent (excludes current node)
+            // Note: boundaryContext is the context before the first history node
+            val chatThusFar = AppUtils.getChatContextAsString(
+                boundaryContext = effectiveHistory.boundaryContext,
+                messages = effectiveHistory.nodes.mapNotNull { it.message },
+                maxAssistantTextLen = 250,
+                maxUserTextLen = 1500
             )
 
-            // The summary for `node` is up to, but does not include, `node`.
-            messages += effectiveHistory.nodes
-                .dropLast(1)
-                .mapNotNull { it.message }
-
-            // Tell the model what to do after presenting the context/conversation.
-            messages += ChatMessage(
-                author = MessageAuthor(type = AuthorType.USER),
-                text = PROMPTS.HISTORY_SUMMARY_GENERATION
-            )
-
-            val prompt = AppUtils.buildPrompt(systemExpert, messages)
-
-            Trace.log(
-                "MAINT: HISTORY SUMMARY START session=$sessionPtr node=${node.id}"
-            )
-
+            Trace.log("MAINT: HISTORY SUMMARY START node=${node.id}")
+            val summaryPrompt = PROMPTS.HISTORY_SUMMARY_GENERATION
             val result = StringBuilder()
             try {
-                LlmPortal.getResponse(sessionPtr, prompt).collect { token ->
+                systemExpert.getResponse(AppUtils.getUserModel(), chatThusFar, summaryPrompt).collect { token ->
                     result.append(token)
                 }
             } catch (e: CancellationException) {
                 Trace.log("MAINT: HISTORY SUMMARY ABORTED node=${node.id}")
                 throw e
             }
+            val resultStr = result.toString().trim()
+            Trace.log("MAINT: HISTORY SUMMARY END node=${node.id}, result = $resultStr")
 
-            Trace.log(
-                "MAINT: HISTORY SUMMARY END session=$sessionPtr node=${node.id}"
-            )
-
-            return result.toString().trim()
+            return resultStr
         }
     }
 
-    suspend fun generateChatSummary(
-        systemExpert: Expert,
-        chat: Chat
-    ): String {
+    // Write a summary of the single named chat into the appropriate JSON file in
+    // APPDIR/chats/chat-summaries. Why? The maint routine periodically summarizes
+    // chats in the background (to chats/chat-summaries). These summaries are picked up by
+    // another background maint job (see next) that updates the current user model
+    // APPDIR/user-model.json (expert.seedPrompt and user-model ride on every prompt)
+    // Another important note: At each update we summarize the current path from root to cursor.
+    // When the cursor changes, the result is the AUGMENTED old+new summary.
+    // Because the chat is a branching object, the cursor could change between invocations
+    // of this function. Thus, the likelihood of a user visiting a particular branch in
+    // a conversation is related to that branch being reflected in the Chat summary.
+    suspend fun generateChatSummary(systemExpert: Expert, chat: Chat): String {
         chatUtilsMutex.withLock {
-            val sessionPtr = systemExpert.sessionPtr ?: error(
-                "Generating chat summary for ${chat.title} returned early " +
-                        "(sysExpert = ${systemExpert.sessionPtr})"
-            )
-            val maxAssistantTextLen = 500
-            val maxUserTextLen = 1500
+            val chatsDir = Paths.get(AppUtils.getChatsDir())
+            val summariesDir = chatsDir.resolve("chat-summaries")
+            val summaryFile = summariesDir.resolve("${chat.id}.json")
 
-            val history = getFullHistory(chat, chat.cursorNodeId)
-
-            val conversation = history
-                .mapNotNull { it.message }
-                .joinToString("\n\n") { message ->
-                    val role = when (message.author.type) {
-                        AuthorType.USER -> "USER"
-                        AuthorType.ASSISTANT -> "ASSISTANT"
-                        else -> "SYSTEM"
+            // Existing summary for this chat-id?
+            // NOTE - null will be substituted by "NO PREV SUMMARY EXISTS" downstream in this fun
+            val previousChatSummary: String? = withContext(Dispatchers.IO) {
+                if (Files.exists(summaryFile)) {
+                    try {
+                        val chatSummary = AppJson.decodeFromString<ChatSummary>(Files.readString(summaryFile))
+                        chatSummary.summary
+                    } catch (e: Exception) {
+                        Trace.log("CHAT SUMMARY GEN: unable to read existing summary ${summaryFile.fileName}: ${e.message}")
+                        null
                     }
-
-                    val text = when {
-                        message.author.type == AuthorType.ASSISTANT &&
-                                message.text.length > 50 ->
-                            message.text.take(50) + "..."
-
-                        message.author.type == AuthorType.USER &&
-                                message.text.length > 500 ->
-                            message.text.take(500) + "..."
-
-                        else -> message.text
-                    }
-
-                    "$role: $text"
+                } else {
+                    null
                 }
-
-            val prompt = AppUtils.buildPrompt(
-                systemExpert,
-                listOf(
-                    ChatMessage(
-                        author = MessageAuthor(type = AuthorType.USER),
-                        text = PROMPTS.CHAT_SUMMARY_GENERATION
-                            .replace("{CONVERSATION}", conversation)
-                    )
-                )
-            )
-            Trace.log("CHAT SUMMARY GEN START session=$sessionPtr chat=${chat.id}")
-            Trace.log("Prompt = ${prompt}")
-
-            val result = StringBuilder()
-            LlmPortal.getResponse(sessionPtr, prompt).collect { token ->
-                result.append(token)
             }
 
-            Trace.log("CHAT SUMMARY GEN END session=$sessionPtr chat=${chat.id}")
-            Trace.log("SUMMARY Result = ${result.toString()}")
+            val cursorNodeId = chat.cursorNodeId ?: return "" // NO CURSOR => Conduit can't do it
+
+            // Unlike history summarization, the cursor itself is included.
+            val effectiveHistory = getEffectiveNodeHistory(chat, cursorNodeId)
+            val chatThusFar = AppUtils.getChatContextAsString(
+                boundaryContext = effectiveHistory.boundaryContext,
+                messages = effectiveHistory.nodes.mapNotNull { it.message },
+                maxAssistantTextLen = 250,
+                maxUserTextLen = 1500
+            )
+
+            val chatSummaryPrompt = PROMPTS.CHAT_SUMMARY_GENERATION
+                .replace("{PREVIOUS_SUMMARY}", previousChatSummary ?: "NO PREVIOUS SUMMARY EXISTS.")
+
+            Trace.log("CHAT SUMMARY GEN START chat=${chat.id}")
+            Trace.log(" userModel = userModel\n\nchatThusFar = $chatThusFar\n\nchatSummaryPrompt = $chatSummaryPrompt")
+
+            val result = StringBuilder()
+            try {
+                systemExpert.getResponse(AppUtils.getUserModel(), chatThusFar, chatSummaryPrompt).collect { token ->
+                    result.append(token)
+                }
+            } catch (e: CancellationException) {
+                Trace.log("CHAT SUMMARY GEN ABORTED chat=${chat.id}")
+                throw e
+            }
+
+            Trace.log("CHAT SUMMARY GEN END chat=${chat.id}")
+            Trace.log("SUMMARY Result = $result")
 
             return result.toString().trim()
         }

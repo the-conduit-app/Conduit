@@ -29,6 +29,7 @@ class AppState(
     var chatsList by mutableStateOf(ChatsList())
     var availablePacks by mutableStateOf(emptyList<Pack>())
     val notification = Notification(scope)
+    var userModel: String = "NO CURRENT USER MODEL IS AVAILABLE"
 
 //    val rightScreenCurtain = ScreenCurtain(scope)
 //    val leftScreenCurtain = ScreenCurtain(scope)

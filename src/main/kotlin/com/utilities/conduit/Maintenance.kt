@@ -267,7 +267,7 @@ object Maintenance {
 }
 
 private suspend fun runUserModelMaintenance(state: AppState) {
-    currentCoroutineContext().ensureActive()
+    currentCoroutineContext().ensureActive() // TODO - check if needed (and why not in other funs)
 
     val systemExpert = state.systemExpert
 
@@ -294,52 +294,40 @@ private suspend fun runUserModelMaintenance(state: AppState) {
         }
     }
 
-    val newSummary: ChatSummary? = withContext(Dispatchers.IO) {
+    val newChatSummary: ChatSummary? = withContext(Dispatchers.IO) {
         Files.list(summariesDir).use { stream ->
             stream
                 .filter { it.fileName.toString().endsWith(".json") }
                 .toList()
                 .mapNotNull { path ->
                     try {
-                        AppJson.decodeFromString<ChatSummary>(
-                            Files.readString(path)
-                        )
+                        AppJson.decodeFromString<ChatSummary>(Files.readString(path))
                     } catch (e: Exception) {
-                        Trace.log(
-                            "MAINT: user model — unable to read ${path.fileName}: ${e.message}"
-                        )
+                        Trace.log("MAINT: user model — unable to read ${path.fileName}: ${e.message}")
                         null
                     }
                 }
-                .filter {
-                    it.sourceModifiedTime > userModelModifiedTime
-                }
+                .filter { it.sourceModifiedTime > userModelModifiedTime }
                 .minByOrNull { it.sourceModifiedTime }
         }
     }
 
-    if (newSummary == null) {
+    if (newChatSummary == null) {
         //Trace.log("MAINT: user model — nothing new")
         return
     }
 
-    val existingUserModel = withContext(Dispatchers.IO) {
-        if (Files.exists(userModelFile)) {
-            Files.readString(userModelFile)
-        } else {
-            "NO EXISTING USER MODEL"
-        }
-    }
+    val existingUserModel = AppUtils.getUserModel()
 
-    val newInformation = """
-        Conversation: ${newSummary.chatTitle}
-
-        ${newSummary.summary}
+    val newChatInformation = """
+        Conversation: ${newChatSummary.chatTitle}
+        
+        ${newChatSummary.summary}
     """.trimIndent()
 
     val promptText = PROMPTS.USER_MODEL_GENERATION
         .replace("{EXISTING_USER_MODEL}", existingUserModel)
-        .replace("{NEW_INFORMATION}", newInformation)
+        .replace("{NEW_INFORMATION}", newChatInformation)
 
     val messages = mutableListOf(
         ChatMessage(
@@ -348,11 +336,11 @@ private suspend fun runUserModelMaintenance(state: AppState) {
         )
     )
 
-    val prompt = AppUtils.buildPrompt(systemExpert, messages)
+    val prompt = AppUtils.buildChatMlPrompt(systemExpert.seedPrompt, messages)
 
     Trace.log(
         "USER MODEL GEN START session=${systemExpert.sessionPtr} " +
-                "summary=${newSummary.chatId}"
+                "summary=${newChatSummary.chatId}"
     )
 
     val result = StringBuilder()
@@ -377,6 +365,6 @@ private suspend fun runUserModelMaintenance(state: AppState) {
     }
 
     Trace.log(
-        "MAINT: generated user model from ${newSummary.chatId}"
+        "MAINT: generated user model from ${newChatSummary.chatId}"
     )
 }

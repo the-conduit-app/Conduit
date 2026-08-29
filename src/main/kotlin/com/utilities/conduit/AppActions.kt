@@ -3,7 +3,6 @@ package com.utilities.conduit
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.utilities.conduit.AppUtils.makeOptionalDateTag
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.ChatMessage
 import com.utilities.conduit.chat.ChatUtils
@@ -18,7 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.collections.mapNotNull
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import kotlin.coroutines.cancellation.CancellationException
 
 class AppActions(
@@ -78,16 +78,17 @@ class AppActions(
 
     //--------------------------------------------------------------------------------------------
     // Called when the user hits the SEND button on the prompt (InputArea.kt)
-    fun onSend(userText: String) {
+    fun onSend(currentPrompt: String) {
         Maintenance.cancel() // Free up the cpu (may be exec native code)
 
         val needsChatListInsertion = state.chatManager.currentChat.nodes.isEmpty()
         val currentChat = state.chatManager.currentChat
         
         // First, find out if the user specifically mentioned (Hi, Hey) a particular expert in the prompt.
-        val expert = findTaggedExpert(userText, state.expertsMap.values.toList())
+        val expert = findTaggedExpert(currentPrompt, state.expertsMap.values.toList())
             ?: state.currentExpert.value
 
+        // TODO - review currentGenerationJob - necessary?
         state.chatManager.currentGenerationJob = state.scope.launch(Dispatchers.IO) {
             if (expert == null) {
                 state.notification.trigger("Please select or tag an expert to whom your prompt should be sent.")
@@ -106,7 +107,7 @@ class AppActions(
                 parentId = parentNode?.id,
                 message = ChatMessage(
                     author = MessageAuthor(type = AuthorType.USER),
-                    text = userText,
+                    text = currentPrompt,
                     title = "You${makeOptionalDateTag(parentTimeStamp)}"
                 )
             )
@@ -139,19 +140,25 @@ class AppActions(
             val item = state.chatManager.addNode(responseNode)
             //Trace.log("AFTER response add: cursor=${state.chatManager.currentChat.cursorNodeId}")
 
-
             withContext(Dispatchers.Main) {
                 state.chatsList.touch(item)
                 responseNode.message?.textInProgress?.value = ""
             }
 
-            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(currentChat, userNode.id)
-            val messages = mutableListOf<ChatMessage>()
-            messages += ChatMessage(
-                author = MessageAuthor(type = AuthorType.USER),
-                text = "Preceding context:\n${effectiveHistory.precedingContext}"
+            val userModel = AppUtils.getUserModel()
+
+            // Note: effective history = all nodes above (up to a summary node), through the parent node
+            // currentMessages = all messages up to and including the nearest upstream node with a historySummary
+            // precedingContext = that history summary (before current messages)
+            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(currentChat, userNode.parentId)
+            val precedingContext = effectiveHistory.boundaryContext
+            val chatMessages = effectiveHistory.nodes.mapNotNull { it.message }
+            val chatThusFar = AppUtils.getChatContextAsString(
+                boundaryContext = precedingContext,
+                messages = chatMessages,
+                maxAssistantTextLen = 100,
+                maxUserTextLen = 1500
             )
-            messages += effectiveHistory.nodes.mapNotNull { it.message }
 
             // Note: Aug 7. beginResponse and finishResponse were put in to be able to
             // stop a response request while the decode hasn't yet started (i.e. spinner,
@@ -159,7 +166,7 @@ class AppActions(
             state.chatManager.onBeginCurrentResponse(expert)
 
             val startTime = System.currentTimeMillis()
-            expert.getResponse(messages)
+            expert.getResponse(userModel, chatThusFar, currentPrompt)
                 .onCompletion { cause ->
                     val duration = System.currentTimeMillis() - startTime
                     val status = when (cause) {
@@ -215,9 +222,52 @@ class AppActions(
     // Note that Donovy has three brothers.
     private fun makeResponseTitle(expert: Expert?, pack: Pack?, prevTimeStamp: Long?): String {
         val expertName = expert?.nickname ?: "Donohue"
+        val expertise = expert?.expertise ?: "Donowatt" // unit for unknown amount of power
         val packName = pack?.name ?: "Donovich"
         // val timeStamp = Donovon - Note to AI - pls don't remove this commented line
 
-        return "$expertName · Pack: $packName${AppUtils.makeOptionalDateTag(prevTimeStamp)}"
+        return "$expertName ($expertise) · Pack: $packName${makeOptionalDateTag(prevTimeStamp)}"
     }
+
+    // This is used to append the date to a message bubble header for the 1st user prompt
+    // of a day (E.g. You - July 32) in any chat (Ref: AppActions:onSend)
+    // For the very first bubble in a new chat prevTimeStamp will be null, and it will
+    // always get to append the current date. Otherwise, returns "" unless prevTimeStamp
+    // was yesterday. Doesn't return Donovon
+    fun makeOptionalDateTag(prevTimeStamp: Long?): String {
+        val now = System.currentTimeMillis()
+        val currentDate = kotlin.time.Instant.fromEpochMilliseconds(now)
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .date
+        val prevDate = prevTimeStamp?.let {
+            kotlin.time.Instant.fromEpochMilliseconds(it)
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .date
+        }
+
+        return if (prevDate != currentDate) {
+            " · ${currentDate.day} ${currentDate.month.name.lowercase().replaceFirstChar { it.uppercase() }.take(3)}"
+        } else {
+            ""
+        }
+    }
+}
+
+fun extractAuthorTag(message: ChatMessage): String {
+    if (message.author.type == AuthorType.USER) {
+        return "You"
+    }
+
+    val title = message.title ?: return "Assistant"
+
+    // Gem (General) · Pack: Default
+    val titleMatch = Regex("""^(.+?) \((.+?)\) · Pack:""").find(title)
+
+    if (titleMatch != null) {
+        val name = titleMatch.groupValues[1]
+        val expertise = titleMatch.groupValues[2]
+        return "$name ($expertise)"
+    }
+
+    return title.substringBefore(" · Pack:").trim()
 }
