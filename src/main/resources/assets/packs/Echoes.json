@@ -1,48 +1,48 @@
 // A pack of Echoes
 {
-  "id": "Echo",
-  "name": "Echo",
-  "description": "A pack of echoing experts",
-  "experts": [
+    "id": "Echo",
+    "name": "Echo",
+    "description": "A pack of echoing experts",
+    "experts": [
     {
-      "id": "ECHO.SIMPLE.ID",
-      "type": "INTERNAL",
-      "nickname": "Simple",
-      "expertise": "Echoing",
-      "modelPath": ":simpleEcho",
-      "seedPrompt": ""
+        "type": "INTERNAL",
+        "nickname": "Simple",
+        "expertise": "Echoing",
+        "modelPath": ":simpleEcho",
+        "description": "An Echo... echo... echo...!",
+        "color": "Proud Peacock"
     },
     {
-      "id": "ECHO.ROTTEN.ID",
-      "type": "INTERNAL",
-      "nickname": "Rotten",
-      "expertise": "Echoing",
-      "modelPath": ":rottenEcho",
-      "seedPrompt": ""
+        "type": "INTERNAL",
+        "nickname": "Rotten",
+        "expertise": "Echoing",
+        "modelPath": ":rottenEcho",
+        "description": "An echo that says... from 'nother place",
+        "color" : "Limpid Lavender"
     },
     {
-      "id": "ECHO.SALAD.ID",
-      "type": "INTERNAL",
-      "nickname": "Salad",
-      "expertise": "Echoing",
-      "modelPath": ":saladEcho",
-      "seedPrompt": ""
+        "type": "INTERNAL",
+        "nickname": "Salad",
+        "expertise": "Echoing",
+        "modelPath": ":saladEcho",
+        "description": "An echo of some sort, but not very smart",
+        "color" : "Surprisingly Sage"
     },
     {
-      "id": "ECHO.SILLY.ID",
-      "type": "INTERNAL",
-      "nickname": "Silly",
-      "expertise": "Echoing",
-      "modelPath": ":sillyEcho",
-      "seedPrompt": ""
+        "type": "INTERNAL",
+        "nickname": "Silly",
+        "expertise": "Echoing",
+        "modelPath": ":sillyEcho",
+        "description": "An echo that likes to stand on her head",
+        "color" : "Misty Blue"
     },
     {
-      "id": "ECHO.WORDREV.ID",
-      "type": "INTERNAL",
-      "nickname": "Ohce",
-      "expertise": "Echoing",
-      "modelPath": ":wordReverseEcho",
-      "seedPrompt": ""
+        "type": "INTERNAL",
+        "nickname": "Ohce",
+        "expertise": "Echoing",
+        "modelPath": ":wordReverseEcho",
+        "description": "An echo in your mirror",
+        "color" : "Slippery Seafoam"
     }
   ]
 }

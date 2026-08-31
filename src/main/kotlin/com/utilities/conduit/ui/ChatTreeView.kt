@@ -44,12 +44,13 @@ fun ChatTreeView(
     val nodeAddedVersion = state.chatManager.nodeAddedVersion
 
     val kuiver = remember(chat, state.chatManager.nodeAddedVersion) {
+        val nodes = chat.nodes.values.toList()
         buildKuiver {
-            chat.nodes.values.forEach { node ->
+            nodes.forEach { node ->
                 nodes(node.id)
             }
 
-            chat.nodes.values.forEach { node ->
+            nodes.forEach { node ->
                 node.children.forEach { childId ->
                     edge(node.id, childId)
                 }

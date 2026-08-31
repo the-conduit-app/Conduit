@@ -1,6 +1,7 @@
 package com.utilities.conduit
 
 import com.utilities.conduit.portals.LlmPortal
+import com.utilities.conduit.utils.AppUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch

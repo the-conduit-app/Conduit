@@ -2,7 +2,7 @@ package com.utilities.conduit.portals
 
 import com.sun.jna.Native
 import com.sun.jna.Pointer
-import com.utilities.conduit.AppUtils
+import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.debug.Trace
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

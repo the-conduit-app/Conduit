@@ -35,10 +35,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
-import com.utilities.conduit.AppUtils
+import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.Chat
-import com.utilities.conduit.chat.ChatUtils
+import com.utilities.conduit.utils.ChatUtils
 import com.utilities.conduit.chat.Node
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

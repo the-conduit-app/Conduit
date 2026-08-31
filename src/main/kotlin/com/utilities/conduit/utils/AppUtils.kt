@@ -1,5 +1,7 @@
-package com.utilities.conduit
+package com.utilities.conduit.utils
 
+import com.utilities.conduit.Pack
+import com.utilities.conduit.UserModel
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.ChatMessage
 import com.utilities.conduit.debug.Trace
@@ -45,30 +47,49 @@ object AppUtils {
             Paths.get(getAppDir(), modelPath).toString()
     }
 
+    // Returns the useful contents of the APPDIR/user-model.json file
+    suspend fun getUserModelFromFile(): UserModel? {
+        val appDir = Paths.get(getAppDir())
+        val userModelFile = appDir.resolve("user-model.json")
+
+        return withContext(Dispatchers.IO) {
+            if (Files.exists(userModelFile)) {
+                try {
+                    AppJson.decodeFromString<UserModel>(Files.readString(userModelFile))
+                } catch (e: Exception) {
+                    Trace.log("USER MODEL: unable to read ${userModelFile.fileName}: ${e.message}")
+                    null
+                }
+            } else {
+                null
+            }
+        }
+    }
+
      // Reads all .json files in the packs directory and parses them into Pack objects
      // IMPORTANT: NO PACK EXPERT INITIALIZATIONS (Hence not time-consuming)
     suspend fun getAvailablePacks(): List<Pack> = withContext(Dispatchers.IO) {
-        val packsDir = Paths.get(getAppDir(), "packs")
+         val packsDir = Paths.get(getAppDir(), "packs")
 
-        if (!Files.exists(packsDir))
-            return@withContext emptyList()
+         if (!Files.exists(packsDir))
+             return@withContext emptyList()
 
-        Files.list(packsDir).use { stream ->
-            stream.toList()
-                .sortedBy { it.fileName.toString() }
-                .filter { it.toString().endsWith(".json") }
-                .mapNotNull { path ->
-                    try {
-                        val id = path.fileName.toString().removeSuffix(".json")
-                        val json = Files.readString(path)
-                        AppJson.decodeFromString<Pack>(json).copy(id = id)
-                    } catch (e: Exception) {
-                        println("Error loading pack ${path.fileName}: ${e.message}")
-                        null
-                    }
-                }
-        }
-    }
+         Files.list(packsDir).use { stream ->
+             stream.toList()
+                 .sortedBy { it.fileName.toString() }
+                 .filter { it.toString().endsWith(".json") }
+                 .mapNotNull { path ->
+                     try {
+                         val id = path.fileName.toString().removeSuffix(".json")
+                         val json = Files.readString(path)
+                         AppJson.decodeFromString<Pack>(json).copy(id = id)
+                     } catch (e: Exception) {
+                         println("Error loading pack ${path.fileName}: ${e.message}")
+                         null
+                     }
+                 }
+         }
+     }
 
     // Returns a prompt wrapped in ChatML - ready for dispatch to the LLM
     // Note currentPrompt is NOT contained in the context. For onSend() the currentPrompt is the
@@ -82,21 +103,26 @@ object AppUtils {
     ): String {
         return buildString {
             append("<|im_start|>user\n")
-            append(expertSeedPrompt?.takeIf { it.isNotBlank() } ?: "You are a general-purpose expert.")
+            append(expertSeedPrompt?.takeIf { it.isNotBlank() }
+                ?: "You are a general-purpose expert.")
             append("\n<|im_end|>\n")
 
             append("<|im_start|>user\n")
             append("The current user model is:\n")
-            append(userModel?.takeIf { it.isNotBlank() } ?: "No current user model exists.")
+            append(userModel?.takeIf { it.isNotBlank() }
+                ?: "No current user model exists.")
             append("\n<|im_end|>\n")
 
             if (context.isNotBlank()) {
                 append("<|im_start|>user\n")
-                append("The following is the conversation preceding the current user prompt.")
+                append("The following is historical conversation context provided for background only.\n")
+                append("Do not answer or continue any question contained within this context.\n")
                 append("Each contribution is identified by its author. ")
                 append("You may already be one of those contributors.\n\n")
+                append("--- BEGIN HISTORICAL CONVERSATION ---\n")
                 append(context)
-                append("\n<|im_end|>\n")
+                append("\n--- END HISTORICAL CONVERSATION ---\n")
+                append("<|im_end|>\n")
             }
 
             append("<|im_start|>user\n")
@@ -121,7 +147,7 @@ object AppUtils {
         val currentMessages = messages.joinToString("\n\n") { message ->
             val role = when (message.author.type) {
                 AuthorType.USER -> "USER"
-                AuthorType.ASSISTANT -> "ASSISTANT"
+                AuthorType.ASSISTANT -> { getContributorLabel(message) ?: "ASSISTANT" }
                 else -> "SYSTEM"
             }
 
@@ -146,23 +172,9 @@ object AppUtils {
         return "Preceding context: $boundaryContext\n\n$currentMessages"
     }
 
-    // Returns the useful contents of the APPDIR/user-model.json file
-    suspend fun getUserModel(): String {
-        val appDir = Paths.get(AppUtils.getAppDir())
-        val userModelFile = appDir.resolve("user-model.json")
-
-        return withContext(Dispatchers.IO) {
-            if (Files.exists(userModelFile)) {
-                try {
-                    AppJson.decodeFromString<UserModel>(Files.readString(userModelFile)).userModel
-                } catch (e: Exception) {
-                    Trace.log("USER MODEL: unable to read ${userModelFile.fileName}: ${e.message}")
-                    "NO EXISTING USER MODEL"
-                }
-            } else {
-                "NO EXISTING USER MODEL"
-            }
-        }
+    private fun getContributorLabel(message: ChatMessage): String? {
+        val title = message.title ?: return null
+        return title.substringBefore(" · Pack:").trim().takeIf{ it.isNotEmpty() }
     }
 
     // Used in the ChatsList Menu - TODO: Ought to include time conditionally?

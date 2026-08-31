@@ -229,36 +229,6 @@ private fun MessageBubbleSurface(
     }
 }
 
-//@Composable
-//private fun MessageBubbleSurface(
-//    color: Color,
-//    cornerRadius: Dp,
-//    content: @Composable () -> Unit
-//) {
-//    val shape = RoundedCornerShape(cornerRadius)
-//
-//    Column(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .shadow(
-//                elevation = 4.dp,
-//                shape = shape
-//            )
-//            .background(
-//                color = color.copy(alpha = .5f),
-//                shape = shape
-//            )
-//            .border(
-//                width = 1.dp,
-//                color = Color.LightGray.copy(alpha = 1f),
-//                shape = shape
-//            )
-//            .padding(6.dp)
-//    ) {
-//        content()
-//    }
-//}
-
 // ---------------------------------------------------------------------------------
 // Below likely deprecated
 

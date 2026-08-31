@@ -13,6 +13,7 @@ import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.ui.LeftPanelMode
 import com.utilities.conduit.ui.Notification
+import com.utilities.conduit.utils.AppUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -29,10 +30,7 @@ class AppState(
     var chatsList by mutableStateOf(ChatsList())
     var availablePacks by mutableStateOf(emptyList<Pack>())
     val notification = Notification(scope)
-    var userModel: String = "NO CURRENT USER MODEL IS AVAILABLE"
-
-//    val rightScreenCurtain = ScreenCurtain(scope)
-//    val leftScreenCurtain = ScreenCurtain(scope)
+    var userModel by mutableStateOf<UserModel?>(null)
 
     var leftPanelMode by mutableStateOf(LeftPanelMode.LIST)
     val focusInput = mutableStateOf(0)
@@ -46,8 +44,9 @@ class AppState(
             nickname = "Conduit",
             expertise = "General",
             modelPath = "llm/gemma-2-9b-it-Q4_K_M.gguf",
-            seedPrompt = "You are a general purpose expert. You assist with various administrative tasks " +
-                    "like summarizing chats, generating titles, the user model, etc."
+            description = "A general purpose expert assisting with various administrative tasks " +
+                    "like summarizing chats, generating titles, the user model, etc.",
+            color = "Snazzy Slate"
         )
 
         // One new AppState per invocation
@@ -56,13 +55,13 @@ class AppState(
             val state = AppState(
                 conduitPtr = conduitPtr,
                 scope = scope,
-                chatManager = ChatManager(scope, systemExpert),
+                chatManager = ChatManager(),
+
                 currentExpert = mutableStateOf(null),
                 currentPack = mutableStateOf(null),
                 expertsMap = mutableStateMapOf(),
                 systemExpert = systemExpert
             )
-
 
             return state
         }

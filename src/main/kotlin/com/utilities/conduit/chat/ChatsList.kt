@@ -6,8 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.utilities.conduit.ui.AppJson
-import com.utilities.conduit.AppUtils.getAppDir
-import com.utilities.conduit.chat.ChatUtils.makeChatFileName
+import com.utilities.conduit.utils.AppUtils.getAppDir
+import com.utilities.conduit.utils.ChatUtils
+import com.utilities.conduit.utils.ChatUtils.makeChatFileName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -61,7 +62,7 @@ class ChatsList(
 
                     val item = ChatsListItem(
                         chat = chat,
-                        creationTime = attrs.creationTime().toMillis(),
+                        creationTime = chat.createdAt,
                         modificationTime = attrs.lastModifiedTime().toMillis()
                     )
 

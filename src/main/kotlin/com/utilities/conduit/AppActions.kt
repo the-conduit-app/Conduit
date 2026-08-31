@@ -5,14 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.ChatMessage
-import com.utilities.conduit.chat.ChatUtils
+import com.utilities.conduit.utils.ChatUtils
 import com.utilities.conduit.chat.ChatsListItem
 import com.utilities.conduit.chat.MessageAuthor
 import com.utilities.conduit.chat.MessageStatus
 import com.utilities.conduit.chat.Node
 import com.utilities.conduit.chat.NodeType
 import com.utilities.conduit.ui.FullMessageOverlayState
-import com.utilities.conduit.ui.sounds.Ting
+import com.utilities.conduit.ui.Sounds
+import com.utilities.conduit.utils.AppUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
@@ -83,6 +84,7 @@ class AppActions(
 
         val needsChatListInsertion = state.chatManager.currentChat.nodes.isEmpty()
         val currentChat = state.chatManager.currentChat
+        val userModel = state.userModel
         
         // First, find out if the user specifically mentioned (Hi, Hey) a particular expert in the prompt.
         val expert = findTaggedExpert(currentPrompt, state.expertsMap.values.toList())
@@ -145,8 +147,6 @@ class AppActions(
                 responseNode.message?.textInProgress?.value = ""
             }
 
-            val userModel = AppUtils.getUserModel()
-
             // Note: effective history = all nodes above (up to a summary node), through the parent node
             // currentMessages = all messages up to and including the nearest upstream node with a historySummary
             // precedingContext = that history summary (before current messages)
@@ -166,7 +166,7 @@ class AppActions(
             state.chatManager.onBeginCurrentResponse(expert)
 
             val startTime = System.currentTimeMillis()
-            expert.getResponse(userModel, chatThusFar, currentPrompt)
+            expert.getResponse(userModel?.text, chatThusFar, currentPrompt)
                 .onCompletion { cause ->
                     val duration = System.currentTimeMillis() - startTime
                     val status = when (cause) {
@@ -195,7 +195,7 @@ class AppActions(
                         state.notification.trigger("Response interrupted by user.")
                     }
                     state.chatManager.onFinishCurrentResponse()
-                    Ting.play()
+                    Sounds.Ting.play()
                 }
                 .collect { chunk ->
                     withContext(Dispatchers.Main) {

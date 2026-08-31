@@ -12,6 +12,7 @@ import androidx.compose.ui.zIndex
 import com.utilities.conduit.*
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
+import com.utilities.conduit.utils.AppUtils
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s64
 import kotlinx.coroutines.Dispatchers
@@ -32,12 +33,11 @@ fun App() {
     val conduitPtr = remember { LlmPortal.createConduit(maxTokensPerResponse) }
     val state = remember { AppState.createNew(conduitPtr, scope = scope) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(state) {
+        state.userModel = AppUtils.getUserModelFromFile()
         state.chatsList.build()        // load existing chats in the chats dir
 
-        val packs = withContext(Dispatchers.IO) {
-            AppUtils.getAvailablePacks()
-        }
+        val packs = withContext(Dispatchers.IO) { AppUtils.getAvailablePacks() }
         state.availablePacks = packs
 
         val defaultPack = packs.find { it.id == "Default" } ?: error("Default pack not found")

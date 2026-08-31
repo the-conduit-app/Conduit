@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.utilities.conduit.Expert
 import com.utilities.conduit.debug.Trace
-import kotlinx.coroutines.CoroutineScope
+import com.utilities.conduit.utils.ChatUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex

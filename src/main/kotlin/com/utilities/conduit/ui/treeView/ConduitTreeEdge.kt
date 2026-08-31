@@ -7,11 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import com.utilities.conduit.chat.ChatUtils.leadsToCursor
-import kotlin.math.atan2
-import kotlin.math.sqrt
 
 @Composable
 fun ConduitTreeEdge(

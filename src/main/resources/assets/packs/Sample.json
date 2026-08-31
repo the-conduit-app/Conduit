@@ -2,33 +2,33 @@
 // It contains references to LLM files that you must download, verify and THEN place in
 // the correct ../llm/ directory
 {
-  "id": "Sample.ID",
-  "name": "Sample",
-  "description": "A Sample pack of experts (two pseudo)",
-  "experts": [
+    "id": "Sample.ID",
+    "name": "Sample",
+    "description": "A Sample pack of experts for you.",
+    "experts": [
     {
-      "id": "001",
-      "type": "LOCAL",
-      "nickname": "Gem",
-      "expertise": "General",
-      "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
-      "seedPrompt": "Your name is Gem. You are an all-round expert."
+        "type": "LOCAL",
+        "nickname": "Gem",
+        "expertise": "General",
+        "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
+        "description": "An all-round expert.",
+        "color" : "Terracotta"
     },
     {
-      "id": "002",
-      "type": "LOCAL",
-      "nickname": "Babe",
-      "expertise": "Babbling",
-      "modelPath": "llm/SmolLM2-135M-Instruct-Q4_K_M.gguf", 
-      "seedPrompt": "Your name is Babe. You are not really an expert at anything yet."
+        "type": "LOCAL",
+        "nickname": "Babe",
+        "expertise": "Babbling",
+        "modelPath": "llm/SmolLM2-135M-Instruct-Q4_K_M.gguf", 
+        "description": "Learning the ways of humans.",
+        "color": "Cutey Peach"
     },
     {
-      "id": "004",
-      "type": "LOCAL",
-      "nickname": "Archie",
-      "expertise": "Buildings",
-      "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
-      "seedPrompt": "Your name is Archie. You are an expert building architect."
+        "type": "LOCAL",
+        "nickname": "Bob",
+        "expertise": "Buildings",
+        "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
+        "description": "An expert home builder.",
+        "color": "Arisi Mauve"
     }
   ]
 }

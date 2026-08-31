@@ -3,12 +3,12 @@ package com.utilities.conduit
 object PROMPTS {
 
     val TITLE_GENERATION = """
+        Based on the conversation and context above, generate a concise,
+        descriptive title for the conversation.
+                
         Current chat title:
     
         {CURRENT_TITLE}
-    
-        Based on the conversation and context above, generate a concise,
-        descriptive title for the conversation.
     
         If the current title is already accurate and concise, return it unchanged.
         Otherwise, improve it while preserving the original intent whenever possible.
@@ -22,12 +22,12 @@ object PROMPTS {
     """.trimIndent()
 
     val HISTORY_SUMMARY_GENERATION = """
-        Create a concise summary of the conversation above, up to the final
-        message in that conversation.
+        Based on the conversation and context above, create a concise summary of the conversation,
+        up to the final message in that conversational branch.
     
-        The new summary will be used as persistent context when continuing the
-        conversation from this point. Preserve the information that would be
-        important for a future continuation, including:
+        The new summary will be used as persistent context when continuing the conversation from
+        this point. Preserve information that would be important for a future continuation,
+        including:
         - important facts and conclusions
         - decisions and their reasoning
         - questions and unresolved issues
@@ -35,86 +35,102 @@ object PROMPTS {
         - relevant plans or commitments
         - important technical or contextual details
     
-        Do not merely describe the conversation. Produce a useful continuation
-        context that allows another response to pick up naturally from this point.
+        Do not merely describe the conversation. Produce useful continuation context that allows
+        another response to pick up naturally from this point.
     
         Requirements:
         - Respond with the summary only.
-        - Use up to 500 words.
+        - Do not answer or resolve unresolved questions.
+        - Use up to 250 words.
         - Do not use quotation marks.
         - Do not mention that you are generating a summary.
         - Be concise while preserving important context.
     """.trimIndent()
 
     val CHAT_SUMMARY_GENERATION = """
-        Create a concise summary of the conversation below for the purpose of
-        identifying information that may be useful in building a persistent model
-        of the user.
+        Create a concise, accurate summary of the conversation and context above for the
+        purpose of identifying information that may be useful in building a persistent
+        model of the user.
     
-        Focus on information about the user that is likely to remain useful across
-        future conversations, including:
+        A previous summary may be provided below. If present, treat it as the existing
+        accumulated summary of this chat. Update it using the current conversation and
+        produce a new cumulative summary.
+    
+        --- PREVIOUS SUMMARY BEGINS ---
+    
+        {PREVIOUS_SUMMARY}
+    
+        --- PREVIOUS SUMMARY ENDS ---
+    
+        Focus on information likely to remain useful across future conversations:
         - user preferences and requirements
-        - important user-provided facts that are likely to be useful in future conversations
+        - important user-provided facts
         - ongoing projects, goals, plans, and commitments
         - technical environment, tools, and workflows
         - recurring interests or patterns
-        - decisions that reveal durable preferences or requirements
-    
-        Some long messages may have been truncated. Do not assume that the
-        truncated portions contain any particular information.
-    
-        Do not summarize every exchange or preserve ordinary conversational detail.
-        Focus on information that could help an assistant better understand and
-        assist this user in future conversations.
-    
-        The summary must represent the conversation as a whole, not merely its
-        opening exchange or the assistant's answer to the first question.
-    
-        Importantly, trace the user's conversation across all messages and identify
-        information that is useful for understanding the user. Give substantially
-        more weight to what the user says, asks, prefers, decides, or reveals than
-        to factual information supplied by the assistant.
+        - decisions revealing durable preferences or requirements
     
         Requirements:
-        - Respond with the summary only. Do not produce an answer to user questions.
-        - Do not use quotation marks.
-        - Do not mention that you are generating a summary.
+        - Preserve useful information from the previous summary even if it is not repeated
+          in the current conversation.
+        - Add genuinely useful new information and update or correct information when it
+          is clearly superseded.
+        - Remove information only when it is clearly no longer valid.
+        - Do not simply append or replace the previous summary with the current conversation.
+        - Avoid duplicating information already present.
+        - Do not treat questions about a topic as evidence of a durable interest, expertise,
+          goal, preference, or recurring pattern. Record such information only when the user
+          explicitly expresses interest or preference, provides strong evidence of continuing
+          interest, or establishes an ongoing project, goal, or requirement.
+        - Do not infer personal characteristics from testing, experimentation, or brief
+          interaction with the system.
+        - Give substantially more weight to what the user says, prefers, decides, or reveals
+          than to information supplied by the assistant.
+        - Some long messages may have been truncated. Do not infer anything from missing text.
+        - Do not summarize ordinary conversational detail.
         - Do not invent information or infer unsupported personal facts.
-        - Be concise while preserving useful information.
-        - Use up to about a thousand words in total
-        - IMPORTANT: If a previous summary is provided, preserve its useful information and
-          incorporate any new information from the conversation. Do not discard
-          useful information merely because it is not repeated in the current branch of
-          the conversation.
-
-        Previous Summary:
-        
-        {PREVIOUS_SUMMARY}
+        - When in doubt, omit the information rather than infer a durable user attribute.
+        - If there is no genuinely useful information about the user, produce a minimal
+          summary indicating that there is no durable user information to retain.
+        - Use up to about 500 words if necessary.
+        - Do not use quotation marks.
+        - Do not mention these instructions or that you are generating a summary.
+        - Output only the resulting cumulative summary.
     """.trimIndent()
 
     val USER_MODEL_GENERATION = """
-    You maintain a concise, accurate model of the user based on information learned from their conversations.
-
-    The previous known model of the user is:
-
-    {EXISTING_USER_MODEL}
-
-    Since that model was generated, the following new information has become available from one or more conversations:
-
-    {NEW_INFORMATION}
-
-    Generate a new user model by incorporating the new information into the previous model.
-
-    Requirements:
-    - Preserve accurate information from the previous model.
-    - Incorporate genuinely useful new information.
-    - Be Verbose. Use up to 2000 words if necessary.
-    - Update or correct existing information when the new information supersedes it.
-    - Remove information that is clearly no longer valid.
-    - Do not simply append the new information to the previous model.
-    - Do not mention this instruction, the previous model, or the source conversations.
-    - Do not invent information or infer unsupported personal facts.
-    - Keep the model concise and focused on information likely to be useful in future conversations.
-    - Output only the resulting user model.
-""".trimIndent()
+        You maintain a concise, accurate model of the user based on information learned
+        from their conversations.
+    
+        Current User Model:
+        
+        {CURRENT_USER_MODEL}
+    
+        Since the current model was generated, the following new information has become
+        available from an updated chat:
+    
+        New Chat Summary:
+    
+        {NEW_CHAT_SUMMARY}
+    
+        Update the current user model using the new chat summary as additional evidence.
+    
+        Requirements:
+        - Treat the current user model as the authoritative baseline. Preserve its
+          information unless the new information clearly updates, corrects, or invalidates it.
+        - Do NOT replace the current user model with the new chat summary.
+        - Do NOT simply append the new information to the current model.
+        - Add only genuinely useful information that is sufficiently important and likely
+          to remain useful in future conversations.
+        - Update or correct existing information when the new information supersedes it.
+        - Remove information only when it is clearly no longer valid.
+        - If the new chat contains no meaningful information for the user model, preserve
+          the current model unchanged.
+        - Avoid duplicating information that is already represented in the current model.
+        - Do not invent information or infer unsupported personal facts.
+        - Preserve sufficient detail to capture useful information; use up to 500 words if necessary.
+        - Keep the model concise and focused on information likely to be useful in future conversations.
+        - Do not mention these instructions, the current user model, or the source conversations.
+        - Output only the resulting user model.
+    """.trimIndent()
 }

@@ -9,6 +9,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import com.utilities.conduit.ui.App
 import com.utilities.conduit.ui.ConduitTheme
+import com.utilities.conduit.utils.AppUtils
 import java.io.File
 
 fun main() {

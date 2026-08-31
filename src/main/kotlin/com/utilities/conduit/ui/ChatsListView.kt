@@ -24,10 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
-import com.utilities.conduit.AppUtils
-import com.utilities.conduit.chat.ChatUtils
+import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.chat.ChatsListItem
-import com.utilities.conduit.ui.sounds.Tick
+import com.utilities.conduit.utils.MaintenanceUtils
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 
@@ -57,7 +56,7 @@ fun ChatsListView(state: AppState) {
 
     suspend fun selectChat(item: ChatsListItem) {
         if (item.chat.id == state.chatManager.currentChat.id) return
-        Tick.play()
+        Sounds.Tick.play()
 
         rightViewOpacity.hide()
         state.chatManager.currentChat = item.chat
@@ -181,7 +180,7 @@ fun ChatsListView(state: AppState) {
                 initialTitle = item.chat.title,
                 onCancel = { showRenameDialog = null },
                 onSuggest = {
-                        ChatUtils.generateChatTitle(state.systemExpert, item.chat)
+                        MaintenanceUtils.generateChatTitle(state.systemExpert, item.chat)
                     },
                 onOk = { newTitle ->
                     scope.launch {

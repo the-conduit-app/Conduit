@@ -1,34 +1,23 @@
 package com.utilities.conduit.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.VolumeOff
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material.icons.filled.VolumeOff
+import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -51,6 +40,7 @@ enum class LeftPanelMode {
 fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
     val opacity = LocalLeftViewOpacity.current
     val scope = rememberCoroutineScope()
+    var settingsMenuExpanded by remember { mutableStateOf(false) }
 
     Box(modifier = modifier.alpha(opacity.value)) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -115,6 +105,23 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
                                 )
                             }
                         }
+                    }
+                    // Sound on/off ---------------------------------------------------------
+
+                    IconButton(
+                        modifier = Modifier.size(18.dp),
+                        onClick = {
+                            Sounds.isSilent = !Sounds.isSilent
+                        }
+                    ) {
+                        Icon(
+                            imageVector = if (Sounds.isSilent)
+                                Icons.AutoMirrored.Filled.VolumeOff
+                            else
+                                Icons.AutoMirrored.Filled.VolumeUp,
+                            contentDescription = if (Sounds.isSilent) "Sounds on" else "Sounds off",
+                            tint = Color(0xFF007C91)
+                        )
                     }
                 }
             }

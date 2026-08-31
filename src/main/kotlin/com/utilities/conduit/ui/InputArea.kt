@@ -1,11 +1,9 @@
 package com.utilities.conduit.ui
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.*
@@ -20,11 +18,6 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
-import com.utilities.conduit.ui.sounds.Hsoohw
-import com.utilities.conduit.ui.sounds.Tick
-import com.utilities.conduit.ui.sounds.Whoosh
-import conduit.generated.resources.Res
-import org.jetbrains.compose.resources.painterResource
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Stop
@@ -73,7 +66,7 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
                     when {
                         ev.key == Key.Escape -> {
                             text = ""
-                            Hsoohw.play()
+                            Sounds.Hsoohw.play()
                             true
                         }
 
@@ -81,7 +74,7 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
 
                         ev.key == Key.Enter -> {
                             if (text.isNotBlank() && !isGenerating) {
-                                Whoosh.play()
+                                Sounds.Whoosh.play()
                                 onSend(text)
                                 text = ""
                             }
@@ -101,7 +94,7 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
                 if (isGenerating) {
                     state.chatManager.abortCurrentResponse()
                 } else if (text.isNotBlank()) {
-                    Whoosh.play()
+                    Sounds.Whoosh.play()
                     onSend(text)
                     text = ""
                 }

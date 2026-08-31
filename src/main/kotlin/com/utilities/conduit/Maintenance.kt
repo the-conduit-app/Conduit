@@ -8,14 +8,13 @@ package com.utilities.conduit
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
-import com.utilities.conduit.chat.AuthorType
-import com.utilities.conduit.chat.ChatMessage
 import com.utilities.conduit.chat.ChatSummary
-import com.utilities.conduit.chat.ChatUtils
-import com.utilities.conduit.chat.MessageAuthor
+import com.utilities.conduit.utils.ChatUtils
 import com.utilities.conduit.debug.Trace
-import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.ui.AppJson
+import com.utilities.conduit.utils.AppUtils
+import com.utilities.conduit.utils.MaintenanceUtils
+import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyles
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -28,7 +27,7 @@ import kotlinx.coroutines.withContext
 import java.nio.file.Files
 import java.nio.file.Paths
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.io.path.writeText
+import kotlin.streams.asSequence
 import kotlin.time.Duration.Companion.milliseconds
 
 // Important note about Maint jobs (see ChatManager also):
@@ -53,6 +52,7 @@ fun Modifier.userActivityMonitor(state: AppState): Modifier =
         }
     }
 
+// Periodic cleanup/org routines when app is idle
 object Maintenance {
     private const val IDLE_TIMEOUT = 5_000L
     private var maintenanceJob: Job? = null
@@ -71,7 +71,7 @@ object Maintenance {
             maintenanceJob = scope.launch(Dispatchers.Default) {
                 try {
                     runMaintenance(state)
-                } catch (e: CancellationException) {
+                } catch (e: CancellationException) {  // TODO - check unused
                     Trace.log("MAINT: CANCELLED")
                 } finally {
                     maintenanceJob = null
@@ -88,6 +88,8 @@ object Maintenance {
     }
 
     fun cancel() {
+        if (maintenanceJob?.isActive != true) return
+
         Trace.log("Maintenance: cancel")
         state?.systemExpert?.abortResponse()
         maintenanceJob?.cancel()
@@ -141,7 +143,7 @@ object Maintenance {
                 return
 
             //Trace.log("Rename generating new title")
-            val newTitle = ChatUtils.generateChatTitle(systemExpert, item.chat)
+            val newTitle = MaintenanceUtils.generateChatTitle(systemExpert, item.chat)
             //Trace.log("Rename generated new title = $newTitle")
 
             if (newTitle.equals(item.chat.title, ignoreCase = true))
@@ -160,6 +162,7 @@ object Maintenance {
         }
     }
 
+    // Generate summaries for branching nodes (with enough ancestors - checked in the helper)
     private suspend fun runHistorySummaryMaintenance(state: AppState) {
         val systemExpert = state.systemExpert
 
@@ -185,20 +188,20 @@ object Maintenance {
 
                 //Trace.log("MAINT: generating history summary for node ${node.id} in chat ${chat.title}")
 
-                val summary = ChatUtils.generateHistorySummary(systemExpert, chat, node)
-                if (summary.isBlank())
+                val summary = MaintenanceUtils.generateHistorySummary(systemExpert, chat, node)
+                if (summary.isNullOrBlank())
                     continue
 
                 node.historySummary = summary
                 ChatUtils.saveChatToDisk(chat)
-
-                //Trace.log("MAINT: generated history summary for node ${node.id}")
+                //Trace.log("MAINT: generated and saved history summary for node ${node.id}")
 
                 return
             }
         }
     }
 
+    // Generate summaries of chats in the chats/chat-summaries/folder
     private suspend fun runChatSummaryMaintenance(state: AppState) {
         val systemExpert = state.systemExpert
         if (systemExpert.sessionPtr == null) {
@@ -207,12 +210,12 @@ object Maintenance {
         }
 
         val summariesDir = Paths.get(AppUtils.getChatsDir(), "chat-summaries")
+
         withContext(Dispatchers.IO) {
             Files.createDirectories(summariesDir)
         }
 
-        val chatsList = state.chatsList
-        for (item in chatsList.items.toList()) {
+        for (item in state.chatsList.items.toList()) {
             if (state.chatManager.currentlyGeneratingExpert != null) {
                 Trace.log("MAINT: chat summary break due to currently generating expert")
                 return
@@ -221,150 +224,113 @@ object Maintenance {
             val chat = item.chat
             val summaryFile = summariesDir.resolve("${chat.id}.json")
 
-            val needsSummary = if (!Files.exists(summaryFile)) {
-                true
-            } else {
-                val summary = runCatching {
-                    AppJson.decodeFromString<ChatSummary>(
-                        Files.readString(summaryFile)
-                    )
-                }.getOrNull()
-
-                summary == null ||
-                        summary.sourceModifiedTime < item.modificationTime ||
-                        summary.chatId != chat.id
+            val previousSummary: ChatSummary? = withContext(Dispatchers.IO) {
+                if (!Files.exists(summaryFile)) {
+                    null
+                } else {
+                    runCatching {
+                        AppJson.decodeFromString<ChatSummary>(
+                            Files.readString(summaryFile)
+                        )
+                    }.getOrNull()
+                }
             }
 
+            val needsSummary = previousSummary == null || previousSummary.chatId != chat.id ||
+                        previousSummary.chatModifiedTime < item.modificationTime
             if (!needsSummary)
                 continue
 
             Trace.log("MAINT: generating chat summary for ${chat.title}")
 
-            val summaryText = ChatUtils.generateChatSummary(
-                systemExpert,
-                chat
-            )
-
+            val summaryText = MaintenanceUtils.generateChatSummary(systemExpert, chat, previousSummary)
             if (summaryText.isBlank())
                 continue
 
             val chatSummary = ChatSummary(
-                chatId = chat.id,
-                chatTitle = chat.title,
-                sourceModifiedTime = item.modificationTime,
-                summary = summaryText
+                chat.id,
+                chat.title,
+                item.modificationTime,
+                summaryText
             )
 
             withContext(Dispatchers.IO) {
-                Files.writeString(summaryFile, AppJson.encodeToString(chatSummary))
+                Files.writeString(
+                    summaryFile,
+                    AppJson.encodeToString(chatSummary)
+                )
             }
 
-            Trace.log("MAINT: generated chat summary for ${chat.title}")
-
+            Trace.log("MAINT: generated and saved chat summary for ${chat.title}")
             return
         }
     }
-}
 
-private suspend fun runUserModelMaintenance(state: AppState) {
-    currentCoroutineContext().ensureActive() // TODO - check if needed (and why not in other funs)
+    // Generate a model of the user from various chats/chat-summaries/*.json
+    private suspend fun runUserModelMaintenance(state: AppState) {
+        val systemExpert = state.systemExpert
 
-    val systemExpert = state.systemExpert
-
-    if (systemExpert.sessionPtr == null) {
-        Trace.log("MAINT: user model skip — system expert unavailable")
-        return
-    }
-
-    val chatsDir = Paths.get(AppUtils.getChatsDir())
-    val appDir = Paths.get(AppUtils.getAppDir())
-    val summariesDir = chatsDir.resolve("chat-summaries")
-    val userModelFile = appDir.resolve("user-model.json")
-
-    if (!Files.exists(summariesDir)) {
-        Trace.log("MAINT: user model skip — no chat summaries directory")
-        return
-    }
-
-    val userModelModifiedTime = withContext(Dispatchers.IO) {
-        if (Files.exists(userModelFile)) {
-            Files.getLastModifiedTime(userModelFile).toMillis()
-        } else {
-            0L
+        if (systemExpert.sessionPtr == null) {
+            Trace.log("MAINT: user model skip — system expert unavailable")
+            return
         }
-    }
 
-    val newChatSummary: ChatSummary? = withContext(Dispatchers.IO) {
-        Files.list(summariesDir).use { stream ->
-            stream
-                .filter { it.fileName.toString().endsWith(".json") }
-                .toList()
-                .mapNotNull { path ->
-                    try {
-                        AppJson.decodeFromString<ChatSummary>(Files.readString(path))
-                    } catch (e: Exception) {
-                        Trace.log("MAINT: user model — unable to read ${path.fileName}: ${e.message}")
-                        null
-                    }
-                }
-                .filter { it.sourceModifiedTime > userModelModifiedTime }
-                .minByOrNull { it.sourceModifiedTime }
+        val summariesDir = Paths.get(AppUtils.getChatsDir(), "chat-summaries")
+        val userModelFile = Paths.get(AppUtils.getAppDir(), "user-model.json")
+
+        if (!Files.exists(summariesDir)) {
+            Trace.log("MAINT: user model skip — no chat summaries directory")
+            return
         }
-    }
 
-    if (newChatSummary == null) {
-        //Trace.log("MAINT: user model — nothing new")
-        return
-    }
+        // We only pick up ONE chat summary file modified LATER than the last summary file already processed
+        val previousUserModel = AppUtils.getUserModelFromFile()
+        val lastSummaryModifiedTime = previousUserModel?.lastSummaryModifiedTime ?: 0L
 
-    val existingUserModel = AppUtils.getUserModel()
-
-    val newChatInformation = """
-        Conversation: ${newChatSummary.chatTitle}
-        
-        ${newChatSummary.summary}
-    """.trimIndent()
-
-    val promptText = PROMPTS.USER_MODEL_GENERATION
-        .replace("{EXISTING_USER_MODEL}", existingUserModel)
-        .replace("{NEW_INFORMATION}", newChatInformation)
-
-    val messages = mutableListOf(
-        ChatMessage(
-            author = MessageAuthor(type = AuthorType.USER),
-            text = promptText
+        // We need to capture both the summary itself, and its file modification time
+        data class NewSummary(
+            val modifiedTime: Long,
+            val chatSummary: ChatSummary
         )
-    )
+        val newSummary: NewSummary? = withContext(Dispatchers.IO) {
+            Files.list(summariesDir).use { stream ->
+                stream.asSequence()
+                    .filter { it.fileName.toString().endsWith(".json") }
+                    .mapNotNull { path ->
+                        try {
+                            val modifiedTime = Files.getLastModifiedTime(path).toMillis()
+                            if (modifiedTime <= lastSummaryModifiedTime) {
+                                return@mapNotNull null
+                            }
+                            NewSummary(modifiedTime, AppJson.decodeFromString<ChatSummary>(Files.readString(path)))
+                        } catch (e: Exception) {
+                            Trace.log("MAINT: user model — skipping mangled " + "${path.fileName}: ${e.message}")
+                            null
+                        }
+                    }
+                    .minByOrNull { it.modifiedTime }
+            }
+        }
+        if (newSummary == null) return
 
-    val prompt = AppUtils.buildChatMlPrompt(systemExpert.seedPrompt, messages)
+        // A new chat summary updated after the previously most recent summary used for
+        // generating the user model is now available
 
-    Trace.log(
-        "USER MODEL GEN START session=${systemExpert.sessionPtr} " +
-                "summary=${newChatSummary.chatId}"
-    )
-
-    val result = StringBuilder()
-
-    LlmPortal.getResponse(systemExpert.sessionPtr!!, prompt)
-        .collect { token ->
-            currentCoroutineContext().ensureActive()
-            result.append(token)
+        val previousUserModelText = previousUserModel?.text ?: "NO PREVIOUS USER MODEL EXISTS"
+        val userModelStr = MaintenanceUtils.generateUserModel(
+            systemExpert, previousUserModelText, newSummary.chatSummary
+        )
+        if (userModelStr.isBlank()) {
+            Trace.log("MAINT: user model generation returned blank")
+            return
         }
 
-    val newUserModel = result.toString().trim()
+        val updatedUserModel = UserModel(text = userModelStr, lastSummaryModifiedTime = newSummary.modifiedTime)
+        withContext(Dispatchers.IO) {
+            Files.writeString(userModelFile, AppJson.encodeToString(updatedUserModel))
+        }
+        state.userModel = updatedUserModel
 
-    Trace.log("USER MODEL GEN END session=${systemExpert.sessionPtr}")
-
-    if (newUserModel.isBlank()) {
-        Trace.log("MAINT: user model generation returned blank")
-        return
+        Trace.log("MAINT: generated user model from ${newSummary.chatSummary.chatId}")
     }
-
-    withContext(Dispatchers.IO) {
-        userModelFile.writeText(newUserModel)
-    }
-
-    Trace.log(
-        "MAINT: generated user model from ${newChatSummary.chatId}"
-    )
 }
