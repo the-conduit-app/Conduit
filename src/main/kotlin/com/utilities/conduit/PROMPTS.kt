@@ -6,9 +6,7 @@ object PROMPTS {
         Based on the conversation and context above, generate a concise,
         descriptive title for the conversation.
                 
-        Current chat title:
-    
-        {CURRENT_TITLE}
+        Current chat title: '{CURRENT_TITLE}'
     
         If the current title is already accurate and concise, return it unchanged.
         Otherwise, improve it while preserving the original intent whenever possible.
@@ -102,16 +100,22 @@ object PROMPTS {
         You maintain a concise, accurate model of the user based on information learned
         from their conversations.
     
-        Current User Model:
-        
+        The following is the current user model. It is the authoritative baseline:
+    
+        --- CURRENT USER MODEL BEGINS ---
+    
         {CURRENT_USER_MODEL}
+    
+        --- CURRENT USER MODEL ENDS ---
     
         Since the current model was generated, the following new information has become
         available from an updated chat:
     
-        New Chat Summary:
+        --- NEW CHAT SUMMARY BEGINS ---
     
         {NEW_CHAT_SUMMARY}
+    
+        --- NEW CHAT SUMMARY ENDS ---
     
         Update the current user model using the new chat summary as additional evidence.
     
@@ -128,9 +132,32 @@ object PROMPTS {
           the current model unchanged.
         - Avoid duplicating information that is already represented in the current model.
         - Do not invent information or infer unsupported personal facts.
-        - Preserve sufficient detail to capture useful information; use up to 500 words if necessary.
+        - Preserve sufficient detail to capture useful information.
         - Keep the model concise and focused on information likely to be useful in future conversations.
-        - Do not mention these instructions, the current user model, or the source conversations.
-        - Output only the resulting user model.
+        - Do not mention these instructions, the source conversations, or the process used
+          to construct the model.
+    
+        OUTPUT FORMAT — IMPORTANT:
+    
+        Your entire response MUST be a single valid JSON object.
+    
+        The JSON object MUST have exactly one field named "features".
+        "features" MUST be an array of strings.
+        Each string represents one concise, useful fact about the user.
+    
+        Do not output Markdown.
+        Do not use code fences.
+        Do not output any text before or after the JSON object.
+        Do not include timestamps, likelihoods, confidence scores, occurrence counts,
+        or any other metadata. The application manages all metadata.
+    
+        If there are no useful user-model features, return:
+    
+        {"features":[]}
+    
+        Example of the required output format:
+    
+        {"features":["The user is interested in mathematics.","The user has a particular
+        interest in the Riemann Hypothesis and the zeta function."]}
     """.trimIndent()
 }

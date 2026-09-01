@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.trySendBlocking
+import kotlinx.coroutines.flow.buffer
 
 object LlmPortal {
     private val conduitLibPath = AppUtils.getNativeLibDir("libconduit.dylib")
@@ -39,7 +42,10 @@ object LlmPortal {
         //Trace.log("Sending prompt: $prompt")
         val callback = object : ConduitTokenCallback {
             override fun invoke(text: String?, userData: Pointer?) {
-                trySend(text?: "")
+                val result = trySendBlocking(text ?: "")
+                if (result.isFailure) {
+                    Trace.log("LLM CALLBACK: trySend FAILED text=[$text]")
+                }
             }
         }
 
@@ -60,6 +66,7 @@ object LlmPortal {
                 close(RuntimeException("Generation failed (rc=$rc)"))
             }
         }
+        Trace.log("conduit_generate returned $rc")
     }
 
     fun abortResponse(sessionPtr: Pointer) {

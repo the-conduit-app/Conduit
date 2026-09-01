@@ -133,6 +133,7 @@ object MaintenanceUtils {
             try {
                 systemExpert.getResponse(userModel, chatThusFar, chatSummaryPrompt).collect { token ->
                     result.append(token)
+                    Trace.log("CHAT SUMMARY TOKEN: [$token] len=${token.length}")
                 }
             } catch (e: CancellationException) {
                 Trace.log("CHAT SUMMARY GEN ABORTED chat=${chat.id}")

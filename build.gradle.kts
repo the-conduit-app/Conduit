@@ -43,3 +43,13 @@ compose.desktop {
         jvmArgs("--enable-native-access=ALL-UNNAMED")
     }
 }
+
+tasks.register<JavaExec>("runMaintTest") {
+    group = "verification"
+    description = "Run standalone maintenance test"
+
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("com.utilities.conduit.debug.MaintTestMainKt")
+
+    jvmArgs("--enable-native-access=ALL-UNNAMED")
+}

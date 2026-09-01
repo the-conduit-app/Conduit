@@ -202,7 +202,8 @@ object Maintenance {
     }
 
     // Generate summaries of chats in the chats/chat-summaries/folder
-    private suspend fun runChatSummaryMaintenance(state: AppState) {
+    // TODO restore private after testing
+    suspend fun runChatSummaryMaintenance(state: AppState) {
         val systemExpert = state.systemExpert
         if (systemExpert.sessionPtr == null) {
             Trace.log("MAINT: chat summary skip — system expert unavailable")
@@ -267,7 +268,8 @@ object Maintenance {
     }
 
     // Generate a model of the user from various chats/chat-summaries/*.json
-    private suspend fun runUserModelMaintenance(state: AppState) {
+    // TODO restore private after testing
+     suspend fun runUserModelMaintenance(state: AppState) {
         val systemExpert = state.systemExpert
 
         if (systemExpert.sessionPtr == null) {
@@ -311,7 +313,10 @@ object Maintenance {
                     .minByOrNull { it.modifiedTime }
             }
         }
-        if (newSummary == null) return
+        if (newSummary == null) {
+            Trace.log("User Model gen: No new summary found - returning")
+            return
+        }
 
         // A new chat summary updated after the previously most recent summary used for
         // generating the user model is now available
