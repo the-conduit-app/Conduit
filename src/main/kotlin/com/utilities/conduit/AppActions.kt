@@ -84,8 +84,7 @@ class AppActions(
 
         val needsChatListInsertion = state.chatManager.currentChat.nodes.isEmpty()
         val currentChat = state.chatManager.currentChat
-        val userModel = state.userModel
-        
+
         // First, find out if the user specifically mentioned (Hi, Hey) a particular expert in the prompt.
         val expert = findTaggedExpert(currentPrompt, state.expertsMap.values.toList())
             ?: state.currentExpert.value
@@ -119,7 +118,7 @@ class AppActions(
                 parentId = userNode.id,
                 message = ChatMessage(
                     author = MessageAuthor(
-                        type = AuthorType.ASSISTANT,
+                        type = if (expert.type == ExpertType.INTERNAL) { AuthorType.SYSTEM } else { AuthorType.ASSISTANT },
                         expertId = expert.id,
                         packId = state.currentPack.value?.id
                     ),
@@ -166,7 +165,7 @@ class AppActions(
             state.chatManager.onBeginCurrentResponse(expert)
 
             val startTime = System.currentTimeMillis()
-            expert.getResponse(userModel?.text, chatThusFar, currentPrompt)
+            expert.getResponse(chatThusFar, currentPrompt, includeUserModel = true)
                 .onCompletion { cause ->
                     val duration = System.currentTimeMillis() - startTime
                     val status = when (cause) {

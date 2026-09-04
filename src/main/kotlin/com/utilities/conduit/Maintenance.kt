@@ -14,7 +14,6 @@ import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.ui.AppJson
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.utils.MaintenanceUtils
-import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyles
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -230,9 +229,7 @@ object Maintenance {
                     null
                 } else {
                     runCatching {
-                        AppJson.decodeFromString<ChatSummary>(
-                            Files.readString(summaryFile)
-                        )
+                        AppJson.decodeFromString<ChatSummary>(Files.readString(summaryFile))
                     }.getOrNull()
                 }
             }
@@ -278,16 +275,15 @@ object Maintenance {
         }
 
         val summariesDir = Paths.get(AppUtils.getChatsDir(), "chat-summaries")
-        val userModelFile = Paths.get(AppUtils.getAppDir(), "user-model.json")
 
         if (!Files.exists(summariesDir)) {
-            Trace.log("MAINT: user model skip — no chat summaries directory")
+            //Trace.log("MAINT: user model skip — no chat summaries directory")
             return
         }
 
         // We only pick up ONE chat summary file modified LATER than the last summary file already processed
-        val previousUserModel = AppUtils.getUserModelFromFile()
-        val lastSummaryModifiedTime = previousUserModel?.lastSummaryModifiedTime ?: 0L
+        val previousConduitUserModel = state.conduitUserModel
+        val lastSummaryModifiedTime = previousConduitUserModel?.lastSummaryModifiedTime ?: 0L
 
         // We need to capture both the summary itself, and its file modification time
         data class NewSummary(
@@ -314,28 +310,25 @@ object Maintenance {
             }
         }
         if (newSummary == null) {
-            Trace.log("User Model gen: No new summary found - returning")
+            //Trace.log("User Model gen: No new summary found - returning")
             return
         }
 
         // A new chat summary updated after the previously most recent summary used for
         // generating the user model is now available
-
-        val previousUserModelText = previousUserModel?.text ?: "NO PREVIOUS USER MODEL EXISTS"
-        val userModelStr = MaintenanceUtils.generateUserModel(
-            systemExpert, previousUserModelText, newSummary.chatSummary
-        )
+        val externalUserModel = ExternalUserModel.convertToExternalUserModel(previousConduitUserModel)
+        val userModelStr = MaintenanceUtils.generateUserModel(systemExpert, newSummary.chatSummary)
         if (userModelStr.isBlank()) {
             Trace.log("MAINT: user model generation returned blank")
             return
         }
 
-        val updatedUserModel = UserModel(text = userModelStr, lastSummaryModifiedTime = newSummary.modifiedTime)
-        withContext(Dispatchers.IO) {
-            Files.writeString(userModelFile, AppJson.encodeToString(updatedUserModel))
-        }
-        state.userModel = updatedUserModel
+        val updatedConduitExternalUserModel = ExternalUserModel.updateConduitUserModel(
+            userModelStr,
+            newSummary.modifiedTime
+        )
+        state.conduitUserModel = updatedConduitExternalUserModel
 
-        Trace.log("MAINT: generated user model from ${newSummary.chatSummary.chatId}")
+        //Trace.log("MAINT: generated user model from ${newSummary.chatSummary.chatId}")
     }
 }

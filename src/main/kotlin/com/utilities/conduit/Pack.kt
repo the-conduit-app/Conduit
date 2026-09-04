@@ -26,7 +26,12 @@ data class Pack(
     suspend fun initializeExperts(state: AppState) = coroutineScope {
         experts.forEach { expert ->
             val modelPath = expert.modelPath ?: return@forEach
-            if (expert.type != ExpertType.LOCAL) return@forEach
+
+            expert.setConduitUserModelGetter() {
+                state.conduitUserModel
+            }
+
+            if (expert.type != ExpertType.LLM) return@forEach
 
             val absoluteModelPath = AppUtils.getAbsoluteModelPath(modelPath)
             launch(Dispatchers.IO) {

@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.milliseconds
 object EchoPortal {
     private var cancelRequested = false
 
-    fun getResponse(expert: Expert, text: String): Flow<String> {
+    suspend fun getResponse(expert: Expert, text: String): Flow<String> {
         val prompt = text.trim()
 
         cancelRequested = false

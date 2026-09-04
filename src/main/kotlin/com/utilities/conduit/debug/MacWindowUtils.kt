@@ -7,9 +7,10 @@ import com.utilities.conduit.utils.AppUtils
 
 private interface MacWindowLibrary : Library {
     fun macwindow_hide_title(window: Pointer?)
+    fun macwindow_style_titlebar(window: Pointer?)
 }
 
-private val macWindow = Native.load(
+private val macWindowLib = Native.load(
     AppUtils.getNativeLibDir("libmacwindow.dylib"),
     MacWindowLibrary::class.java
 )
@@ -17,6 +18,10 @@ private val macWindow = Native.load(
 object MacWindowUtils {
 
     fun hideTitle(windowHandle: Long) {
-        macWindow.macwindow_hide_title(Pointer(windowHandle))
+        macWindowLib.macwindow_hide_title(Pointer(windowHandle))
+    }
+
+    fun styleTitlebar(windowHandle: Long) {
+        macWindowLib.macwindow_style_titlebar(Pointer(windowHandle))
     }
 }

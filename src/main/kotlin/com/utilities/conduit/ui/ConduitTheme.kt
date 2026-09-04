@@ -10,6 +10,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 
 object ConduitTheme {
     @OptIn(ExperimentalTextApi::class)
@@ -36,11 +37,12 @@ object ConduitTheme {
         ),
         titleMedium = TextStyle(
             fontFamily = HelveticaNeueLight,
-            fontWeight = FontWeight.Light
+            fontWeight = FontWeight.Light,
+            fontSize = 18.sp
         ),
         titleSmall = TextStyle(
             fontFamily = HelveticaNeueLight,
-            fontWeight = FontWeight.Light
+            fontWeight = FontWeight.Light,
         )
     )
 }

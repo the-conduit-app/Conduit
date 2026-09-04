@@ -7,7 +7,7 @@
     "description": "A Sample pack of experts for you.",
     "experts": [
     {
-        "type": "LOCAL",
+        "type": "LLM",
         "nickname": "Gem",
         "expertise": "General",
         "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
@@ -15,7 +15,7 @@
         "color" : "Terracotta"
     },
     {
-        "type": "LOCAL",
+        "type": "LLM",
         "nickname": "Babe",
         "expertise": "Babbling",
         "modelPath": "llm/SmolLM2-135M-Instruct-Q4_K_M.gguf", 
@@ -23,7 +23,7 @@
         "color": "Cutey Peach"
     },
     {
-        "type": "LOCAL",
+        "type": "LLM",
         "nickname": "Bob",
         "expertise": "Buildings",
         "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 

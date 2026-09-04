@@ -20,7 +20,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import com.sun.beans.introspect.PropertyInfo
 import com.utilities.conduit.AppState
+import com.utilities.conduit.EXPERT_COLORS
 import com.utilities.conduit.Expert
 
 @Composable
@@ -42,8 +44,7 @@ fun ExpertsPanelView(
     ) {
         expertList.forEachIndexed { index, expert ->
             Box(modifier = Modifier.weight(1f)) {
-                val bgColor = if (expert.isReady) ExpertTheme.getExpertColor(index) else Color.LightGray
-                ExpertIcon(state, expert, bgColor) {
+                ExpertIcon(state, expert) {
                     if (expert.isReady)
                         onExpertSwitch(expert)
                 }
@@ -54,27 +55,10 @@ fun ExpertsPanelView(
 
 // --------------------------------------------------------------------------------------------
 
-object ExpertTheme {
-    private val colors = listOf(
-        Color(0xFF8DB9CC), // Dusty Blue
-        Color(0xFFD09AAA), // Dusty Rose
-        Color(0xFFD5BF72), // Muted Gold
-        Color(0xFFD5A084), // Muted Peach
-        Color(0xFF91B99A), // Sage
-        Color(0xFF9EADB3)  // Slate
-    )
-
-    fun getExpertColor(n: Int): Color =
-        colors[n % colors.size]
-}
-
-// --------------------------------------------------------------------------------------------
-
 @Composable
 fun ExpertIcon(
     state: AppState,
     expert: Expert,
-    color: Color,
     onClick: () -> Unit
 ) {
     val isCurrent = state.currentExpert.value?.id == expert.id
@@ -87,8 +71,10 @@ fun ExpertIcon(
         animationSpec = spring(),
         label = "expertScale"
     )
-
-    val iconColor = if (expert.isReady) color else Color.LightGray
+    val iconColor = if (expert.isReady) {
+        EXPERT_COLORS[expert.color] ?: Color.Gray
+    } else
+        Color.LightGray
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

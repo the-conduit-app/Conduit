@@ -29,7 +29,7 @@ object MaintenanceUtils {
             val oldTitle = chat.title
 
             val effectiveHistory: ChatUtils.EffectiveHistory =
-                ChatUtils.getEffectiveNodeHistory(chat, chat.cursorNodeId)
+                ChatUtils.getEffectiveNodeHistory(chat, chat.cursorNodeId, excludeSystemNodes = false)
 
             // NOTE: boundaryContext is the first effectiveHistory node.historySummary
             // cuz we stop there
@@ -44,20 +44,24 @@ object MaintenanceUtils {
             Trace.log("TITLE GEN START for $oldTitle")
 
             val result = StringBuilder()
-            val userModel = "NO USER MODEL IS REQUIRED FOR THIS TASK"
             try {
-                systemExpert.getResponse(userModel, chatThusFar, titlePrompt).collect { token ->
+                systemExpert.getResponse(chatThusFar, titlePrompt, includeUserModel = false).collect { token ->
                     result.append(token)
                 }
             } catch (e: CancellationException) {
                 Trace.log("TITLE GEN ABORTED for $oldTitle")
                 throw e
             }
-            val newTitle = result.toString().trim()
+            val newTitle = sanitizeChatTitle(result.toString())
 
-            Trace.log("TITLE GEN END ('$oldTitle', '$newTitle'")
+            Trace.log("TITLE GEN END ('$oldTitle', '$newTitle')")
             return newTitle.ifEmpty { oldTitle }
         }
+    }
+    private fun sanitizeChatTitle(rawTitle: String): String {
+        return rawTitle
+            .replace(Regex("<\\|im_(start|end)\\|?>\\s*$"), "")
+            .trim()
     }
 
     // Infer a summary of all nodes up to a node's parent (excluding the node itself). This is
@@ -69,7 +73,7 @@ object MaintenanceUtils {
     suspend fun generateHistorySummary(systemExpert: Expert, chat: Chat, node: Node): String? {
         ChatUtils.chatUtilsMutex.withLock {
 
-            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(chat, node.parentId)
+            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(chat, node.parentId, excludeSystemNodes = true)
             if (effectiveHistory.nodes.size < HISTORY_LENGTH_THRESHOLD) return null
 
             // The history summary for `node` describes everything leading up to and including
@@ -84,10 +88,9 @@ object MaintenanceUtils {
 
             Trace.log("MAINT: HISTORY SUMMARY START node=${node.id}")
             val summaryPrompt = PROMPTS.HISTORY_SUMMARY_GENERATION
-            val userModel = "NO USER MODEL IS REQUIRED FOR THIS TASK"
             val result = StringBuilder()
             try {
-                systemExpert.getResponse(userModel, chatThusFar, summaryPrompt).collect { token ->
+                systemExpert.getResponse(chatThusFar, summaryPrompt, includeUserModel = false).collect { token ->
                     result.append(token)
                 }
             } catch (e: CancellationException) {
@@ -115,7 +118,9 @@ object MaintenanceUtils {
             val cursorNodeId = chat.cursorNodeId ?: return "" // NO CURSOR => Conduit can't do it
 
             // Unlike history summarization, the cursor itself is included.
-            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(chat, cursorNodeId)
+            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(chat, cursorNodeId, excludeSystemNodes = true)
+            if (effectiveHistory.nodes.size == 0) return ""
+
             val chatThusFar = AppUtils.getChatContextAsString(
                 boundaryContext = effectiveHistory.boundaryContext,
                 messages = effectiveHistory.nodes.mapNotNull { it.message },
@@ -128,12 +133,10 @@ object MaintenanceUtils {
 
             Trace.log("CHAT SUMMARY GEN START chat=${chat.id}")
 
-            val userModel = "NO USER MODEL IS REQUIRED FOR THIS TASK"
             val result = StringBuilder()
             try {
-                systemExpert.getResponse(userModel, chatThusFar, chatSummaryPrompt).collect { token ->
+                systemExpert.getResponse(chatThusFar, chatSummaryPrompt, includeUserModel = false).collect { token ->
                     result.append(token)
-                    Trace.log("CHAT SUMMARY TOKEN: [$token] len=${token.length}")
                 }
             } catch (e: CancellationException) {
                 Trace.log("CHAT SUMMARY GEN ABORTED chat=${chat.id}")
@@ -149,7 +152,7 @@ object MaintenanceUtils {
 
     // Generate revised content for the user-model.json file using ONE
     // newly modified chat summary in APPDIR/chats/chat-summaries/*.json
-    suspend fun generateUserModel(systemExpert: Expert, previousUserModelStr: String, newChatSummary: ChatSummary): String {
+    suspend fun generateUserModel(systemExpert: Expert, newChatSummary: ChatSummary): String {
         if (systemExpert.sessionPtr == null) {
             Trace.log("MAINT: user model skip — system expert unavailable")
             return ""
@@ -160,9 +163,9 @@ object MaintenanceUtils {
         val result = StringBuilder()
         try {
             systemExpert.getResponse(
-                userModel = previousUserModelStr,
                 chatThusFar = "THE CURRENT CHAT CONTEXT IS NOT NECESSARY FOR THIS TASK",
-                prompt = prompt  // embedded new chat summary
+                prompt = prompt,  // embedded new chat summary
+                includeUserModel = true
             ).collect { token ->
                 currentCoroutineContext().ensureActive()
                 result.append(token)

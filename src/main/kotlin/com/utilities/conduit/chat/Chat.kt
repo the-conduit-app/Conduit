@@ -104,5 +104,5 @@ data class MessageAuthor(
 enum class AuthorType {
     USER,
     ASSISTANT,
-    SYSTEM,
+    SYSTEM,   // Responses from INTERNAL experts are tagged SYSTEM
 }

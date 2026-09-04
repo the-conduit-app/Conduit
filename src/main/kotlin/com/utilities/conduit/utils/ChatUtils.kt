@@ -1,5 +1,8 @@
 package com.utilities.conduit.utils
 
+import com.utilities.conduit.Expert
+import com.utilities.conduit.ExpertType
+import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.chat.ChatsListItem
 import com.utilities.conduit.chat.Node
@@ -95,20 +98,32 @@ object ChatUtils {
         val boundaryContext: String,
         val nodes: List<Node>
     )
-    fun getEffectiveNodeHistory(chat: Chat, nodeId: String?): EffectiveHistory {
+    fun getEffectiveNodeHistory(chat: Chat, nodeId: String?, excludeSystemNodes: Boolean = false): EffectiveHistory {
         val historyNodes = mutableListOf<Node>()
         var currentNodeId = nodeId
         var precedingContext = "No previous context exists before this point"
 
         while (currentNodeId != null) {
             val node = chat.nodes[currentNodeId] ?: break
+
+            // SYSTEM nodes represent internal expert responses.
+            // Since traversal is leaf → root, also skip the user node
+            // that immediately precedes this response.
+            if (excludeSystemNodes && node.message?.author?.type == AuthorType.SYSTEM) {
+                currentNodeId = node.parentId?.let { chat.nodes[it]?.parentId }
+                continue
+            }
+
             historyNodes.add(node)
+
             node.historySummary?.let {
                 precedingContext = it
                 break
             }
+
             currentNodeId = node.parentId
         }
+
         return EffectiveHistory(
             boundaryContext = precedingContext,
             nodes = historyNodes.reversed()

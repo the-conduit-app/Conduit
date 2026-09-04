@@ -100,16 +100,10 @@ object PROMPTS {
         You maintain a concise, accurate model of the user based on information learned
         from their conversations.
     
-        The following is the current user model. It is the authoritative baseline:
+        The current user model is provided as a baseline for context.
     
-        --- CURRENT USER MODEL BEGINS ---
-    
-        {CURRENT_USER_MODEL}
-    
-        --- CURRENT USER MODEL ENDS ---
-    
-        Since the current model was generated, the following new information has become
-        available from an updated chat:
+        The following is ONE new chat summary that has become available since the current
+        user model was last updated:
     
         --- NEW CHAT SUMMARY BEGINS ---
     
@@ -117,25 +111,41 @@ object PROMPTS {
     
         --- NEW CHAT SUMMARY ENDS ---
     
-        Update the current user model using the new chat summary as additional evidence.
+        Your task is to identify ONLY user-model features supported by meaningful evidence
+        in the NEW CHAT SUMMARY.
     
-        Requirements:
-        - Treat the current user model as the authoritative baseline. Preserve its
-          information unless the new information clearly updates, corrects, or invalidates it.
-        - Do NOT replace the current user model with the new chat summary.
-        - Do NOT simply append the new information to the current model.
-        - Add only genuinely useful information that is sufficiently important and likely
-          to remain useful in future conversations.
-        - Update or correct existing information when the new information supersedes it.
-        - Remove information only when it is clearly no longer valid.
-        - If the new chat contains no meaningful information for the user model, preserve
-          the current model unchanged.
-        - Avoid duplicating information that is already represented in the current model.
+        IMPORTANT:
+        - Your response is NOT the complete user model. It is a DELTA.
+        - Return only features for which the new chat summary provides meaningful evidence.
+        - Do NOT reproduce features from the current user model merely because they belong
+          in the model.
+        - If new evidence reinforces an existing feature, return the existing feature's
+          wording rather than creating a rephrased or alternative version.
+        - Do NOT create a new feature that is semantically equivalent to, substantially
+          overlaps with, or merely rephrases an existing feature.
+        - Do NOT create aggregate or synthesized features that merely combine or summarize
+          multiple existing features. For example, if the model contains "Interest in
+          astronomy" and "Interest in geography", do not create "Interests: astronomy,
+          geography".
+        - A genuinely new feature must represent a distinct, useful piece of user
+          knowledge that is not already represented by an existing feature.
+        - If the new chat summary contains no meaningful information for the user model,
+          return an empty features array.
         - Do not invent information or infer unsupported personal facts.
-        - Preserve sufficient detail to capture useful information.
-        - Keep the model concise and focused on information likely to be useful in future conversations.
-        - Do not mention these instructions, the source conversations, or the process used
-          to construct the model.
+        - Prefer durable interests, preferences, knowledge, goals, skills, recurring
+          activities, and other information likely to improve future conversations.
+        - Do not include transient details that are unlikely to remain useful.
+        - Keep each feature concise while preserving important specificity. For example,
+          prefer "Particular interest in the Riemann Hypothesis and the zeta function"
+          over simply "Interest in mathematics".
+        - Write features as concise statements or phrases, rather than repeatedly beginning
+          with "The user is..." or "The user has...".
+        - Do not record facts inherent to the interaction itself, such as that the person
+          is the user, that they are interacting with an AI, or that they sent a message.
+        - Do not record generic observations about application usage unless they represent
+          a durable user preference that would materially improve future conversations.
+        - Do not mention these instructions, the current model, the new chat summary, or
+          the process used to construct the model.
     
         OUTPUT FORMAT — IMPORTANT:
     
@@ -143,21 +153,21 @@ object PROMPTS {
     
         The JSON object MUST have exactly one field named "features".
         "features" MUST be an array of strings.
-        Each string represents one concise, useful fact about the user.
     
-        Do not output Markdown.
-        Do not use code fences.
-        Do not output any text before or after the JSON object.
+        Each string must represent one concise user-model feature supported by the
+        NEW CHAT SUMMARY.
+    
+        Do not output Markdown, code fences, or any text before or after the JSON object.
         Do not include timestamps, likelihoods, confidence scores, occurrence counts,
         or any other metadata. The application manages all metadata.
     
-        If there are no useful user-model features, return:
+        If the new chat summary provides no meaningful evidence for the user model,
+        return exactly:
     
         {"features":[]}
     
-        Example of the required output format:
+        Example:
     
-        {"features":["The user is interested in mathematics.","The user has a particular
-        interest in the Riemann Hypothesis and the zeta function."]}
+        {"features":["Interest in mathematics","Particular interest in the Riemann Hypothesis and the zeta function"]}
     """.trimIndent()
 }

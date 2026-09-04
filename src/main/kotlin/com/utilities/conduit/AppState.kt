@@ -13,7 +13,6 @@ import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.ui.LeftPanelMode
 import com.utilities.conduit.ui.Notification
-import com.utilities.conduit.utils.AppUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,7 +29,7 @@ class AppState(
     var chatsList by mutableStateOf(ChatsList())
     var availablePacks by mutableStateOf(emptyList<Pack>())
     val notification = Notification(scope)
-    var userModel by mutableStateOf<UserModel?>(null)
+    internal var conduitUserModel by mutableStateOf<ConduitUserModel?>(null)
 
     var leftPanelMode by mutableStateOf(LeftPanelMode.LIST)
     val focusInput = mutableStateOf(0)
@@ -39,8 +38,7 @@ class AppState(
 
     companion object {
         fun createSystemExpert() = Expert(
-            id = "SYSTEM.ID",
-            type = ExpertType.LOCAL,
+            type = ExpertType.LLM,
             nickname = "Conduit",
             expertise = "General",
             modelPath = "llm/gemma-2-9b-it-Q4_K_M.gguf",

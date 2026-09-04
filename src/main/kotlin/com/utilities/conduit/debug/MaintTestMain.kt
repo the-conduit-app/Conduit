@@ -1,26 +1,28 @@
 package com.utilities.conduit.debug
 
-import com.sun.tools.javac.tree.TreeInfo.args
+/*
+ * Comment in for testing - may require slight refactoring to adjust for
+ * changes in the rest of the code.
+
 import com.utilities.conduit.AppState
 import com.utilities.conduit.Maintenance
+import com.utilities.conduit.UserModel
+import com.utilities.conduit.ConduitUserModelFeature
 import com.utilities.conduit.chat.ChatsList
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.utils.AppUtils
-import com.utilities.conduit.utils.MaintenanceUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
-import kotlin.io.path.exists
 import kotlin.io.path.readText
 
 fun main(args: Array<String>) = runBlocking {
     val mode = args.firstOrNull()?.lowercase() ?: "all"
 
-    if (mode !in setOf("summary", "user-model", "all")) {
-        println("Usage: ./gradlew runMaintTest --args=\"summary|user-model|all\"")
+    if (mode !in setOf("summary", "user-model", "dui", "all")) {
+        println("Usage: ./gradlew runMaintTest --args=\"summary|user-model|dui|all\"")
         return@runBlocking
     }
 
@@ -40,6 +42,11 @@ fun main(args: Array<String>) = runBlocking {
     println("Mode:      $mode")
     println("Chats dir: ${AppUtils.getChatsDir()}")
     println("Output:    $testOutputDir")
+
+    if (mode == "dui") {
+        runDuiTest()
+        return@runBlocking
+    }
 
     // ---------------------------------------------------------------------
     // Create the native Conduit instance.
@@ -116,7 +123,7 @@ fun main(args: Array<String>) = runBlocking {
             val chatsDir = Paths.get(AppUtils.getChatsDir())
             val summariesDir = chatsDir.resolve("chat-summaries")
             val userModelFile =
-                Paths.get(AppUtils.getAppDir(), "user-model.json")
+                Paths.get(AppUtils.getAppDir(), ".conduit-user-model.json")
 
             println()
             println("--- Results ---")
@@ -140,7 +147,7 @@ fun main(args: Array<String>) = runBlocking {
             }
 
             if (Files.exists(userModelFile)) {
-                val snapshot = testOutputDir.resolve("user-model.json")
+                val snapshot = testOutputDir.resolve(".conduit-user-model.json")
 
                 withContext(Dispatchers.IO) {
                     Files.copy(
@@ -151,10 +158,23 @@ fun main(args: Array<String>) = runBlocking {
 
                 println("User model copied to: $snapshot")
                 println()
-                println("--- user-model.json ---")
+                println("--- .conduit-user-model.json ---")
                 println(userModelFile.readText())
+                println()
+                println("--- DUI Ranking ---")
+
+                val duiRanking = UserModel.getDuiRankingForTest()
+                for ((index, entry) in duiRanking.withIndex()) {
+                    println(
+                        "%3d  %.6f  %s".format(
+                            index + 1,
+                            entry.second,
+                            entry.first
+                        )
+                    )
+                }
             } else {
-                println("No user-model.json produced.")
+                println("No .conduit-user-model.json produced.")
             }
 
         } finally {
@@ -172,3 +192,103 @@ fun main(args: Array<String>) = runBlocking {
     println()
     println("=== Maint Test Complete ===")
 }
+
+private fun runDuiTest() {
+    println()
+    println("=== DUI v1 Synthetic Test ===")
+
+    val now = 1_800_000_000_000L
+    val day = 24L * 60L * 60L * 1000L
+
+    val features = buildList {
+        // Highly persistent and recent.
+        add(
+            ConduitUserModelFeature(
+                text = "The user has a long-standing interest in mathematics.",
+                firstSeen = now - 60 * day,
+                lastSeen = now - 1 * day,
+                observationCount = 20
+            )
+        )
+
+        // Highly persistent but old.
+        add(
+            ConduitUserModelFeature(
+                text = "The user has a long-standing interest in classical music.",
+                firstSeen = now - 180 * day,
+                lastSeen = now - 120 * day,
+                observationCount = 20
+            )
+        )
+
+        // Recent but seen only once.
+        add(
+            ConduitUserModelFeature(
+                text = "The user recently mentioned a particular book.",
+                firstSeen = now,
+                lastSeen = now,
+                observationCount = 1
+            )
+        )
+
+        // Old and seen once.
+        add(
+            ConduitUserModelFeature(
+                text = "The user once mentioned a temporary implementation detail.",
+                firstSeen = now - 180 * day,
+                lastSeen = now - 180 * day,
+                observationCount = 1
+            )
+        )
+
+        // Several intermediate cases.
+        for (i in 1..96) {
+            val count = (i % 10) + 1
+            val ageDays = (i * 3L) % 150
+
+            add(
+                ConduitUserModelFeature(
+                    text = "Synthetic user feature number $i with some additional descriptive text.",
+                    firstSeen = now - ageDays * day,
+                    lastSeen = now - ageDays * day,
+                    observationCount = count
+                )
+            )
+        }
+    }
+
+    println("Features: ${features.size}")
+    println("Test time: $now")
+
+    val testResult = UserModel.duiTest(features = features, now = now)
+    val ranking = testResult.first
+    val userModel = testResult.second
+
+    println()
+    println("--- DUI Ranking ---")
+    println("rank  score      count  age(days)  feature")
+
+    for ((rank, score, feature) in ranking) {
+        val ageDays =
+            (now - feature.lastSeen).coerceAtLeast(0L) /
+                    (24.0 * 60.0 * 60.0 * 1000.0)
+
+        println(
+            "%4d  %9.6f  %5d  %9.2f  %s".format(
+                rank,
+                score,
+                feature.observationCount,
+                ageDays,
+                feature.text
+            )
+        )
+    }
+
+    println()
+    println("--- DUI Projection ---")
+    println(userModel.text)
+
+    println()
+    println("Projected characters: ${userModel.text.length}")
+}
+*/

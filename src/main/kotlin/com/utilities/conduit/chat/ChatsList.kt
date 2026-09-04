@@ -135,18 +135,20 @@ class ChatsList(
 
             return withContext(Dispatchers.IO) {
                 val oldTitle = item.chat.title
+                val chatDir = Paths.get(getAppDir(), "chats")
+                val oldFileName = makeChatFileName(item.chat.id, oldTitle)
+                val oldPath = chatDir.resolve(oldFileName)
+
                 try {
                     val updatedChat = item.chat.copy(title = newTitle, needsHumanReview = needsHumanReview)
                     ChatUtils.saveChatToDisk(updatedChat) // Ignore returned Item
-
-                    val chatDir = Paths.get(getAppDir(), "chats")
-                    val oldFileName = makeChatFileName(item.chat.id, oldTitle)
-                    val oldPath = chatDir.resolve(oldFileName)
-                    try { Files.delete(oldPath) } catch (e: Exception) { println("Failed to delete old chat: $oldPath") }
+                    try { Files.delete(oldPath) } catch (e: Exception) { println("Failed to delete old chat: $oldPath: ${e.message}") }
 
                     withContext(Dispatchers.Main) {
                         val currentIndex = items.indexOfFirst { it.chat.id == item.chat.id }
-                        items[currentIndex] = item.copy(chat = updatedChat)
+                        if (currentIndex >= 0) {
+                            items[currentIndex] = item.copy(chat = updatedChat)
+                        }
                     }
                     updatedChat
                 } catch (e: Exception) {

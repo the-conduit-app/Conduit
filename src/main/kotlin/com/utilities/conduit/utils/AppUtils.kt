@@ -1,11 +1,12 @@
 package com.utilities.conduit.utils
 
+import com.utilities.conduit.ConduitUserModel
 import com.utilities.conduit.Pack
-import com.utilities.conduit.UserModel
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.ChatMessage
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.ui.AppJson
+import com.utilities.conduit.utils.AppUtils.getAppDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -45,25 +46,6 @@ object AppUtils {
             modelPath
         else
             Paths.get(getAppDir(), modelPath).toString()
-    }
-
-    // Returns the useful contents of the APPDIR/user-model.json file
-    suspend fun getUserModelFromFile(): UserModel? {
-        val appDir = Paths.get(getAppDir())
-        val userModelFile = appDir.resolve("user-model.json")
-
-        return withContext(Dispatchers.IO) {
-            if (Files.exists(userModelFile)) {
-                try {
-                    AppJson.decodeFromString<UserModel>(Files.readString(userModelFile))
-                } catch (e: Exception) {
-                    Trace.log("USER MODEL: unable to read ${userModelFile.fileName}: ${e.message}")
-                    null
-                }
-            } else {
-                null
-            }
-        }
     }
 
      // Reads all .json files in the packs directory and parses them into Pack objects

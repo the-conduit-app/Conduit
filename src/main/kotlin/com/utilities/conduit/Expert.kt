@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import com.sun.jna.Pointer
 import com.utilities.conduit.debug.Trace
+import com.utilities.conduit.portals.ConduitPortal
 import com.utilities.conduit.portals.EchoPortal
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.utils.AppUtils
@@ -15,7 +16,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.util.*
 
-enum class ExpertType { INTERNAL, LOCAL, REMOTE }
+enum class ExpertType { INTERNAL, LLM, REMOTE }
 
 @Serializable
 class Expert(
@@ -36,19 +37,43 @@ class Expert(
 
     val isReady: Boolean
         get() = when (type) {
-            ExpertType.LOCAL -> sessionPtr != null
+            ExpertType.LLM -> sessionPtr != null
             else -> true
         }
 
-    fun getResponse(userModel: String?, chatThusFar: String, prompt: String): Flow<String> {
-        return when (type) {
-            ExpertType.INTERNAL -> { EchoPortal.getResponse(this, prompt) }
+    // set from App() to a lambda that returns AppState.conduitUserModel
+    internal var conduitUserModelProvider: () -> ConduitUserModel? = { null }
+    internal fun setConduitUserModelGetter(provider: () -> ConduitUserModel?) {
+        conduitUserModelProvider = provider
+    }
 
-            ExpertType.LOCAL -> {
+    // For internal experts, ignore the chatThusFar context. They simply react algorithmically
+    // to the prompt. For LLM experts we need to fetch the conduitUserModel, convert it to the
+    // outwards facing user model, and send that.
+    suspend fun getResponse(chatThusFar: String, prompt: String, includeUserModel: Boolean): Flow<String> {
+        return when (type) {
+            ExpertType.INTERNAL -> {
+                when (modelPath) {
+                    ":conduit" -> ConduitPortal.getResponse(this, prompt)
+                    else -> EchoPortal.getResponse(this, prompt)
+                }
+            }
+
+            ExpertType.LLM -> {
                 val sessionPtr = sessionPtr ?: error("Expert '${nickname}': LLM session not found.")
+                val externalUserModel = if (includeUserModel) {
+                    val conduitUserModel = conduitUserModelProvider() // retrieves from AppState (in mem)
+                    ExternalUserModel.convertToExternalUserModel(conduitUserModel)
+                } else {
+                    ExternalUserModel(
+                        text = "NO USER MODEL IS REQUIRED FOR THIS TASK.",
+                        lastSummaryModifiedTime = 0L
+                    )
+                }
+
                 val finalPrompt = AppUtils.buildChatMlPrompt(
                     this.seedPrompt,
-                    userModel ?: "NO EXISTING USER MODEL",
+                    externalUserModel.text,
                     chatThusFar,
                     prompt
                 )
@@ -65,9 +90,13 @@ class Expert(
         Trace.log("Expert Aborting Response: ${sessionPtr}")
         when (type) {
             ExpertType.INTERNAL -> {
-                EchoPortal.abortResponse()
+                when (modelPath) {
+                    ":conduit" -> { ConduitPortal.abortResponse() }
+                    else -> { EchoPortal.abortResponse() }
+                }
             }
-            ExpertType.LOCAL -> {
+
+            ExpertType.LLM -> {
                 sessionPtr?.let {
                     LlmPortal.abortResponse(it)
                 }
@@ -79,27 +108,28 @@ class Expert(
 
 // Internal expert model Convenience identifiers
 object InternalExperts {
-    const val SYSTEM = ":system"
-
     const val SIMPLE_ECHO = ":simpleEcho"
     const val ROTTEN_ECHO = ":rottenEcho"
     const val SILLY_ECHO  = ":sillyEcho"
     const val SALAD_ECHO  = ":saladEcho"
     const val W_REV_ECHO  = ":wordReverseEcho"
+    const val CONDUIT = ":conduit"
 }
 
-
-val expertColors = mapOf(
+val EXPERT_COLORS = mapOf(
     "Proud Peacock" to Color(0xFF007C91),
     "Misty Blue" to Color(0xFF8DB9CC),
     "Dusty Rose" to Color(0xFFD09AAA),
     "Muted Gold" to Color(0xFFD5BF72),
     "Cutey Peach" to Color(0xFFD5A084),
     "Surprisingly Sage" to Color(0xFF91B99A),
-    "Snazzy Slate" to Color(0xFF9EADB3),
+    "Mr. Slater" to Color(0xFF9EADB3),
     "Limpid Lavender" to Color(0xFFB3A6C7),
     "Terracotta" to Color(0xFFC58B78),
     "Slippery Seafoam" to Color(0xFF8FB9AD),
     "Pretty Periwinkle" to Color(0xFF9FAED0),
-    "Arisi Mauve" to Color(0xFFB596A8)
+    "Arisi Mauve" to Color(0xFFF5F0E6),
+    "Gina Orangina" to Color(0xFFF57C00),
+    "Lemony Lu" to Color(0xFDD835),
+    "Scarlett Dawn" to Color(0xE53935)
 )

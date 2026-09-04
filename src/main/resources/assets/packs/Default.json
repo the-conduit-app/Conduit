@@ -15,7 +15,7 @@
         
     },
     {
-        "type": "LOCAL",
+        "type": "LLM",
         "nickname": "Gem",
         "expertise": "General",
         "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
@@ -23,7 +23,7 @@
         "color": "Cutey Peach"
     },
     {
-        "type": "LOCAL",
+        "type": "LLM",
         "nickname": "Larry",
         "expertise": "Law",
         "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
@@ -31,7 +31,7 @@
         "color": "Terracotta"
     },
     {
-        "type": "LOCAL",
+        "type": "LLM",
         "nickname": "Finn",
         "expertise": "Finance",
         "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
@@ -39,12 +39,12 @@
         "color": "Muted Gold"
     },
     {
-        "type": "LOCAL",
-        "nickname": "Bob",
-        "expertise": "Buildings",
-        "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
-        "description": "An expert home builder.",
-        "color": "Dusty Rose"
+        "type": "INTERNAL",
+        "nickname": "Condy",
+        "expertise": "People",
+        "modelPath": ":conduit", 
+        "description": "the Conduit",
+        "color": "Arisi Mauve"
     }
   ]
 }

@@ -34,7 +34,7 @@ fun App() {
     val state = remember { AppState.createNew(conduitPtr, scope = scope) }
 
     LaunchedEffect(state) {
-        state.userModel = AppUtils.getUserModelFromFile()
+        state.conduitUserModel = ExternalUserModel.loadConduitUserModelFromFile()
         state.chatsList.build()        // load existing chats in the chats dir
 
         val packs = withContext(Dispatchers.IO) { AppUtils.getAvailablePacks() }

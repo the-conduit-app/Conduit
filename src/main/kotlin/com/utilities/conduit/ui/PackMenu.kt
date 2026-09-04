@@ -23,7 +23,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.utilities.conduit.AppState
-import com.utilities.conduit.expertColors
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s1
 import conduit.generated.resources.plasma_s64

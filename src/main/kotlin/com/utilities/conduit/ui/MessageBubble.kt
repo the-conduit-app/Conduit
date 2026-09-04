@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.sun.beans.introspect.PropertyInfo
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.Node
 
@@ -40,7 +41,7 @@ fun MessageBubble(
     when (node.message?.author?.type ?: AuthorType.SYSTEM) {
         AuthorType.USER -> UserMessageBubble(node, isCursor, contextMenuItems)
         AuthorType.ASSISTANT -> ExpertMessageBubble(node, isCursor, contextMenuItems)
-        AuthorType.SYSTEM -> SystemMessageBubble(node.message?.text ?: "Hmm... Wonder where this came from!")
+        AuthorType.SYSTEM -> ExpertMessageBubble(node, isCursor, contextMenuItems)
     }
 }
 
@@ -122,10 +123,11 @@ private fun ExpertMessageBubble(node: Node, isCursor: Boolean, contextMenuItems:
     val text = textInProgress ?: node.message?.text.orEmpty()
     val title = node.message?.title ?: "Donovich"
     var hasMore by remember { mutableStateOf(false) }
+    var bubbleColor = if (node.message?.author?.type == AuthorType.SYSTEM) Color.White else Color(0xFFFFFF00)
 
     val bubble: @Composable () -> Unit = {
         MessageBubbleSurface(
-            color = Color(0xFFFFFF00),
+            color = bubbleColor,
             cornerRadius = 12.dp
         ) {
             if (textInProgress != null && text.isEmpty()) {
@@ -226,19 +228,5 @@ private fun MessageBubbleSurface(
             .padding(8.dp)
     ) {
         content()
-    }
-}
-
-// ---------------------------------------------------------------------------------
-// Below likely deprecated
-
-@Composable
-private fun SystemMessageBubble(text: String) {
-    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
-        Text(
-            text = text,
-            style = TextStyle(fontSize = 12.sp, color = Color.Gray),
-            modifier = Modifier.padding(10.dp)
-        )
     }
 }

@@ -104,7 +104,7 @@ fun MessagePanelView(
     if (panel.opacity <= 0f) return
 
     val outerShape = RoundedCornerShape(20.dp)
-    val innerShape = RoundedCornerShape(12.dp)
+    val innerShape = RoundedCornerShape(14.dp)
 
     Box(
         modifier = Modifier
@@ -138,7 +138,7 @@ fun MessagePanelView(
 
         Box(
             modifier = Modifier
-                .padding(8.dp)
+                .padding(6.dp)
                 .clip(innerShape)
                 .border(
                     1.dp,
