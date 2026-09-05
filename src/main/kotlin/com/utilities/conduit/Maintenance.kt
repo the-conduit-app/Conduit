@@ -57,8 +57,9 @@ object Maintenance {
     private var maintenanceJob: Job? = null
     private var state: AppState? = null
 
-    suspend fun start(state: AppState, scope: CoroutineScope) {
+    suspend fun start(state: AppState) {
         Maintenance.state = state
+
         //Trace.log("Maint: STARTING")
         while (currentCoroutineContext().isActive) {
             delay(IDLE_TIMEOUT.milliseconds)
@@ -67,7 +68,7 @@ object Maintenance {
                 continue
             }
 
-            maintenanceJob = scope.launch(Dispatchers.Default) {
+            maintenanceJob = state.scope.launch(Dispatchers.Default) {
                 try {
                     runMaintenance(state)
                 } catch (e: CancellationException) {  // TODO - check unused
@@ -316,18 +317,18 @@ object Maintenance {
 
         // A new chat summary updated after the previously most recent summary used for
         // generating the user model is now available
-        val externalUserModel = ExternalUserModel.convertToExternalUserModel(previousConduitUserModel)
+        val userModel = UserModel.convertToExternalUserModel(previousConduitUserModel)
         val userModelStr = MaintenanceUtils.generateUserModel(systemExpert, newSummary.chatSummary)
         if (userModelStr.isBlank()) {
             Trace.log("MAINT: user model generation returned blank")
             return
         }
 
-        val updatedConduitExternalUserModel = ExternalUserModel.updateConduitUserModel(
+        val updatedConduitUserModel = UserModel.updateConduitUserModel(
             userModelStr,
             newSummary.modifiedTime
         )
-        state.conduitUserModel = updatedConduitExternalUserModel
+        state.conduitUserModel = updatedConduitUserModel
 
         //Trace.log("MAINT: generated user model from ${newSummary.chatSummary.chatId}")
     }

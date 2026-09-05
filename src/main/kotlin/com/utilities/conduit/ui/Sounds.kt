@@ -7,155 +7,80 @@ import java.io.BufferedInputStream
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
 import javax.sound.sampled.FloatControl
+import kotlin.jvm.java
+
+private fun createSound(resourceName: String): Sound {
+    return Sound(loadClip(resourceName))
+}
+
+private fun loadClip(resourceName: String): Clip? {
+    val stream = Sounds::class.java.getResourceAsStream("/assets/sounds/$resourceName") ?: return null
+
+    return AudioSystem.getClip().also { clip ->
+        stream.use {
+            clip.open(AudioSystem.getAudioInputStream(BufferedInputStream(it)))
+        }
+    }
+}
+
+private class Sound(private val clip: Clip?) {
+    fun play() {
+        if (clip == null) return
+
+        if (clip.isRunning) {
+            clip.stop()
+        }
+        clip.framePosition = 0
+        clip.start()
+    }
+}
 
 object Sounds {
     var isSilent by mutableStateOf(false)
 
+    // ChatsList Menu active item change
     object Tick {
-        private val clip: Clip by lazy {
-            val stream = Tick::class.java.getResourceAsStream(
-                "/assets/sounds/tick.wav"
-            ) ?: error("Could not find tick.wav")
-
-            AudioSystem.getClip().also { clip ->
-                stream.use {
-                    clip.open(
-                        AudioSystem.getAudioInputStream(
-                            BufferedInputStream(it)
-                        )
-                    )
-                }
-            }
-        }
-
-        fun play() {
-            if (clip.isRunning) {
-                clip.stop()
-            }
-            if (!isSilent) {
-                clip.framePosition = 0
-                clip.start()
-            }
-        }
+        private val sound by lazy { createSound("tick.wav") }
+        fun play() { if (!isSilent) sound.play() }
     }
 
+    // onSend dispatches prompt to expert
     object Whoosh {
-        private val clip: Clip by lazy {
-            val stream = Whoosh::class.java.getResourceAsStream(
-                "/assets/sounds/whoosh.wav"
-            ) ?: error("Could not find whoosh.wav")
-
-            AudioSystem.getClip().also { clip ->
-                stream.use {
-                    clip.open(
-                        AudioSystem.getAudioInputStream(
-                            BufferedInputStream(it)
-                        )
-                    )
-                }
-            }
-        }
-
-        fun play() {
-            if (clip.isRunning) {
-                clip.stop()
-            }
-
-            if (!isSilent) {
-                clip.framePosition = 0
-                clip.start()
-            }
-        }
+        private val sound by lazy { createSound("whoosh.wav") }
+        fun play() { if (!isSilent) sound.play() }
     }
 
+    // ESC to cancel and clear InputArea
     object Hsoohw {
-        private val clip: Clip by lazy {
-            val stream = Hsoohw::class.java.getResourceAsStream(
-                "/assets/sounds/hsoohw.wav"
-            ) ?: error("Could not find hsoohw.wav")
-
-            AudioSystem.getClip().also { clip ->
-                stream.use {
-                    clip.open(
-                        AudioSystem.getAudioInputStream(
-                            BufferedInputStream(it)
-                        )
-                    )
-                }
-            }
-        }
-
-        fun play() {
-            if (clip.isRunning) {
-                clip.stop()
-            }
-
-            if (!isSilent) {
-                clip.framePosition = 0
-                clip.start()
-            }
-        }
+        private val sound by lazy { createSound("Hsoohw.wav") }
+        fun play() { if (!isSilent) sound.play() }
     }
 
+    // Enter app when init is done (from splash screen)
     object EnterChime {
-        private val clip: Clip by lazy {
-            val stream = EnterChime::class.java.getResourceAsStream(
-                "/assets/sounds/enterChime.wav"
-            ) ?: error("Could not find enterChime.wav")
-
-            AudioSystem.getClip().also { clip ->
-                stream.use {
-                    clip.open(
-                        AudioSystem.getAudioInputStream(
-                            BufferedInputStream(it)
-                        )
-                    )
-                }
-            }
-        }
-
-        fun play() {
-            if (clip.isRunning) {
-                clip.stop()
-            }
-
-            if (!isSilent) {
-                clip.framePosition = 0
-                clip.start()
-            }
-        }
+        private val sound by lazy { createSound("enterChime.wav") }
+        fun play() { if (!isSilent) sound.play() }
     }
 
+    // When app becomes ready (systeme expert loaded) in splash screen
+    object Ready {
+        private val sound by lazy { createSound("ready.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+
+    // When response from expert is complete
     object Ting {
-        private val clip: Clip by lazy {
-            val stream = Ting::class.java.getResourceAsStream(
-                "/assets/sounds/ting.wav"
-            ) ?: error("Could not find ting.wav")
-
-            AudioSystem.getClip().also { clip ->
-                stream.use {
-                    clip.open(
-                        AudioSystem.getAudioInputStream(
-                            BufferedInputStream(it)
-                        )
-                    )
-                }
-            }
-        }
-
-        fun play() {
-            if (clip.isRunning) {
-                clip.stop()
-            }
-
-            if (!isSilent) {
-                clip.framePosition = 0
-                clip.start()
-            }
-        }
+        private val sound by lazy { createSound("ting.wav") }
+        fun play() { if (!isSilent) sound.play() }
     }
 
-    // For Splash Screen
+    // When clicking on Conduit portal before app is ready (splash screen)
+    object Knock {
+        private val sound by lazy { createSound("door_knock.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+
+    // For Splash Screen (TODO - awaiting refactor to reuse above code)
     object Space {
         private val clip: Clip by lazy {
             val stream = Tick::class.java.getResourceAsStream(
@@ -174,15 +99,18 @@ object Sounds {
         }
 
         fun play() {
+            if (isSilent) return
+
             if (clip.isRunning) {
                 clip.stop()
             }
-            if (!isSilent) {
-                clip.framePosition = 0
-                clip.start()
-            }
+            clip.framePosition = 0
+            clip.loop(Clip.LOOP_CONTINUOUSLY)
         }
-        fun stop() { if (clip.isRunning) { clip.stop() } }
+
+        fun stop() {
+            if (clip.isRunning) { clip.stop() }
+        }
 
         fun fadeOut(durationMs: Long = 1000) {
             if (!clip.isRunning) return
@@ -193,7 +121,7 @@ object Sounds {
 
             Thread {
                 try {
-                    val steps = 20
+                    val steps = 1000
                     val stepDelay = durationMs / steps
 
                     for (i in 1..steps) {
@@ -205,9 +133,12 @@ object Sounds {
                 } finally {
                     clip.stop()
                     clip.framePosition = 0
-                    gainControl.value = initialGain
+                    gainControl.value = gainControl.maximum
                 }
-            }.start()
+            }.apply {
+                isDaemon = true
+                start()
+            }
         }
     }
 }

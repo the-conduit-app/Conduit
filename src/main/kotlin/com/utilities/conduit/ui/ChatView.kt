@@ -366,7 +366,7 @@ private fun ChatNodeRow(
     ) {
         // Branching user nodes (right aligned) have the branch cycling icon on their left
         if (isUserNode && isBranchable) {
-            PulsingBranchIcon(
+            PulsingImage(
                 modifier = Modifier.size(32.dp),
                 onClick = {
                     scope.launch {
@@ -384,7 +384,7 @@ private fun ChatNodeRow(
 
         // Branching expert nodes (left aligned) have the branch cycling icon on their right
         if (!isUserNode && isBranchable) {
-            PulsingBranchIcon(
+            PulsingImage(
                 modifier = Modifier.size(20.dp),
                 onClick = {
                     scope.launch {

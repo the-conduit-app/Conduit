@@ -23,7 +23,8 @@ data class Pack(
         state.currentPack.value = this
     }
 
-    suspend fun initializeExperts(state: AppState) = coroutineScope {
+    // Non-blocking - Launches bg inits for the various experts in the pack
+    fun initializeExperts(state: AppState) {
         experts.forEach { expert ->
             val modelPath = expert.modelPath ?: return@forEach
 
@@ -34,7 +35,7 @@ data class Pack(
             if (expert.type != ExpertType.LLM) return@forEach
 
             val absoluteModelPath = AppUtils.getAbsoluteModelPath(modelPath)
-            launch(Dispatchers.IO) {
+            state.scope.launch(Dispatchers.IO) {
                 expert.sessionPtr = LlmPortal.initialize(state.conduitPtr, absoluteModelPath)
             }
         }

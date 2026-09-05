@@ -34,6 +34,9 @@ dependencies {
 
     // Kuiver Treeview
     implementation("io.github.justdeko:kuiver:0.4.1")
+
+    // Fletch's liquid glass
+    implementation("io.github.fletchmckee.liquid:liquid:1.1.1")
 }
 
 compose.desktop {

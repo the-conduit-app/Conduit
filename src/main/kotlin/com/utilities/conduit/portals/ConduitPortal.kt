@@ -2,7 +2,7 @@ package com.utilities.conduit.portals
 
 import com.utilities.conduit.ConduitUserModel
 import com.utilities.conduit.Expert
-import com.utilities.conduit.ExternalUserModel
+import com.utilities.conduit.UserModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -67,7 +67,7 @@ object ConduitPortal {
             return "NO USER MODEL EXISTS"
         }
 
-        val rankedFeatures = ExternalUserModel.rankAndNormalizeFeatures(conduitUserModel.features)
+        val rankedFeatures = UserModel.rankAndNormalizeFeatures(conduitUserModel.features)
         return rankedFeatures.joinToString("\n") { ranked ->
             "${(ranked.normalizedWeight * 100.0).toInt()}% confidence: ${ranked.feature.text}"
         }
@@ -76,8 +76,8 @@ object ConduitPortal {
     // Returns a kinda grammatical sentence made from the externalUserModel, which is
     // extracted from the passed ConduitUserModel
     private fun getFriendlyExternalUserModel(conduitUserModel: ConduitUserModel?): String {
-        val externalUserModel = ExternalUserModel.convertToExternalUserModel(conduitUserModel)
-        val features = externalUserModel.text.lines().filter { it.isNotBlank() }
+        val userModel = UserModel.convertToExternalUserModel(conduitUserModel)
+        val features = userModel.text.lines().filter { it.isNotBlank() }
 
         val interests = features
             .filter { it.startsWith("Interest in ") }

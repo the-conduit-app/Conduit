@@ -31,7 +31,7 @@ private const val USER_MODEL_TOTAL_WEIGHT = 0.95
  * passed directly to the LLM or written directly from an LLM response.
  */
 @Serializable
-data class ExternalUserModel(val text: String, val lastSummaryModifiedTime: Long)
+data class UserModel(val text: String, val lastSummaryModifiedTime: Long)
 {
     companion object {
         private fun conduitUserModelFile(): Path =
@@ -130,9 +130,9 @@ data class ExternalUserModel(val text: String, val lastSummaryModifiedTime: Long
         internal fun convertToExternalUserModel(
             conduitUserModel: ConduitUserModel?,
             now: Long = System.currentTimeMillis()
-        ): ExternalUserModel {
+        ): UserModel {
             if (conduitUserModel == null || conduitUserModel.features.isEmpty()) {
-                return ExternalUserModel(
+                return UserModel(
                     text = "NO PREVIOUS USER MODEL EXISTS",
                     lastSummaryModifiedTime = conduitUserModel?.lastSummaryModifiedTime ?: 0L
                 )
@@ -163,7 +163,7 @@ data class ExternalUserModel(val text: String, val lastSummaryModifiedTime: Long
             }
 
             val text = selectedFeatures.joinToString("\n").ifBlank { "NO PREVIOUS USER MODEL EXISTS" }
-            return ExternalUserModel(text, conduitUserModel.lastSummaryModifiedTime)
+            return UserModel(text, conduitUserModel.lastSummaryModifiedTime)
         }
 
         private fun duiScore(feature: ConduitUserModelFeature, now: Long): Double {

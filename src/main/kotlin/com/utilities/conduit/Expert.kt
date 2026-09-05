@@ -61,11 +61,11 @@ class Expert(
 
             ExpertType.LLM -> {
                 val sessionPtr = sessionPtr ?: error("Expert '${nickname}': LLM session not found.")
-                val externalUserModel = if (includeUserModel) {
+                val userModel = if (includeUserModel) {
                     val conduitUserModel = conduitUserModelProvider() // retrieves from AppState (in mem)
-                    ExternalUserModel.convertToExternalUserModel(conduitUserModel)
+                    UserModel.convertToExternalUserModel(conduitUserModel)
                 } else {
-                    ExternalUserModel(
+                    UserModel(
                         text = "NO USER MODEL IS REQUIRED FOR THIS TASK.",
                         lastSummaryModifiedTime = 0L
                     )
@@ -73,7 +73,7 @@ class Expert(
 
                 val finalPrompt = AppUtils.buildChatMlPrompt(
                     this.seedPrompt,
-                    externalUserModel.text,
+                    userModel.text,
                     chatThusFar,
                     prompt
                 )

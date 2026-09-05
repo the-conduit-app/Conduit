@@ -26,40 +26,9 @@ val LocalActions = staticCompositionLocalOf<AppActions> { error("No AppActions p
 val AppJson = Json { prettyPrint = true; allowComments = true; ignoreUnknownKeys = true }
 
 @Composable
-fun App() {
+fun App(state: AppState) {
     val scope = rememberCoroutineScope()
 
-    val maxTokensPerResponse = 2048L
-    val conduitPtr = remember { LlmPortal.createConduit(maxTokensPerResponse) }
-    val state = remember { AppState.createNew(conduitPtr, scope = scope) }
-
-    LaunchedEffect(state) {
-        state.conduitUserModel = ExternalUserModel.loadConduitUserModelFromFile()
-        state.chatsList.build()        // load existing chats in the chats dir
-
-        val packs = withContext(Dispatchers.IO) { AppUtils.getAvailablePacks() }
-        state.availablePacks = packs
-
-        val defaultPack = packs.find { it.id == "Default" } ?: error("Default pack not found")
-        defaultPack.select(state)
-        defaultPack.initializeExperts(state) // may launch several model.inits
-
-        // Launch the system expert
-        state.systemExpert.modelPath?.let { modelPath ->
-            val absoluteModelPath = AppUtils.getAbsoluteModelPath(modelPath)
-            withContext(Dispatchers.IO) {
-                try {
-                    state.systemExpert.sessionPtr = LlmPortal.initialize(state.conduitPtr, absoluteModelPath)
-                } catch (e: Exception) {
-                    Trace.log("System expert initialization failed: ${e.message}")
-                }
-            }
-        }
-
-        val echoExpert = defaultPack.experts.find { it.modelPath == InternalExperts.SIMPLE_ECHO }
-        state.currentExpert.value = echoExpert
-        Maintenance.start(state, scope)
-    }
     DisposableEffect(Unit) {
         val hook = Thread {
             scope.launch { state.shutdown() }

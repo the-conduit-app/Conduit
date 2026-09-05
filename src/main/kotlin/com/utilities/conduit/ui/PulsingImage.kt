@@ -24,7 +24,7 @@ import conduit.generated.resources.Res
 import conduit.generated.resources.cycle_branches
 
 @Composable
-fun PulsingBranchIcon(
+fun PulsingImage(
     modifier: Modifier = Modifier,
     pulseDuration: Int = 1000,
     onClick: (() -> Unit)? = null
