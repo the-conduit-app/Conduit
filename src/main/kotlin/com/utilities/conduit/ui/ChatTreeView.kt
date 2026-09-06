@@ -126,6 +126,7 @@ fun ChatTreeView(
                             onClick = {
                                 if (nodesOnCursorPath.contains(conduitNode.id)) {
                                     appActions.scrollChatToNode(conduitNode.id)
+                                    Sounds.Drop.play()
                                 }
                             }
                         )
@@ -143,6 +144,7 @@ fun ChatTreeView(
                                         ContextMenuItem("Teleport to here?") {
                                             messagePanel.hide()
                                             scope.launch {
+                                                Sounds.Teleport.play()
                                                 state.chatManager.setCursor(conduitNode)
                                             }
                                         }

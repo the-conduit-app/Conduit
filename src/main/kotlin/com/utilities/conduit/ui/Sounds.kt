@@ -44,6 +44,24 @@ object Sounds {
         fun play() { if (!isSilent) sound.play() }
     }
 
+    // Water drop on treeview node click
+    object Drop {
+        private val sound by lazy { createSound("waterdrop.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+
+    // Switch branches in ChatView
+    object Swish {
+        private val sound by lazy { createSound("swish.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+
+    // Teleport to another branch
+    object Teleport {
+        private val sound by lazy { createSound("teleport.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+
     // onSend dispatches prompt to expert
     object Whoosh {
         private val sound by lazy { createSound("whoosh.wav") }

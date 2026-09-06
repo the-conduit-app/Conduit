@@ -41,7 +41,7 @@
     {
         "type": "INTERNAL",
         "nickname": "Condy",
-        "expertise": "People",
+        "expertise": "Humans",
         "modelPath": ":conduit", 
         "description": "the Conduit",
         "color": "Arisi Mauve"

@@ -11,7 +11,6 @@ import com.utilities.conduit.chat.MessageAuthor
 import com.utilities.conduit.chat.MessageStatus
 import com.utilities.conduit.chat.Node
 import com.utilities.conduit.chat.NodeType
-import com.utilities.conduit.ui.FullMessageOverlayState
 import com.utilities.conduit.ui.Sounds
 import com.utilities.conduit.utils.AppUtils
 import kotlinx.coroutines.Dispatchers
@@ -22,10 +21,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.coroutines.cancellation.CancellationException
 
-class AppActions(
-    private val state: AppState,
-    private val fullMessageOverlayState: FullMessageOverlayState
-) {
+class AppActions(private val state: AppState) {
     // For showing full large message content in an overlay panel separately
     var fullMessageText by mutableStateOf<String?>(null)
         private set
@@ -149,7 +145,9 @@ class AppActions(
             // Note: effective history = all nodes above (up to a summary node), through the parent node
             // currentMessages = all messages up to and including the nearest upstream node with a historySummary
             // precedingContext = that history summary (before current messages)
-            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(currentChat, userNode.parentId)
+
+            // TODO - VERIFY - on Sep 6, added exclude system nodes = true because of some slow responses
+            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(currentChat, userNode.parentId, excludeSystemNodes = true)
             val precedingContext = effectiveHistory.boundaryContext
             val chatMessages = effectiveHistory.nodes.mapNotNull { it.message }
             val chatThusFar = AppUtils.getChatContextAsString(
@@ -250,23 +248,4 @@ class AppActions(
             ""
         }
     }
-}
-
-fun extractAuthorTag(message: ChatMessage): String {
-    if (message.author.type == AuthorType.USER) {
-        return "You"
-    }
-
-    val title = message.title ?: return "Assistant"
-
-    // Gem (General) · Pack: Default
-    val titleMatch = Regex("""^(.+?) \((.+?)\) · Pack:""").find(title)
-
-    if (titleMatch != null) {
-        val name = titleMatch.groupValues[1]
-        val expertise = titleMatch.groupValues[2]
-        return "$name ($expertise)"
-    }
-
-    return title.substringBefore(" · Pack:").trim()
 }

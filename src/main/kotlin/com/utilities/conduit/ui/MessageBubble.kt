@@ -2,34 +2,31 @@ package com.utilities.conduit.ui
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.dropShadow
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.sun.beans.introspect.PropertyInfo
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.Node
+import conduit.generated.resources.Res
+import conduit.generated.resources.plasma_s1
+import conduit.generated.resources.plasma_s64
+import io.github.fletchmckee.liquid.LiquidState
+import io.github.fletchmckee.liquid.liquid
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -55,14 +52,20 @@ private fun UserMessageBubble(node: Node, isCursor: Boolean, contextMenuItems: (
     var hasMore by remember { mutableStateOf(false) }
 
     val bubble: @Composable () -> Unit = {
+        val liquidState = LocalLiquidState.current
+
         MessageBubbleSurface(
+            liquidState,
             color = Color.Green,
             cornerRadius = 12.dp
         ) {
             if (textInProgress != null && text.isEmpty()) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp
+                ConduitProgressIndicator(
+                    images = listOf(
+                        painterResource(Res.drawable.plasma_s64),
+                        painterResource(Res.drawable.plasma_s1)
+                    ),
+                    modifier = Modifier.size(30.dp)
                 )
             } else {
                 Column(
@@ -123,17 +126,23 @@ private fun ExpertMessageBubble(node: Node, isCursor: Boolean, contextMenuItems:
     val text = textInProgress ?: node.message?.text.orEmpty()
     val title = node.message?.title ?: "Donovich"
     var hasMore by remember { mutableStateOf(false) }
-    var bubbleColor = if (node.message?.author?.type == AuthorType.SYSTEM) Color.White else Color(0xFFFFFF00)
+    val bubbleColor = if (node.message?.author?.type == AuthorType.SYSTEM) Color.White else Color.Magenta
 
     val bubble: @Composable () -> Unit = {
+        val liquidState = LocalLiquidState.current
+
         MessageBubbleSurface(
+            liquidState = liquidState,
             color = bubbleColor,
             cornerRadius = 12.dp
         ) {
             if (textInProgress != null && text.isEmpty()) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp
+                ConduitProgressIndicator(
+                    images = listOf(
+                        painterResource(Res.drawable.plasma_s64),
+                        painterResource(Res.drawable.plasma_s1)
+                    ),
+                    modifier = Modifier.size(30.dp)
                 )
             } else {
                 Column(
@@ -198,33 +207,28 @@ private fun ExpertMessageBubble(node: Node, isCursor: Boolean, contextMenuItems:
 
 @Composable
 private fun MessageBubbleSurface(
+    liquidState: LiquidState,
     color: Color,
     cornerRadius: Dp,
     content: @Composable () -> Unit
 ) {
-    val shape = RoundedCornerShape(cornerRadius)
+    val bubbleShape = RoundedCornerShape(cornerRadius)
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .dropShadow(
-                shape = shape,
-                shadow = Shadow(
-                    radius = 2.dp,
-                    color = color.copy(alpha = 0.1f),
-                    offset = DpOffset(0.dp, 4.dp)
-                )
-            )
-            .clip(shape)
-            .background(
-                color = color.copy(alpha = .05f),
-                shape = shape
-            )
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = shape
-            )
+            .liquid(liquidState) {
+                frost = 2.dp
+                shape = bubbleShape
+                refraction = .5f
+                curve = 1f
+                edge = .5f
+                tint = color.copy(alpha = 0.2f)
+                saturation = 1f
+                dispersion = .5f
+                contrast = 1f
+            }
+            .clip(bubbleShape)
             .padding(8.dp)
     ) {
         content()

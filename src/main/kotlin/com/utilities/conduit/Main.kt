@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,10 +28,12 @@ import com.utilities.conduit.debug.MacWindowUtils
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.ui.App
 import com.utilities.conduit.ui.ConduitTheme
+import com.utilities.conduit.ui.LocalLiquidState
 import com.utilities.conduit.ui.splashScreen.SplashScreen
 import com.utilities.conduit.utils.AppUtils
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s64
+import io.github.fletchmckee.liquid.rememberLiquidState
 import org.jetbrains.compose.resources.painterResource
 import java.io.File
 
@@ -41,38 +44,41 @@ fun main() {
         val scope = rememberCoroutineScope()
         val maxTokensPerResponse = 2048L
         val conduitPtr = remember { LlmPortal.createConduit(maxTokensPerResponse) }
-        val state = remember { AppState.createNew(conduitPtr, scope) }
+        val liquidState = rememberLiquidState()
+        val appState = remember { AppState.createNew(conduitPtr, scope) }
         var showSplashScreen by remember { mutableStateOf(true) }
 
-        Window(
-            state = rememberWindowState(
-                width = 1200.dp,
-                height = 800.dp,
-                //position = WindowPosition.Aligned(Alignment.Center)
-            ),
-            title = "Conduit",
-            onCloseRequest = ::exitApplication,
-            resizable = true
-        ) {
-            val windowHandle = window.windowHandle
-
-            Box(
-                modifier = Modifier.fillMaxSize()
+        CompositionLocalProvider(LocalLiquidState provides liquidState) {
+            Window(
+                state = rememberWindowState(
+                    width = 1200.dp,
+                    height = 800.dp,
+                    //position = WindowPosition.Aligned(Alignment.Center)
+                ),
+                title = "Conduit",
+                onCloseRequest = ::exitApplication,
+                resizable = true
             ) {
-                // Main application is always underneath the splash.
-                MainContent(
-                    state = state,
-                    windowHandle = windowHandle
-                )
+                val windowHandle = window.windowHandle
 
-                // Splash sits over the main content during startup.
-                if (showSplashScreen) {
-                    SplashScreen(
-                        state = state,
-                        onReady = {
-                            showSplashScreen = false
-                        }
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // Main application is always underneath the splash.
+                    MainContent(
+                        state = appState,
+                        windowHandle = windowHandle
                     )
+
+                    // Splash sits over the main content during startup.
+                    if (showSplashScreen) {
+                        SplashScreen(
+                            state = appState,
+                            onReady = {
+                                showSplashScreen = false
+                            }
+                        )
+                    }
                 }
             }
         }

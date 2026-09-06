@@ -12,9 +12,11 @@ import androidx.compose.ui.zIndex
 import com.utilities.conduit.*
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
+import com.utilities.conduit.ui.LocalLiquidState
 import com.utilities.conduit.utils.AppUtils
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s64
+import io.github.fletchmckee.liquid.liquefiable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -42,12 +44,11 @@ fun App(state: AppState) {
 
     //------------------------------------------------------------------------------------------
 
-    val fullMessageOverlayState = remember { FullMessageOverlayState() }
-
     CompositionLocalProvider(
-        LocalActions provides AppActions(state, fullMessageOverlayState)
+        LocalActions provides AppActions(state)
     ) {
         val appActions = LocalActions.current
+        val liquidState = LocalLiquidState.current
 
         Box(
             Modifier
@@ -60,6 +61,7 @@ fun App(state: AppState) {
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxSize()
+                    .liquefiable(liquidState)
                     .zIndex(0f),
                 contentScale = ContentScale.Crop
             )

@@ -40,7 +40,6 @@ enum class LeftPanelMode {
 fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
     val opacity = LocalLeftViewOpacity.current
     val scope = rememberCoroutineScope()
-    var settingsMenuExpanded by remember { mutableStateOf(false) }
 
     Box(modifier = modifier.alpha(opacity.value)) {
         Column(modifier = Modifier.fillMaxSize()) {

@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
+import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,14 +42,6 @@ import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s1
 import org.jetbrains.compose.resources.painterResource
 
-class FullMessageOverlayState {
-    var text by mutableStateOf<String?>(null)
-        private set
-
-    fun show(text: String) { this.text = text }
-    fun dismiss() { text = null }
-}
-
 @Composable
 fun FullMessagePanel(
     modifier: Modifier,
@@ -56,8 +49,6 @@ fun FullMessagePanel(
     onDismiss: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val outerShape = RoundedCornerShape(20.dp)
-    val innerShape = RoundedCornerShape(12.dp)
 
     BoxWithConstraints(
         modifier = modifier.fillMaxSize()
@@ -65,7 +56,7 @@ fun FullMessagePanel(
         val maxPanelWidth = maxWidth * 0.65f
         val maxPanelHeight = maxHeight * 0.70f
 
-        // Click outside dismisses.
+        // Clickout dismisses.
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -76,55 +67,25 @@ fun FullMessagePanel(
                 }
         )
 
-        // The panel itself wraps its content.
-        Box(
+        InfoBoard(
             modifier = Modifier
                 .align(Alignment.Center)
                 .widthIn(max = maxPanelWidth)
                 .heightIn(max = maxPanelHeight)
-                .clip(outerShape)
                 .pointerInput(Unit) {
                     detectTapGestures { }
-                }
-                .border(
-                    1.dp,
-                    Color.White.copy(alpha = 0.45f),
-                    outerShape
-                )
-        ) {
-            // Plasma
-            Image(
-                painter = painterResource(Res.drawable.plasma_s1),
-                contentDescription = null,
-                modifier = Modifier.matchParentSize(),
-                contentScale = ContentScale.Crop
-            )
+                },
+            outerShape = RoundedCornerShape(20.dp),
+            innerShape = RoundedCornerShape(12.dp),
+            innerPadding = 24.dp,
+            contentPadding = 20.dp,
 
-            // Slight wash
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .background(Color.White.copy(alpha = 0.08f))
-            )
-
-            // Reading surface
-            Box(
-                modifier = Modifier
-                    .padding(24.dp)
-                    .clip(innerShape)
-                    .border(
-                        1.dp,
-                        Color.White.copy(alpha = 0.5f),
-                        innerShape
-                    )
-                    .background(Color.White.copy(alpha = 0.50f))
-            ) {
+            content = {
                 SelectionContainer {
                     Column(
                         modifier = Modifier
                             .heightIn(max = maxPanelHeight - 48.dp)
                             .verticalScroll(scrollState)
-                            .padding(20.dp)
                     ) {
                         Text(
                             text = text.trim(),
@@ -132,55 +93,16 @@ fun FullMessagePanel(
                         )
                     }
                 }
+            },
 
-                // Subtle scrollbar
-                if (scrollState.maxValue > 0) {
-                    val viewportHeight =
-                        scrollState.viewportSize.toFloat()
-
-                    val contentHeight =
-                        viewportHeight + scrollState.maxValue
-
-                    val thumbFraction =
-                        (viewportHeight / contentHeight)
-                            .coerceIn(0.05f, 1f)
-
-                    val scrollFraction =
-                        scrollState.value.toFloat() /
-                                scrollState.maxValue
-
-                    BoxWithConstraints(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .fillMaxHeight()
-                            .padding(
-                                top = 8.dp,
-                                bottom = 8.dp,
-                                end = 5.dp
-                            )
-                    ) {
-                        val thumbHeight =
-                            maxHeight * thumbFraction
-
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.TopCenter)
-                                .offset(
-                                    y = (maxHeight - thumbHeight) *
-                                            scrollFraction
-                                )
-                                .width(3.dp)
-                                .height(thumbHeight)
-                                .clip(
-                                    RoundedCornerShape(2.dp)
-                                )
-                                .background(
-                                    Color.Black.copy(alpha = 0.20f)
-                                )
-                        )
-                    }
-                }
+            overlay = {
+                SubtleScrollbar(
+                    scrollState = scrollState,
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 6.dp)
+                )
             }
-        }
+        )
     }
 }

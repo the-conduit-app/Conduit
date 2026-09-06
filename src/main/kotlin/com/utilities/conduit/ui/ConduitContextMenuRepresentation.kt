@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberCursorPositionProvider
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s64
+import io.github.fletchmckee.liquid.liquid
 import org.jetbrains.compose.resources.painterResource
 
 val ConduitContextMenuRepresentation = object : ContextMenuRepresentation
@@ -64,6 +65,7 @@ val ConduitContextMenuRepresentation = object : ContextMenuRepresentation
                             shape = RoundedCornerShape(8.dp)
                         )
                         .clip(RoundedCornerShape(8.dp))
+
                 ) {
                     Image(
                         painter = painterResource(Res.drawable.plasma_s64),

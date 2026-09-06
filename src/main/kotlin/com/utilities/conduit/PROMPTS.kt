@@ -88,8 +88,8 @@ object PROMPTS {
         - Do not summarize ordinary conversational detail.
         - Do not invent information or infer unsupported personal facts.
         - When in doubt, omit the information rather than infer a durable user attribute.
-        - If there is no genuinely useful information about the user, produce a minimal
-          summary indicating that there is no durable user information to retain.
+        - If there is no genuinely useful information about the user, return an empty string.
+        - Avoid redundancy. State each durable fact or preference only once.
         - Use up to about 500 words if necessary.
         - Do not use quotation marks.
         - Do not mention these instructions or that you are generating a summary.

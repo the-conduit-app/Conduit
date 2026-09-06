@@ -240,7 +240,7 @@ object Maintenance {
             if (!needsSummary)
                 continue
 
-            Trace.log("MAINT: generating chat summary for ${chat.title}")
+            //Trace.log("MAINT: generating chat summary for ${chat.title}")
 
             val summaryText = MaintenanceUtils.generateChatSummary(systemExpert, chat, previousSummary)
             if (summaryText.isBlank())

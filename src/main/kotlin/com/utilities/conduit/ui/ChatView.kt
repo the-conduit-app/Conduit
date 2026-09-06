@@ -40,6 +40,7 @@ import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.utils.ChatUtils
 import com.utilities.conduit.chat.Node
+import com.utilities.conduit.debug.Trace
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.collections.forEach
@@ -154,18 +155,10 @@ fun ColumnScope.ChatView(state: AppState) {
                     onNodePositioned = onNodePositioned
                 )
             }
-
-//            if (state.rightScreenCurtain.isActive) {
-//                val screenColor = Color(0xFFF2F2F2)
-//
-//                Box(
-//                    modifier = Modifier
-//                        .clip(RoundedCornerShape(12.dp))
-//                        .matchParentSize()
-//                        .alpha(state.rightScreenCurtain.opacity)
-//                        .background(screenColor)
-//                )
-//            }
+            SubtleScrollbar(
+                scrollState = scrollState,
+                modifier = Modifier.align(Alignment.CenterEnd)
+            )
         }
     }
 }
@@ -241,19 +234,18 @@ private fun BranchAnimatedHistory(
         // The changing suffix will be animated here.
         AnimatedContent(
             targetState = transition.incoming,
-            transitionSpec = {
-                (
-                        slideInHorizontally(initialOffsetX = { -it }) + fadeIn()) togetherWith (
-                        slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
-                        )
+            transitionSpec = { (
+                    slideInHorizontally(initialOffsetX = { -it }) + fadeIn()) togetherWith (
+                    slideOutHorizontally(targetOffsetX = { it }) + fadeOut()
+                )
             },
             label = "branch-suffix") { incomingNodes ->
             Column {
                 incomingNodes.forEach {
                         node -> ChatNodeRow(state, chat, node, version,
-                    isHighlighted = node.id == highlightedNodeId,
-                    onPositioned = { y -> onNodePositioned(node.id, y) }
-                )
+                        isHighlighted = node.id == highlightedNodeId,
+                        onPositioned = { y -> onNodePositioned(node.id, y) }
+                    )
                 }
             }
         }
@@ -369,6 +361,8 @@ private fun ChatNodeRow(
             PulsingImage(
                 modifier = Modifier.size(32.dp),
                 onClick = {
+                    Sounds.Swish.play()
+                    Trace.log("Switching branches")
                     scope.launch {
                         state.chatManager.cycleBranch(node)
                     }
@@ -387,6 +381,7 @@ private fun ChatNodeRow(
             PulsingImage(
                 modifier = Modifier.size(20.dp),
                 onClick = {
+                    Sounds.Swish.play()
                     scope.launch {
                         state.chatManager.cycleBranch(node)
                     }

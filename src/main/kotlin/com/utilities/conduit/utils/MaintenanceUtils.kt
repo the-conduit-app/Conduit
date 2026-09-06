@@ -119,7 +119,7 @@ object MaintenanceUtils {
 
             // Unlike history summarization, the cursor itself is included.
             val effectiveHistory = ChatUtils.getEffectiveNodeHistory(chat, cursorNodeId, excludeSystemNodes = true)
-            if (effectiveHistory.nodes.size == 0) return ""
+            if (effectiveHistory.nodes.isEmpty()) return ""
 
             val chatThusFar = AppUtils.getChatContextAsString(
                 boundaryContext = effectiveHistory.boundaryContext,
@@ -129,7 +129,7 @@ object MaintenanceUtils {
             )
 
             val chatSummaryPrompt = PROMPTS.CHAT_SUMMARY_GENERATION
-                .replace("{PREVIOUS_SUMMARY}", previousSummary?.summary ?: "NO PREVIOUS SUMMARY EXISTS.")
+                .replace("{PREVIOUS_SUMMARY}", previousSummary?.summary ?: "")
 
             Trace.log("CHAT SUMMARY GEN START chat=${chat.id}")
 
