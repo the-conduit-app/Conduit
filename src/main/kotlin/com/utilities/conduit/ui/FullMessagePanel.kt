@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s1
+import kotlinx.serialization.json.JsonNull.content
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -54,7 +55,8 @@ fun FullMessagePanel(
         modifier = modifier.fillMaxSize()
     ) {
         val maxPanelWidth = maxWidth * 0.65f
-        val maxPanelHeight = maxHeight * 0.70f
+        val maxPanelHeight = maxHeight * 0.75f
+        val panelShape = RoundedCornerShape(20.dp)
 
         // Clickout dismisses.
         Box(
@@ -75,17 +77,15 @@ fun FullMessagePanel(
                 .pointerInput(Unit) {
                     detectTapGestures { }
                 },
-            outerShape = RoundedCornerShape(20.dp),
-            innerShape = RoundedCornerShape(12.dp),
-            innerPadding = 24.dp,
-            contentPadding = 20.dp,
+            outerShape = panelShape,
+            innerShape = panelShape,
+            innerPadding = 20.dp,
+            contentPadding = 15.dp,
 
             content = {
                 SelectionContainer {
                     Column(
-                        modifier = Modifier
-                            .heightIn(max = maxPanelHeight - 48.dp)
-                            .verticalScroll(scrollState)
+                        modifier = Modifier.verticalScroll(scrollState)
                     ) {
                         Text(
                             text = text.trim(),

@@ -39,18 +39,16 @@ fun ChatViewNotification(
     val notification = state.notification
 
     if (notification.opacity <= 0f) return
-
-    val outerShape = RoundedCornerShape(20.dp)
-    val innerShape = RoundedCornerShape(12.dp)
+    val panelShape = RoundedCornerShape(12.dp)
 
     Box(
         modifier = modifier
             .alpha(notification.opacity)
-            .clip(outerShape)
+            .clip(panelShape)
             .border(
                 1.dp,
-                Color.White.copy(alpha = 0.45f),
-                outerShape
+                Color.Red.copy(alpha = 0.45f),
+                panelShape
             )
     ) {
         // Plasma backdrop
@@ -59,27 +57,28 @@ fun ChatViewNotification(
             contentDescription = null,
             modifier = Modifier.matchParentSize(),
             contentScale = ContentScale.Crop,
-            alpha = 0.75f
+            alpha = 1f
         )
 
-        // Very subtle wash
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .background(Color.White.copy(alpha = 0.08f))
-        )
+//        // Very subtle wash
+//        Box(
+//            modifier = Modifier
+//                .matchParentSize()
+//                .background(Color.White.copy(alpha = 0.1f))
+//        )
 
         // Inner panel
         Box(
             modifier = Modifier
-                .padding(8.dp)
-                .clip(innerShape)
+                .padding(10.dp)
+                .clip(panelShape)
                 .border(
                     1.dp,
-                    Color.White.copy(alpha = 0.5f),
-                    innerShape
+                    Color.Red.copy(alpha = 0.3f),
+                    panelShape
                 )
-                .background(Color.White.copy(alpha = 0.50f))
+                //.background(Color.White.copy(alpha = 0.00f))
+                .background(Color.White.copy(alpha = .5f))
                 .padding(
                     horizontal = 20.dp,
                     vertical = 12.dp

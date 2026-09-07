@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import com.dk.kuiver.RelayoutPolicy
 import com.dk.kuiver.model.KuiverEdge
@@ -27,15 +25,13 @@ import com.utilities.conduit.chat.Node
 import com.utilities.conduit.ui.treeView.ConduitTreeEdge
 import com.utilities.conduit.ui.treeView.ConduitTreeNode
 import com.utilities.conduit.ui.treeView.hierarchical
-import jdk.javadoc.internal.doclets.formats.html.markup.HtmlStyles
 import kotlinx.coroutines.launch
-import java.awt.SystemColor.text
 
 @Composable
 fun ChatTreeView(
     state: AppState
 ) {
-    val messagePanel = LocalMessagePanel.current
+    val messagePanel = LocalMessagePanelController.current
     val appActions = LocalActions.current
     val scope = rememberCoroutineScope()
 

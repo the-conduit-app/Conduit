@@ -16,6 +16,7 @@ import kotlin.time.Duration.Companion.milliseconds
 // Calling trigger() updates the message and temporarily perturbs the opacity from 0 → 1 → 0.
 // Companion composables (ChatViewNotification, TreeViewNotification, etc.)
 // simply render the current state of the Notification.
+// The Notification composable can be found within AppRightView.kt
 
 class Notification (private val scope: CoroutineScope) {
     // Text currently displayed.
