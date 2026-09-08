@@ -33,7 +33,8 @@ object ConduitTheme {
         ),
         titleLarge = TextStyle(
             fontFamily = HelveticaNeueLight,
-            fontWeight = FontWeight.Light
+            fontWeight = FontWeight.Light,
+            fontSize = 24.sp
         ),
         titleMedium = TextStyle(
             fontFamily = HelveticaNeueLight,

@@ -105,7 +105,7 @@ fun ChatTreeView(
                     @Composable
                     fun renderNode() {
                         ConduitTreeNode(
-                            kuiverNode = kuiverNode,
+                            //kuiverNode = kuiverNode,
                             isCursor = kuiverNode.id == cursorNodeId,
                             isActive = isActive,
                             leadsToCursor = nodesOnCursorPath.contains(conduitNode.id),

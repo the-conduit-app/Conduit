@@ -37,7 +37,7 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ConduitTreeNode(
-    kuiverNode: KuiverNode,
+    //kuiverNode: KuiverNode,
     isActive: Boolean,
     isCursor: Boolean = false,
     leadsToCursor: Boolean = false,

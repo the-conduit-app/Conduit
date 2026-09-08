@@ -9,7 +9,7 @@
         "nickname": "Simple",
         "expertise": "Echoing",
         "modelPath": ":simpleEcho",
-        "description": "An Echo... echo... echo...!",
+        "description": "An echo... echo... echo...!",
         "color": "Proud Peacock"
     },
     {
@@ -40,7 +40,7 @@
         "type": "INTERNAL",
         "nickname": "Ohce",
         "expertise": "Echoing",
-        "modelPath": ":wordReverseEcho",
+        "modelPath": ":ohceEcho",
         "description": "An echo in your mirror",
         "color" : "Slippery Seafoam"
     }

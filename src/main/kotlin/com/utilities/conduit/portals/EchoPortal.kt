@@ -22,7 +22,7 @@ object EchoPortal {
         val response = when (expert.modelPath) {
             ":simpleEcho" -> getSimpleResponse(prompt)
             ":saladEcho" -> getSaladResponse(prompt)
-            ":wordReverseEcho" -> getWordReverseResponse(prompt)
+            ":ohceEcho" -> getOhceEchoResponse(prompt)
             ":rottenEcho" -> getRottenResponse(prompt)
             ":sillyEcho" -> getSillyResponse(prompt)
             else -> getSimpleResponse(prompt)
@@ -51,7 +51,7 @@ object EchoPortal {
         return (text ?: "").split(" ").shuffled().joinToString(" ")
     }
 
-    fun getWordReverseResponse(text: String?): String {
+    fun getOhceEchoResponse(text: String?): String {
         return (text ?: "").split(" ").reversed().joinToString(" ")
     }
 

@@ -65,7 +65,7 @@ class AppActions(private val state: AppState) {
         state.scope.launch(Dispatchers.IO) {
             try {
                 newPack.initializeExperts(state)
-                state.notification.trigger("The current pack is now ${newPack.name}. Please select an expert.")
+                // state.notification.trigger("The current pack is now ${newPack.name}. Please select an expert.")
             }
             catch (e: Exception) {
                 state.notification.trigger("Error switching pack: ${e.message}")

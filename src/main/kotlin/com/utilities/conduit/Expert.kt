@@ -112,7 +112,7 @@ object InternalExperts {
     const val ROTTEN_ECHO = ":rottenEcho"
     const val SILLY_ECHO  = ":sillyEcho"
     const val SALAD_ECHO  = ":saladEcho"
-    const val W_REV_ECHO  = ":wordReverseEcho"
+    const val W_REV_ECHO  = ":ohceEcho"
     const val CONDUIT = ":conduit"
 }
 
