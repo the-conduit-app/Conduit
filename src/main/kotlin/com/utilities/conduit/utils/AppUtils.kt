@@ -41,14 +41,30 @@ object AppUtils {
     fun getChatsDir(): String { return "${getAppDir()}/chats" }
 
     // full pathline to the .gguf file
-    fun getAbsoluteModelPath(modelPath: String): String {
-        return if (Paths.get(modelPath).isAbsolute)
-            modelPath
-        else
-            Paths.get(getAppDir(), modelPath).toString()
+//    fun getAbsoluteModelPath(modelPath: String): String {
+//        return if (Paths.get(modelPath).isAbsolute)
+//            modelPath
+//        else
+//            Paths.get(getAppDir(), modelPath).toString()
+//    }
+
+    //    return candidates.firstOrNull { file -> file.isFile && sha256(file) == GEMMA_SHA256 }
+//        ?.absolutePath
+
+    // Returns the absolute path of the model file when given its filename,
+    // searching a bunch of likely places
+    fun locateModelFile(filename: String): String? {
+        val candidates = listOf(
+            File(AppUtils.getAppDir(), "llm/$filename"),
+            File(System.getProperty("user.home"), "llm/$filename"),
+            File(System.getProperty("user.home"), "Models/$filename"),
+            File(System.getProperty("user.home"), "models/$filename"),
+            File(System.getProperty("user.home"), "Desktop/$filename")
+        )
+        return candidates.firstOrNull { file -> file.isFile }?.absolutePath
     }
 
-     // Reads all .json files in the packs directory and parses them into Pack objects
+    // Reads all .json files in the packs directory and parses them into Pack objects
      // IMPORTANT: NO PACK EXPERT INITIALIZATIONS (Hence not time-consuming)
     suspend fun getAvailablePacks(): List<Pack> = withContext(Dispatchers.IO) {
          val packsDir = Paths.get(getAppDir(), "packs")

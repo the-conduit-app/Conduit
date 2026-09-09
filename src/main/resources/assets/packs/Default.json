@@ -1,6 +1,4 @@
 // This is the Default pack, bundled with the Conduit App.
-// It contains references to LLM files that you must download, verify and THEN place in
-// Conduit App's llm/ directory
 {
     "name": "Default",
     "description": "The default pack of experts.",
@@ -9,7 +7,7 @@
         "type": "INTERNAL",
         "nickname": "Simple",
         "expertise": "Echoing",
-        "modelPath": ":simpleEcho",
+        "model": ":simpleEcho",
         "description": "An Echo... echo... echo...!",
         "color": "Proud Peacock"
         
@@ -18,7 +16,7 @@
         "type": "LLM",
         "nickname": "Gem",
         "expertise": "General",
-        "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
+        "model": "gemma-2-9b-it-Q4_K_M.gguf", 
         "description": "An all-round expert.",
         "color": "Cutey Peach"
     },
@@ -26,15 +24,15 @@
         "type": "LLM",
         "nickname": "Larry",
         "expertise": "Law",
-        "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
-        "description": "An expert Lawyer.",
+        "model": "gemma-2-9b-it-Q4_K_M.gguf", 
+        "description": "An expert lawyer.",
         "color": "Terracotta"
     },
     {
         "type": "LLM",
         "nickname": "Finn",
         "expertise": "Finance",
-        "modelPath": "llm/gemma-2-9b-it-Q4_K_M.gguf", 
+        "model": "gemma-2-9b-it-Q4_K_M.gguf", 
         "description": "Your friendly neighborhood accountant, and a good one.",
         "color": "Muted Gold"
     },
@@ -42,7 +40,7 @@
         "type": "INTERNAL",
         "nickname": "Condy",
         "expertise": "Humans",
-        "modelPath": ":conduit", 
+        "model": ":conduit", 
         "description": "The Conduit",
         "color": "Arisi Mauve"
     }

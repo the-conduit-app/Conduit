@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.utilities.conduit.AppState
-import com.utilities.conduit.EXPERT_COLORS
 import com.utilities.conduit.Expert
 import com.utilities.conduit.Pack
 import conduit.generated.resources.Res
@@ -225,7 +224,7 @@ fun renderPackInfo(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Person,
-                            tint = EXPERT_COLORS[expert.color] ?: Color.Gray,
+                            tint = CONDUIT_COLORS[expert.color] ?: Color.Gray,
                             contentDescription = null,
                             modifier = Modifier.size(20.dp)
                         )
@@ -264,7 +263,7 @@ fun renderPackInfo(
                     )
 
                     Text(
-                        text = hoveredExpert?.modelPath ?: "",
+                        text = hoveredExpert?.model ?: "",
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodySmall.copy(fontSize = 10.sp),

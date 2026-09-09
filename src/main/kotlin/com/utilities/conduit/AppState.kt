@@ -13,7 +13,6 @@ import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.ui.LeftPanelMode
 import com.utilities.conduit.ui.Notification
-import io.github.fletchmckee.liquid.LiquidState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -42,10 +41,10 @@ class AppState(
             type = ExpertType.LLM,
             nickname = "Conduit",
             expertise = "General",
-            modelPath = "llm/gemma-2-9b-it-Q4_K_M.gguf",
+            model = "gemma-2-9b-it-Q4_K_M.gguf",
             description = "A general purpose expert assisting with various administrative tasks " +
                     "like summarizing chats, generating titles, the user model, etc.",
-            color = "Snazzy Slate"
+            color = "Mr. Slater"
         )
 
         // One new AppState per invocation

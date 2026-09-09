@@ -15,7 +15,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
@@ -24,9 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
@@ -34,9 +31,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.sun.beans.introspect.PropertyInfo
 import com.utilities.conduit.AppState
-import com.utilities.conduit.EXPERT_COLORS
 import com.utilities.conduit.Expert
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s1
@@ -90,7 +85,7 @@ fun ExpertIcon(
         label = "expertScale"
     )
 
-    val expertColor = EXPERT_COLORS[expert.color] ?: Color.Gray
+    val expertColor = CONDUIT_COLORS[expert.color] ?: Color.Gray
     val iconColor = if (expert.isReady) expertColor else Color.LightGray
     val iconBoxSize = 52.dp
     val density = LocalDensity.current

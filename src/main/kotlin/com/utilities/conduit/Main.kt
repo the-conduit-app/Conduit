@@ -31,7 +31,6 @@ import com.utilities.conduit.ui.ConduitTheme
 import com.utilities.conduit.ui.LocalLiquidState
 import com.utilities.conduit.ui.splashScreen.SplashScreen
 import com.utilities.conduit.utils.AppUtils
-import com.utilities.conduit.utils.sha256
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s64
 import io.github.fletchmckee.liquid.rememberLiquidState
@@ -64,8 +63,6 @@ fun main() {
                 Box(
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    println(sha256(File(AppUtils.getAbsoluteModelPath(appState.systemExpert.modelPath!!))))
-
                     // Main application is always underneath the splash.
                     MainContent(
                         state = appState,
@@ -75,7 +72,7 @@ fun main() {
                     // Splash sits over the main content during startup.
                     if (showSplashScreen) {
                         SplashScreen(
-                            state = appState,
+                            appState = appState,
                             onReady = {
                                 showSplashScreen = false
                             }

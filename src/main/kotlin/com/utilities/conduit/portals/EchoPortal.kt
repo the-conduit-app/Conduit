@@ -19,7 +19,7 @@ object EchoPortal {
         val prompt = text.trim()
 
         cancelRequested = false
-        val response = when (expert.modelPath) {
+        val response = when (expert.model) {
             ":simpleEcho" -> getSimpleResponse(prompt)
             ":saladEcho" -> getSaladResponse(prompt)
             ":ohceEcho" -> getOhceEchoResponse(prompt)
