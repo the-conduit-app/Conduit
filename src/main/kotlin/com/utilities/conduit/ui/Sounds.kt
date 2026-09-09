@@ -3,6 +3,7 @@ package com.utilities.conduit.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.utilities.conduit.ui.Sounds.Space.clip
 import java.io.BufferedInputStream
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
@@ -32,6 +33,21 @@ private class Sound(private val clip: Clip?) {
         }
         clip.framePosition = 0
         clip.start()
+    }
+
+    fun loop() {
+        if (clip == null) return
+
+        if (clip.isRunning) {
+            clip.stop()
+        }
+        clip.framePosition = 0
+        clip.loop(Clip.LOOP_CONTINUOUSLY)
+        clip.start()
+    }
+
+    fun stop() {
+        clip?.stop()
     }
 }
 
@@ -96,6 +112,24 @@ object Sounds {
     object Knock {
         private val sound by lazy { createSound("door_knock.wav") }
         fun play() { if (!isSilent) sound.play() }
+    }
+
+    // When initializing the system expert
+    object Crunch {
+        private val sound by lazy { createSound("crunch.wav") }
+
+        fun loop() {
+            if (isSilent) return
+            sound.loop()
+        }
+        fun play() {
+            if (isSilent) return
+            sound.play()
+        }
+        fun stop() {
+            if (isSilent) return
+            sound.stop()
+        }
     }
 
     // For Splash Screen (TODO - awaiting refactor to reuse above code)

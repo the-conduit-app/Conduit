@@ -2,6 +2,7 @@ package com.utilities.conduit
 
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
+import com.utilities.conduit.ui.Sounds
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.utils.sha256
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +21,15 @@ enum class ConduitInitResult {
     FAILED_MODEL_SHA
 }
 
-suspend fun initializeConduit(appState: AppState, systemModelPath: String): ConduitInitResult {
+suspend fun initializeConduit(
+    appState: AppState,
+    systemModelPath: String?,
+    onVerified: () -> Unit = {}
+): ConduitInitResult {
+    if (systemModelPath == null)
+        return ConduitInitResult.FAILED_MODEL_MISSING
+    Trace.log("system model path = $systemModelPath")
+
     appState.conduitUserModel = UserModel.loadConduitUserModelFromFile()
     appState.chatsList.build()
 
@@ -38,14 +47,18 @@ suspend fun initializeConduit(appState: AppState, systemModelPath: String): Cond
     // start off maint in the bg
     appState.scope.launch { Maintenance.start(appState) }
 
-    return initializeSystemExpert(appState, systemModelPath)
+    return initializeSystemExpert(appState, systemModelPath, onVerified)
 }
 
 // The System Expert must additionally match the trusted Gemma SHA-256.
-private suspend fun initializeSystemExpert(appState: AppState, absoluteModelPath: String): ConduitInitResult {
+private suspend fun initializeSystemExpert(
+    appState: AppState,
+    absoluteModelPath: String,
+    onVerfified: () -> Unit
+): ConduitInitResult {
     return try {
-        if (sha256(File(absoluteModelPath)) != GEMMA_SHA256)
-            return ConduitInitResult.FAILED_MODEL_SHA
+        if (sha256(File(absoluteModelPath)) != GEMMA_SHA256) return ConduitInitResult.FAILED_MODEL_SHA
+        onVerfified()
 
         appState.systemExpert.sessionPtr = withContext(Dispatchers.IO) {
             LlmPortal.initialize(

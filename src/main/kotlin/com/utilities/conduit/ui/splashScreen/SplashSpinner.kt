@@ -14,8 +14,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.PointerIcon
@@ -35,12 +32,12 @@ import com.utilities.conduit.ui.Sounds
 import org.jetbrains.compose.resources.painterResource
 import conduit.generated.resources.Res
 import conduit.generated.resources.enter_conduit
+import conduit.generated.resources.open_conduit
 import io.github.fletchmckee.liquid.rememberLiquidState
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 import io.github.fletchmckee.liquid.liquefiable
 import io.github.fletchmckee.liquid.liquid
-import io.github.fletchmckee.liquid.rememberLiquidState
 
 
 // Essentially mostly duplicated code from PulsingImage.kt (TODO ripe for a refactor)
@@ -51,12 +48,20 @@ fun SplashSpinner(
     modifier: Modifier = Modifier,
     isReady: Boolean,
     pulseDuration: Int = 20_000,
-    onReady: (() -> Unit)? = null
+    isShaVerified: Boolean = false,
+    onReady: (() -> Unit)? = null,
 ) {
     val transition = rememberInfiniteTransition()
     val interactionSource = remember { MutableInteractionSource() }
     var fadingOut by remember { mutableStateOf(false) }
     val liquidState = rememberLiquidState()
+
+    // When sha check passes on the system expert, this transitions from 0 to 1
+    val shaCheckAlpha by animateFloatAsState(
+        targetValue = if (isShaVerified) 1f else 0f,
+        animationSpec = tween(400),
+        label = "verifiedAlpha"
+    )
 
     LaunchedEffect(Unit) {
         Sounds.Space.play()
@@ -130,18 +135,35 @@ fun SplashSpinner(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painterResource(Res.drawable.enter_conduit),
-            contentDescription = "Enter Conduit",
+        if (!isShaVerified || shaCheckAlpha < 1f) {
+            Image(
+                painter = painterResource(Res.drawable.open_conduit),
+                contentDescription = "Open/Enter Conduit",
+                modifier = Modifier
+                    .liquefiable(liquidState)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                        alpha = opacity * fadeAlpha * (1f - shaCheckAlpha)
+                        rotationZ = rotation * direction
+                    }
+            )
+        }
 
-            Modifier.liquefiable(liquidState)
-                .graphicsLayer {
-                    scaleX = scale
-                    scaleY = scale
-                    alpha = opacity * fadeAlpha
-                    rotationZ = rotation * direction
-                }
-        )
+        if (isShaVerified || shaCheckAlpha > 0f) {
+            Image(
+                painter = painterResource(Res.drawable.enter_conduit),
+                contentDescription = "Enter Conduit",
+                modifier = Modifier
+                    .liquefiable(liquidState)
+                    .graphicsLayer {
+                        scaleX = scale
+                        scaleY = scale
+                        alpha = opacity * fadeAlpha * shaCheckAlpha
+                        rotationZ = rotation * direction
+                    }
+            )
+        }
 
         Box(
             modifier = Modifier
