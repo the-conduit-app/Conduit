@@ -26,23 +26,28 @@ import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.chat.ChatsListItem
+import com.utilities.conduit.utils.ChatUtils.hasStringInChatPrefix
 import com.utilities.conduit.utils.MaintenanceUtils
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 
 @Composable
-fun ChatsListView(state: AppState) {
+fun ChatsListView(state: AppState, filterText: String) {
     val rightViewOpacity = LocalRightViewOpacity.current
     val leftViewOpacity = LocalLeftViewOpacity.current
 
-    val chatsList = state.chatsList
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
 
+    val chatsList = state.chatsList
+    val filteredItems = chatsList.items.filter {
+        hasStringInChatPrefix(it.chat, filterText)
+    }
+
     LaunchedEffect(chatsList.needsScrollingToTop) {
         if (chatsList.needsScrollingToTop) {
-            listState.animateScrollToItem(0)
+            if (filteredItems.isNotEmpty()) { listState.animateScrollToItem(0) }
             chatsList.needsScrollingToTop = false
         }
     }
@@ -64,12 +69,40 @@ fun ChatsListView(state: AppState) {
             chatsList.setNeedsHumanReview(item.chat.id, false)
         rightViewOpacity.show()
         state.focusInput.value++ // Trigger recomp
+
+        focusRequester.requestFocus()
     }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .alpha(if (enabled) 1f else 0.25f)
+    // Key capture not working
+//            .onPreviewKeyEvent { event ->
+//                println("KEY: ${event.key} ${event.type}")
+//                if (event.type != KeyEventType.KeyDown)
+//                    return@onPreviewKeyEvent false
+//
+//                val direction = when (event.key) {
+//                    Key.DirectionUp -> -1
+//                    Key.DirectionDown -> 1
+//                    else -> return@onPreviewKeyEvent false
+//                }
+//
+//                scope.launch {
+//                    val currentIndex = filteredItems.indexOfFirst {
+//                        it.chat.id == state.chatManager.currentChat.id
+//                    }
+//                    val newIndex = currentIndex + direction
+//
+//                    if (currentIndex >= 0 && newIndex in filteredItems.indices) {
+//                        val item = filteredItems[newIndex]
+//                        selectChat(item)
+//                    }
+//                }
+//                true
+//            }
+
     ) {
         LazyColumn(
             state = listState,
@@ -78,32 +111,13 @@ fun ChatsListView(state: AppState) {
                 .padding(horizontal = 8.dp)
                 .focusRequester(focusRequester)
                 .focusable()
-                .onPreviewKeyEvent { event ->
-                    if (event.type != KeyEventType.KeyDown)
-                        return@onPreviewKeyEvent false
-
-                    val direction = when (event.key) {
-                        Key.DirectionUp -> -1
-                        Key.DirectionDown -> 1
-                        else -> return@onPreviewKeyEvent false
-                    }
-
-                    scope.launch {
-                        val currentIndex = chatsList.items.indexOfFirst {
-                            it.chat.id == state.chatManager.currentChat.id
-                        }
-                        val newIndex = currentIndex + direction
-
-                        if (currentIndex >= 0 && newIndex in chatsList.items.indices) {
-                            val item = chatsList.items[newIndex]
-                            selectChat(item)
-                        }
-                    }
-                    true
-                }
+                .onPreviewKeyEvent {
+                    println("KEY: ${it.key}")
+                    false
+                },
         ) {
             itemsIndexed(
-                items = chatsList.items,
+                items = filteredItems,
                 key = { _, item -> item.chat.id }
             ) { index, item ->
                 val isCurrent = item.chat.id == state.chatManager.currentChat.id

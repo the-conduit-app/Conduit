@@ -1,23 +1,27 @@
 package com.utilities.conduit.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.VolumeOff
-import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -40,6 +44,7 @@ enum class LeftPanelMode {
 fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
     val opacity = LocalLeftViewOpacity.current
     val scope = rememberCoroutineScope()
+    var filterText by remember { mutableStateOf("") }
 
     Box(modifier = modifier.alpha(opacity.value)) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -51,17 +56,71 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
                     .padding(horizontal = 12.dp, vertical = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = when (state.leftPanelMode) {
-                        LeftPanelMode.LIST -> "Chats"
-                        LeftPanelMode.TREE -> state.chatManager.currentChat.title
-                            .let { if (it.length > 30) it.take(27) + "..." else it }
-                    },
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+            ) {when (state.leftPanelMode) {
+                LeftPanelMode.LIST -> {
+                    Text(
+                        text = "Chats",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    BasicTextField(
+                        value = filterText,
+                        onValueChange = { filterText = it },
+                        singleLine = true,
+                        textStyle = MaterialTheme.typography.bodySmall.copy(
+                            color = Color.Gray //// TODO
+                        ),
+                        cursorBrush = SolidColor(Color(0xFF007C91)),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(32.dp),
+                        decorationBox = { innerTextField ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(
+                                        color = Color.White.copy(alpha = 0.25f),
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
+                                    .padding(horizontal = 10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier.weight(1f),
+                                    contentAlignment = Alignment.CenterStart
+                                ) {
+                                    if (filterText.isEmpty()) {
+                                        Text(
+                                            text = "Filter",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = Color.Black.copy(alpha = 0.5f)
+                                        )
+                                    }
+
+                                    innerTextField()
+                                }
+
+                                Icon(
+                                    imageVector = Icons.Filled.FilterAlt,
+                                    contentDescription = "Filter chats",
+                                    modifier = Modifier.size(17.dp),
+                                    tint = Color(0xFF007C91)
+                                )
+                            }
+                        }
+                    )
+                }
+
+                LeftPanelMode.TREE -> {
+                    Text(
+                        text = state.chatManager.currentChat.title
+                            .let { if (it.length > 30) it.take(27) + "..." else it },
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     when (state.leftPanelMode) {
                         LeftPanelMode.LIST -> {
@@ -137,7 +196,7 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
 
             // Body ---------------------------------------------------------------
             when (state.leftPanelMode) {
-                LeftPanelMode.LIST -> ChatsListView(state)
+                LeftPanelMode.LIST -> ChatsListView(state, filterText)
                 LeftPanelMode.TREE -> ChatTreeView(state)
             }
         }

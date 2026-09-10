@@ -29,6 +29,16 @@ object ChatUtils {
         return "${sanitizedTitle}-${chatId}.json"
     }
 
+    fun hasStringInChatPrefix(chat: Chat, string: String): Boolean {
+        val query = string.trim()
+        if (query.isEmpty()) return true
+
+        return chat.nodes.values.any { node ->
+            node.message?.title?.contains(query, ignoreCase = true) == true ||
+                    node.message?.text?.take(1000)?.contains(query, ignoreCase = true) == true
+        }
+    }
+
     // mutexed, writes to disk and blocks until finished
     suspend fun saveChatToDisk(chat: Chat): ChatsListItem {
         chatUtilsMutex.withLock {
