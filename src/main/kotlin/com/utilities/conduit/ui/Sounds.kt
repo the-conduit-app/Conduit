@@ -114,6 +114,12 @@ object Sounds {
         fun play() { if (!isSilent) sound.play() }
     }
 
+    // When changing packs
+    object SwishSwash {
+        private val sound by lazy { createSound("swish_swash.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+
     // When initializing the system expert
     object Crunch {
         private val sound by lazy { createSound("crunch.wav") }

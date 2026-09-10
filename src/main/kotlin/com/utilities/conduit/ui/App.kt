@@ -10,16 +10,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.zIndex
 import com.utilities.conduit.*
-import com.utilities.conduit.debug.Trace
-import com.utilities.conduit.portals.LlmPortal
-import com.utilities.conduit.ui.LocalLiquidState
-import com.utilities.conduit.utils.AppUtils
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s64
 import io.github.fletchmckee.liquid.liquefiable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.painterResource
 
@@ -28,12 +23,16 @@ val LocalActions = staticCompositionLocalOf<AppActions> { error("No AppActions p
 val AppJson = Json { prettyPrint = true; allowComments = true; ignoreUnknownKeys = true }
 
 @Composable
-fun App(state: AppState) {
+fun App(appState: AppState) {
     val scope = rememberCoroutineScope()
+
+    appState.scope.launch(Dispatchers.Default) {
+        Maintenance.start(appState)
+    }
 
     DisposableEffect(Unit) {
         val hook = Thread {
-            scope.launch { state.shutdown() }
+            scope.launch { appState.shutdown() }
         }
         Runtime.getRuntime().addShutdownHook(hook)
 
@@ -45,7 +44,7 @@ fun App(state: AppState) {
     //------------------------------------------------------------------------------------------
 
     CompositionLocalProvider(
-        LocalActions provides AppActions(state)
+        LocalActions provides AppActions(appState)
     ) {
         val appActions = LocalActions.current
         val liquidState = LocalLiquidState.current
@@ -53,7 +52,7 @@ fun App(state: AppState) {
         Box(
             Modifier
                 .fillMaxSize()
-                .userActivityMonitor(state)
+                .userActivityMonitor(appState)
         ) {
             // Background
             Image(
@@ -80,7 +79,7 @@ fun App(state: AppState) {
                     .fillMaxSize()
                     .zIndex(1f)
             ) {
-                MainScreen(state)
+                MainScreen(appState)
             }
 
             appActions.fullMessageText?.let { text ->

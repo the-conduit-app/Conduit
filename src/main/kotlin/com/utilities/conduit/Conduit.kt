@@ -2,7 +2,6 @@ package com.utilities.conduit
 
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
-import com.utilities.conduit.ui.Sounds
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.utils.sha256
 import kotlinx.coroutines.Dispatchers
@@ -44,9 +43,6 @@ suspend fun initializeConduit(
     // Pack experts are non-core experts - they will all init in the bg.
     defaultPack.initializeExperts(appState)
 
-    // start off maint in the bg
-    appState.scope.launch { Maintenance.start(appState) }
-
     return initializeSystemExpert(appState, systemModelPath, onVerified)
 }
 
@@ -57,7 +53,10 @@ private suspend fun initializeSystemExpert(
     onVerfified: () -> Unit
 ): ConduitInitResult {
     return try {
-        if (sha256(File(absoluteModelPath)) != GEMMA_SHA256) return ConduitInitResult.FAILED_MODEL_SHA
+        if (sha256(File(absoluteModelPath)) != GEMMA_SHA256) {
+            Trace.log("System model path = $absoluteModelPath, sha failed")
+            return ConduitInitResult.FAILED_MODEL_SHA
+        }
         onVerfified()
 
         appState.systemExpert.sessionPtr = withContext(Dispatchers.IO) {

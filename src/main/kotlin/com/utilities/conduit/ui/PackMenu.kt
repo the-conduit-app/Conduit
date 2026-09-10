@@ -138,6 +138,7 @@ fun PackMenu(state: AppState) {
                                         showPacksMenu = false
                                     },
                                     onFrontItemChanged = { item ->
+                                        ////Sounds.SwishSwash.play() // TODO
                                         appActions.switchPack(item.content)
                                     },
                                     itemRenderer = ::renderPackInfo

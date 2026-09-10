@@ -14,7 +14,6 @@ import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.ui.AppJson
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.utils.MaintenanceUtils
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
@@ -53,24 +52,26 @@ fun Modifier.userActivityMonitor(state: AppState): Modifier =
 
 // Periodic cleanup/org routines when app is idle
 object Maintenance {
-    private const val IDLE_TIMEOUT = 5_000L
+    private const val IDLE_TIMEOUT = 5_000L //// todo chg
     private var maintenanceJob: Job? = null
-    private var state: AppState? = null
+    private var appState: AppState? = null
 
     suspend fun start(state: AppState) {
-        Maintenance.state = state
+        appState = state
+
+        delay(30_000.milliseconds) // Startup grace period
 
         //Trace.log("Maint: STARTING")
         while (currentCoroutineContext().isActive) {
             delay(IDLE_TIMEOUT.milliseconds)
-            if (state.chatManager.isGenerating
-                || System.currentTimeMillis() - state.lastUserActivity < IDLE_TIMEOUT) {
+            if (appState.chatManager.isGenerating
+                || System.currentTimeMillis() - appState.lastUserActivity < IDLE_TIMEOUT) {
                 continue
             }
 
-            maintenanceJob = state.scope.launch(Dispatchers.Default) {
+            maintenanceJob = appState.scope.launch(Dispatchers.Default) {
                 try {
-                    runMaintenance(state)
+                    runMaintenance()
                 } catch (e: CancellationException) {  // TODO - check unused
                     Trace.log("MAINT: CANCELLED")
                 } finally {
@@ -91,7 +92,7 @@ object Maintenance {
         if (maintenanceJob?.isActive != true) return
 
         Trace.log("Maintenance: cancel")
-        state?.systemExpert?.abortResponse()
+        appState?.systemExpert?.abortResponse()
         maintenanceJob?.cancel()
     }
 
@@ -105,31 +106,37 @@ object Maintenance {
         //Trace.log("MAINT: STOPPED")
     }
 
-    private suspend fun runMaintenance(state: AppState) {
-        currentCoroutineContext().ensureActive()
-        runTitleMaintenance(state)
+    private suspend fun runMaintenance() {
+        delay(2000.milliseconds)
+        if (appState?.systemExpert?.sessionPtr == null) {
+            Trace.log("MAINT: Round skipped — system expert unavailable")
+            return
+        }
 
         currentCoroutineContext().ensureActive()
-        runHistorySummaryMaintenance(state)
+        runTitleMaintenance()
 
         currentCoroutineContext().ensureActive()
-        runChatSummaryMaintenance(state)
+        runHistorySummaryMaintenance()
 
         currentCoroutineContext().ensureActive()
-        runUserModelMaintenance(state)
+        runChatSummaryMaintenance()
+
+        currentCoroutineContext().ensureActive()
+        runUserModelMaintenance()
     }
 
     // Rename a *single* anonymous chat, if found, and return
-    suspend fun runTitleMaintenance(state: AppState) {
-        val systemExpert = state.systemExpert
-
-        if (systemExpert.sessionPtr == null) {
-            Trace.log("Maintenance early ret - sysexpert.session = ${systemExpert.sessionPtr}")
+    suspend fun runTitleMaintenance() {
+        val systemExpert = appState?.systemExpert
+        if (systemExpert?.sessionPtr == null) {
+            Trace.log("Maintenance early ret - sysexpert.session = ${systemExpert?.sessionPtr}")
             return
         }
         //Trace.log("RunTitlemaint CGE = ${state.chatManager.currentlyGeneratingExpert}")
 
-        val chatsList = state.chatsList
+        val chatsList = appState?.chatsList ?: return
+
         for (item in chatsList.items.toList()) {
             if (!item.chat.title.equals("Welcome to Conduit", ignoreCase = true))
                 continue
@@ -139,7 +146,7 @@ object Maintenance {
             if (item.chat.nodes.size < 3)
                 continue
 
-            if (state.chatManager.currentlyGeneratingExpert != null)
+            if (appState?.chatManager?.currentlyGeneratingExpert != null)
                 return
 
             //Trace.log("Rename generating new title")
@@ -154,8 +161,8 @@ object Maintenance {
                 Trace.log("Rename to '$newTitle' failed; maintenance round ending")
                 return
             }
-            if (updatedChat.id == state.chatManager.currentChat.id) {
-                withContext(Dispatchers.Main) { state.chatManager.currentChat = updatedChat }
+            if (updatedChat.id == appState?.chatManager?.currentChat?.id) {
+                withContext(Dispatchers.Main) { appState!!.chatManager.currentChat = updatedChat }
             }
 
             return
@@ -163,20 +170,19 @@ object Maintenance {
     }
 
     // Generate summaries for branching nodes (with enough ancestors - checked in the helper)
-    private suspend fun runHistorySummaryMaintenance(state: AppState) {
-        val systemExpert = state.systemExpert
-
-        if (systemExpert.sessionPtr == null) {
+    private suspend fun runHistorySummaryMaintenance() {
+        val systemExpert = appState?.systemExpert
+        if (systemExpert?.sessionPtr == null) {
             Trace.log("MAINT: summary skip — system expert unavailable")
             return
         }
 
-        val chatsList = state.chatsList
+        val chatsList = appState?.chatsList ?: return
         for (item in chatsList.items.toList()) {
             val chat = item.chat
 
             for (node in chat.nodes.values) {
-                if (state.chatManager.currentlyGeneratingExpert != null) {
+                if (appState?.chatManager?.currentlyGeneratingExpert != null) {
                     Trace.log("Summary Generation break due to currently generating expert")
                     return
                 }
@@ -203,9 +209,9 @@ object Maintenance {
 
     // Generate summaries of chats in the chats/chat-summaries/folder
     // TODO restore private after testing
-    suspend fun runChatSummaryMaintenance(state: AppState) {
-        val systemExpert = state.systemExpert
-        if (systemExpert.sessionPtr == null) {
+    suspend fun runChatSummaryMaintenance() {
+        val systemExpert = appState?.systemExpert
+        if (systemExpert?.sessionPtr == null) {
             Trace.log("MAINT: chat summary skip — system expert unavailable")
             return
         }
@@ -216,8 +222,9 @@ object Maintenance {
             Files.createDirectories(summariesDir)
         }
 
-        for (item in state.chatsList.items.toList()) {
-            if (state.chatManager.currentlyGeneratingExpert != null) {
+        val items = appState?.chatsList?.items ?: return
+        for (item in items.toList()) {
+            if (appState?.chatManager?.currentlyGeneratingExpert != null) {
                 Trace.log("MAINT: chat summary break due to currently generating expert")
                 return
             }
@@ -267,10 +274,10 @@ object Maintenance {
 
     // Generate a model of the user from various chats/chat-summaries/*.json
     // TODO restore private after testing
-     suspend fun runUserModelMaintenance(state: AppState) {
-        val systemExpert = state.systemExpert
+     suspend fun runUserModelMaintenance() {
+        val systemExpert = appState?.systemExpert
 
-        if (systemExpert.sessionPtr == null) {
+        if (systemExpert?.sessionPtr == null) {
             Trace.log("MAINT: user model skip — system expert unavailable")
             return
         }
@@ -283,7 +290,7 @@ object Maintenance {
         }
 
         // We only pick up ONE chat summary file modified LATER than the last summary file already processed
-        val previousConduitUserModel = state.conduitUserModel
+        val previousConduitUserModel = appState?.conduitUserModel
         val lastSummaryModifiedTime = previousConduitUserModel?.lastSummaryModifiedTime ?: 0L
 
         // We need to capture both the summary itself, and its file modification time
@@ -315,9 +322,11 @@ object Maintenance {
             return
         }
 
-        // A new chat summary updated after the previously most recent summary used for
-        // generating the user model is now available
-        val userModel = UserModel.convertToExternalUserModel(previousConduitUserModel)
+        if (appState?.chatManager?.currentlyGeneratingExpert != null) {
+            Trace.log("User Model generation break due to currently generating expert")
+            return
+        }
+
         val userModelStr = MaintenanceUtils.generateUserModel(systemExpert, newSummary.chatSummary)
         if (userModelStr.isBlank()) {
             Trace.log("MAINT: user model generation returned blank")
@@ -328,7 +337,10 @@ object Maintenance {
             userModelStr,
             newSummary.modifiedTime
         )
-        state.conduitUserModel = updatedConduitUserModel
+
+        if (appState != null) {
+            appState!!.conduitUserModel = updatedConduitUserModel
+        }
 
         //Trace.log("MAINT: generated user model from ${newSummary.chatSummary.chatId}")
     }
