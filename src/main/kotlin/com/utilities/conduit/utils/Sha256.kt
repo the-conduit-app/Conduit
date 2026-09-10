@@ -3,6 +3,7 @@ package com.utilities.conduit.utils
 import java.io.File
 import java.security.MessageDigest
 
+// Used in checking if a file in Drag and Drop matches Gemma4 in our Approved List
 fun sha256(file: File): String {
     val digest = MessageDigest.getInstance("SHA-256")
 
@@ -16,6 +17,5 @@ fun sha256(file: File): String {
         }
     }
 
-    return digest.digest()
-        .joinToString("") { "%02x".format(it) }
+    return digest.digest().joinToString("") { "%02x".format(it) }
 }

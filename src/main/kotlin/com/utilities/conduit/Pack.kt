@@ -1,5 +1,7 @@
 package com.utilities.conduit
 
+import com.sun.beans.introspect.PropertyInfo
+import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.utils.AppUtils
 import kotlinx.coroutines.Dispatchers
@@ -23,22 +25,27 @@ data class Pack(
     }
 
     // Non-blocking - Launches bg inits for the various experts in the pack
-    fun initializeExperts(state: AppState) {
+    fun initializeExperts(appState: AppState) {
         experts.forEach { expert ->
-            val modelFilename = expert.model ?: return@forEach
-
             expert.setConduitUserModelGetter() {
-                state.conduitUserModel
+                appState.conduitUserModel
             }
 
             if (expert.type != ExpertType.LLM) return@forEach
 
+            val modelFilename = expert.model ?: return@forEach
+            val modelSha = appState.approvedModels.entries
+                .firstOrNull { it.value.name == modelFilename }
+                ?.key ?: return@forEach
+
             val absoluteModelPath = AppUtils.locateModelFile(modelFilename)
-            if (absoluteModelPath != null) {
-                state.scope.launch(Dispatchers.IO) {
-                    expert.sessionPtr = LlmPortal.initialize(state.conduitPtr, absoluteModelPath)
+                appState.scope.launch(Dispatchers.IO) {
+                    expert.sessionPtr = LlmPortal.initialize(
+                        conduitPtr =  appState.conduitPtr,
+                        modelSha = modelSha,
+                        absoluteModelPath = absoluteModelPath ?: ""
+                    )
                 }
-            }
         }
     }
 }

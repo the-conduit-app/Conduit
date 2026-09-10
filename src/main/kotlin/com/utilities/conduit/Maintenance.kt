@@ -16,6 +16,7 @@ import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.utils.MaintenanceUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -57,19 +58,20 @@ object Maintenance {
     private var appState: AppState? = null
 
     suspend fun start(state: AppState) {
-        appState = state
-
         delay(30_000.milliseconds) // Startup grace period
+        appState = state
 
         //Trace.log("Maint: STARTING")
         while (currentCoroutineContext().isActive) {
             delay(IDLE_TIMEOUT.milliseconds)
-            if (appState.chatManager.isGenerating
-                || System.currentTimeMillis() - appState.lastUserActivity < IDLE_TIMEOUT) {
+            val currentAppState = appState ?: continue
+
+            if (currentAppState.chatManager.isGenerating
+                || System.currentTimeMillis() - currentAppState.lastUserActivity < IDLE_TIMEOUT) {
                 continue
             }
 
-            maintenanceJob = appState.scope.launch(Dispatchers.Default) {
+            maintenanceJob = currentAppState.scope.launch(Dispatchers.Default) {
                 try {
                     runMaintenance()
                 } catch (e: CancellationException) {  // TODO - check unused

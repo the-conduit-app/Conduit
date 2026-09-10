@@ -2,6 +2,7 @@ package com.utilities.conduit
 
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
+import com.utilities.conduit.ui.AppJson
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.utils.sha256
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +28,8 @@ suspend fun initializeConduit(
 ): ConduitInitResult {
     if (systemModelPath == null)
         return ConduitInitResult.FAILED_MODEL_MISSING
-    Trace.log("system model path = $systemModelPath")
+
+    appState.approvedModels =  getApprovedModels()
 
     appState.conduitUserModel = UserModel.loadConduitUserModelFromFile()
     appState.chatsList.build()
@@ -40,10 +42,14 @@ suspend fun initializeConduit(
     val echoExpert = defaultPack.experts.find { it.model == InternalExperts.SIMPLE_ECHO }
     appState.currentExpert.value = echoExpert
 
-    // Pack experts are non-core experts - they will all init in the bg.
+    val conduitInitResult = initializeSystemExpert(appState, systemModelPath, onVerified)
+
+    // Pack experts are non-core experts - they will all init in the bg. But it needs
+    // to happen STRICTLY AFTER the system expert init to handle the case when it names
+    // the right file, but it's missing!
     defaultPack.initializeExperts(appState)
 
-    return initializeSystemExpert(appState, systemModelPath, onVerified)
+    return conduitInitResult
 }
 
 // The System Expert must additionally match the trusted Gemma SHA-256.
@@ -62,12 +68,33 @@ private suspend fun initializeSystemExpert(
         appState.systemExpert.sessionPtr = withContext(Dispatchers.IO) {
             LlmPortal.initialize(
                 appState.conduitPtr,
-                absoluteModelPath
+                absoluteModelPath,
+                GEMMA_SHA256
             )
         }
-        ConduitInitResult.OK
+
+        return if (appState.systemExpert.sessionPtr == null) {
+            ConduitInitResult.FAILED_MODEL_LOAD
+        } else {
+            ConduitInitResult.OK
+        }
     } catch (e: Exception) {
         Trace.log("System expert initialization failed: ${e.message}")
         ConduitInitResult.FAILED_MODEL_LOAD
+    }
+}
+
+private fun getApprovedModels(): Map<String, ApprovedModel> {
+    val file = File(AppUtils.getAppDir(), ".approved-models.json")
+
+    return if (file.isFile) {
+        try {
+            AppJson.decodeFromString<Map<String, ApprovedModel>>(file.readText())
+        } catch (e: Exception) {
+            Trace.log("Unable to load .approved-models.json: ${e.message}")
+            emptyMap()
+        }
+    } else {
+        emptyMap()
     }
 }

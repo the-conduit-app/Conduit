@@ -15,6 +15,7 @@ import androidx.compose.ui.draganddrop.dragData
 import androidx.compose.ui.graphics.Color
 import com.utilities.conduit.AppState
 import com.utilities.conduit.ConduitInitResult
+import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.initializeConduit
 import com.utilities.conduit.ui.Sounds
 import com.utilities.conduit.utils.AppUtils
@@ -92,7 +93,6 @@ fun SplashScreen(appState: AppState, onReady: () -> Unit) {
         }
     }
 
-    // Check every 5s if a system model file has become available in "common" locations
     // Check every 5s if a system model file has become available in "common" locations.
     LaunchedEffect(Unit) {
         while (true) {
@@ -104,10 +104,16 @@ fun SplashScreen(appState: AppState, onReady: () -> Unit) {
             val absoluteModelPath = AppUtils.locateModelFile(modelFile) ?: continue
 
             isInitializing.value = true
-            conduitInitResult.value = withContext(Dispatchers.IO) {
+            conduitInitResult.value = null
+            Trace.log("Poller start init: initializeConduit = ${conduitInitResult.value}")
+
+            val result = withContext(Dispatchers.IO) {
                 initializeConduit(appState, absoluteModelPath, onVerified = { isShaVerified = true })
             }
             isInitializing.value = false
+
+            Trace.log("Poller: initializeConduit returned $result")
+            conduitInitResult.value = result
         }
     }
 

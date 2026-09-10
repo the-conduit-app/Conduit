@@ -8,6 +8,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.sin
 
+/* Signatures may have changed
+
 // Stress test helper object.
 object CpuHammer {
     suspend fun run(durationMs: Long = 5_000) = withContext(Dispatchers.Default) {
@@ -69,3 +71,4 @@ object SessionHammer {
             Trace.log("SESSION HAMMER: DONE")
         }
 }
+*/

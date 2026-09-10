@@ -26,12 +26,8 @@ object LlmPortal {
 
     // ---------------------------------------------------------------------------------
     // Potentially time-consuming - Ensure it's called from an IO thread.
-    fun initialize(conduitPtr: Pointer, absoluteModelPath: String): Pointer {
-        if (!File(absoluteModelPath).exists()) {
-            throw IllegalArgumentException("Model file not found at: $absoluteModelPath")
-        }
-
-        val sessionPtr = conduitLib.conduit_create_session(conduitPtr, absoluteModelPath)
+    fun initialize(conduitPtr: Pointer, absoluteModelPath: String, modelSha: String): Pointer {
+        val sessionPtr = conduitLib.conduit_create_session(conduitPtr, absoluteModelPath, modelSha)
             ?: throw RuntimeException("Failed to load model: $absoluteModelPath")
 
         return sessionPtr

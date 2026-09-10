@@ -26,6 +26,9 @@ class AppState(
     val systemExpert: Expert,
     val chatManager: ChatManager
 ) {
+    // Only LLMs approved by Conduit can be loaded to reduce native crash poss
+    // Power users can edit APPDIR/.approved-models.json
+    var approvedModels: Map<String, ApprovedModel> = emptyMap()
     var chatsList by mutableStateOf(ChatsList())
     var availablePacks by mutableStateOf(emptyList<Pack>())
     val notification = Notification(scope)

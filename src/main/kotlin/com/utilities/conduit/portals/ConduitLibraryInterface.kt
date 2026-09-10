@@ -18,7 +18,7 @@ interface ConduitLib : Library {
     fun conduit_create(maxGenTokens: Long): Pointer?
     fun conduit_destroy(conduitPtr: Pointer?)
 
-    fun conduit_create_session(conduitPtr: Pointer?, absoluteModelPath: String): Pointer?
+    fun conduit_create_session(conduitPtr: Pointer?, absoluteModelPath: String, modelSha: String): Pointer?
     fun conduit_destroy_session(conduitPtr: Pointer?, sessionPtr: Pointer?)
     fun conduit_generate(sessionPtr: Pointer?, prompt: String, callback: ConduitTokenCallback, userData: Pointer?): Int
 
