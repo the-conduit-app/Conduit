@@ -58,6 +58,7 @@ object MaintenanceUtils {
             return newTitle.ifEmpty { oldTitle }
         }
     }
+
     private fun sanitizeChatTitle(rawTitle: String): String {
         return rawTitle
             .replace(Regex("<\\|im_(start|end)\\|?>\\s*$"), "")
@@ -153,30 +154,33 @@ object MaintenanceUtils {
     // Generate revised content for the user-model.json file using ONE
     // newly modified chat summary in APPDIR/chats/chat-summaries/*.json
     suspend fun generateUserModel(systemExpert: Expert, newChatSummary: ChatSummary): String {
-        if (systemExpert.sessionPtr == null) {
-            Trace.log("MAINT: user model skip — system expert unavailable")
-            return ""
-        }
+        ChatUtils.chatUtilsMutex.withLock {
 
-        val prompt = PROMPTS.USER_MODEL_GENERATION.replace("{NEW_CHAT_SUMMARY}", newChatSummary.summary)
-
-        val result = StringBuilder()
-        try {
-            systemExpert.getResponse(
-                chatThusFar = "THE CURRENT CHAT CONTEXT IS NOT NECESSARY FOR THIS TASK",
-                prompt = prompt,  // embedded new chat summary
-                includeUserModel = true
-            ).collect { token ->
-                currentCoroutineContext().ensureActive()
-                result.append(token)
+            if (systemExpert.sessionPtr == null) {
+                Trace.log("MAINT: user model skip — system expert unavailable")
+                return ""
             }
-        } catch (e: CancellationException) {
-            Trace.log("MAINT: USER MODEL GEN ABORTED")
-            throw e
-        }
-        val resultStr = result.toString().trim()
 
-        Trace.log("New user model = $resultStr")
-        return resultStr
+            val prompt = PROMPTS.USER_MODEL_GENERATION.replace("{NEW_CHAT_SUMMARY}", newChatSummary.summary)
+
+            val result = StringBuilder()
+            try {
+                systemExpert.getResponse(
+                    chatThusFar = "THE CURRENT CHAT CONTEXT IS NOT NECESSARY FOR THIS TASK",
+                    prompt = prompt,  // embedded new chat summary
+                    includeUserModel = true
+                ).collect { token ->
+                    currentCoroutineContext().ensureActive()
+                    result.append(token)
+                }
+            } catch (e: CancellationException) {
+                Trace.log("MAINT: USER MODEL GEN ABORTED")
+                throw e
+            }
+            val resultStr = result.toString().trim()
+
+            Trace.log("New user model = $resultStr")
+            return resultStr
+        }
     }
 }

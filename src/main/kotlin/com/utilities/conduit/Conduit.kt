@@ -43,6 +43,9 @@ suspend fun initializeConduit(
     appState.currentExpert.value = echoExpert
 
     val conduitInitResult = initializeSystemExpert(appState, systemModelPath, onVerified)
+    if (conduitInitResult != ConduitInitResult.OK) {
+        return conduitInitResult
+    }
 
     // Pack experts are non-core experts - they will all init in the bg. But it needs
     // to happen STRICTLY AFTER the system expert init to handle the case when it names

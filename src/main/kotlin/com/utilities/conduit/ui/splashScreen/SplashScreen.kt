@@ -59,7 +59,10 @@ fun SplashScreen(appState: AppState, onReady: () -> Unit) {
                     conduitInitResult.value = withContext(Dispatchers.IO) {
                         initializeConduit(appState, file.absolutePath, onVerified = { isShaVerified = true })
                     }
-                    isInitializing.value = false
+                    if (conduitInitResult.value != ConduitInitResult.OK) {
+                        isInitializing.value = false
+                        // TODO - need to leave the D&D context and return to spinning splash
+                    }
                 }
                 return true
             }

@@ -127,6 +127,7 @@ class ChatsList(
 
     // Syncs changes to disk, but NOT FROM DISK. Relaunch instead.
     suspend fun rename(item: ChatsListItem, newTitle: String, needsHumanReview: Boolean = false): Chat? {
+        if (newTitle == item.chat.title) return item.chat
         chatsListMutex.withLock {
             val index = withContext(Dispatchers.Main) {
                 items.indexOfFirst { it.chat.id == item.chat.id }

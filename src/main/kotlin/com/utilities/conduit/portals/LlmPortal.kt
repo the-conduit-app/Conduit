@@ -40,7 +40,7 @@ object LlmPortal {
             override fun invoke(text: String?, userData: Pointer?) {
                 val result = trySendBlocking(text ?: "")
                 if (result.isFailure) {
-                    Trace.log("LLM CALLBACK: trySend FAILED text=[$text]")
+                    Trace.log("LLM CALLBACK: trySendBlocking FAILED text=[$text]")
                 }
             }
         }

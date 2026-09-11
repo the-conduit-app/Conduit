@@ -1,5 +1,8 @@
 package com.utilities.conduit.ui
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,11 +11,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,12 +33,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.sp
+import com.utilities.conduit.debug.Trace
+import com.utilities.conduit.utils.MaintenanceUtils
+import conduit.generated.resources.Res
+import conduit.generated.resources.plasma_s1
+import conduit.generated.resources.plasma_s64
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.painterResource
+import kotlin.coroutines.cancellation.CancellationException
 
 @Composable
 fun ChatRenameDialog(
@@ -43,6 +60,7 @@ fun ChatRenameDialog(
 ) {
     val scope = rememberCoroutineScope()
     var isSuggesting by remember { mutableStateOf(false) }
+    var suggestJob by remember { mutableStateOf<Job?>(null) } // So Cancel can cancel
 
     var chatTitle by remember(initialTitle) {
         mutableStateOf(initialTitle)
@@ -68,101 +86,167 @@ fun ChatRenameDialog(
             shadowElevation = 8.dp,
             modifier = Modifier.width(420.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
-                Text(
-                    text = "Rename Chat",
-                    style = MaterialTheme.typography.titleLarge
+            Box {
+                Image(
+                    painter = painterResource(Res.drawable.plasma_s1),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.matchParentSize()
                 )
 
-                Spacer(Modifier.height(20.dp))
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    // title
+                    Text(
+                        text = "Rename Chat",
+                        color = Color.White.copy(alpha = 0.75f),
+                        style = MaterialTheme.typography.titleLarge
+                    )
 
-                OutlinedTextField(
-                    enabled = !isSuggesting,
-                    value = chatTitle,
-                    onValueChange = { chatTitle = it },
-                    singleLine = true,
-                    trailingIcon = {
-                        if (isSuggesting) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                strokeWidth = 2.dp
+                    Spacer(Modifier.height(20.dp))
+
+                    // text input box under the title
+                    OutlinedTextField(
+                        enabled = !isSuggesting,
+                        value = chatTitle,
+                        onValueChange = { chatTitle = it },
+                        singleLine = true,
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = 14.sp,
+                            color = Color.White.copy(alpha = 0.8f)
+                        ),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF007C91).copy(alpha = 0.4f),
+                            unfocusedBorderColor = Color(0xFF007C91).copy(alpha = 0.2f)
+                        ),
+                        trailingIcon = {
+                            if (isSuggesting) {
+                                ConduitProgressIndicator(
+                                    images = listOf(
+                                        painterResource(Res.drawable.plasma_s64),
+                                        painterResource(Res.drawable.plasma_s1)
+                                    ),
+                                    modifier = Modifier.size(30.dp)
+                                )
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester)
+                            .onPreviewKeyEvent { event ->
+                                if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
+                                when (event.key) {
+                                    Key.Enter -> {
+                                        val title = chatTitle.trim()
+                                        if (title.isNotEmpty()) {
+                                            onOk(title)
+                                            true
+                                        } else
+                                            false
+                                    }
+
+                                    Key.Escape -> {
+                                        onCancel()
+                                        true
+                                    }
+
+                                    else -> false
+                                }
+                            }
+                    )
+
+                    Spacer(Modifier.height(24.dp))
+
+                    // bot row: cancel, suggest, ok
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Cancel button
+                        TextButton(
+                            onClick = {
+                                if (suggestJob?.isActive == true) {
+                                    Sounds.Braking.play()
+                                    Trace.log("Cancelling generation job $suggestJob")
+                                    suggestJob?.cancel()
+                                    suggestJob = null
+                                }
+                                onCancel()
+                            },
+                            colors = ButtonDefaults.textButtonColors(
+                                containerColor = Color.White.copy(alpha = 0.10f),
+                                contentColor = Color.White.copy(alpha = 0.9f)
+                            )
+                        ) {
+                            Text(
+                                text = "Cancel",
+                                style = ConduitTheme.Typography.labelLarge
                             )
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester)
-                        .onPreviewKeyEvent { event ->
-                            if (event.type != KeyEventType.KeyDown) return@onPreviewKeyEvent false
-                            when (event.key) {
-                                Key.Enter -> {
-                                    val title = chatTitle.trim()
-                                    if (title.isNotEmpty()) {
-                                        onOk(title)
-                                        true
-                                    } else
-                                        false
-                                }
-                                Key.Escape -> {
-                                    onCancel()
-                                    true
-                                }
-                                else -> false
-                            }
-                        }
-                )
 
-                Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.weight(1f))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextButton(
-                        onClick = onCancel
-                    ) {
-                        Text("Cancel")
-                    }
+                        // Suggest a title button
+                        OutlinedButton(
+                            enabled = !isSuggesting,
+                            onClick = {
+                                Sounds.Whoosh.play()
+                                isSuggesting = true
 
-                    Spacer(Modifier.weight(1f))
-
-                    OutlinedButton(
-                        enabled = !isSuggesting,
-                        onClick = {
-                            isSuggesting = true
-                            scope.launch(Dispatchers.IO) {
-                                try {
-                                    val title = onSuggest()
-                                    withContext(Dispatchers.Main) {
-                                        chatTitle = title
-                                    }
-                                } finally {
-                                    withContext(Dispatchers.Main) {
-                                        isSuggesting = false
+                                suggestJob = scope.launch(Dispatchers.IO) {
+                                    try {
+                                        val title = onSuggest() // is MaintenanceUtils.generateChatTitle
+                                        Sounds.Ting.play()
+                                        withContext(Dispatchers.Main) {
+                                            chatTitle = title
+                                        }
+                                    } catch (e: CancellationException) {
+                                        throw e
+                                    } finally {
+                                        withContext(Dispatchers.Main) {
+                                            isSuggesting = false
+                                        }
                                     }
                                 }
-                            }
+                            },
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color.White
+                            ),
+                            border = BorderStroke(
+                                1.dp,
+                                Color.White.copy(alpha = 0.65f)
+                            )
+                        ) {
+                            Text(if (isSuggesting) "Reviewing Chat" else "Suggest a Title")
                         }
-                    ) {
-                        Text(if (isSuggesting) "Reviewing Chat" else "Suggest a Title")
-                    }
-                    Spacer(Modifier.width(12.dp))
+                        Spacer(Modifier.width(12.dp))
 
-                    Button(
-                        enabled = !isSuggesting,
-                        onClick = {
-                            val title = chatTitle.trim()
-                            if (title.isNotEmpty()) {
-                                onOk(title)
+                        Button(
+                            enabled = !isSuggesting,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.White.copy(alpha = 0.5f) // Color(0xFF007C91).copy(alpha = 0.75f),
+                            ),
+                            onClick = {
+                                val title = chatTitle.trim()
+                                if (title.isNotEmpty()) {
+                                    onOk(title)
+                                }
                             }
+                        ) {
+                            Text("OK")
                         }
-                    ) {
-                        Text("OK")
                     }
                 }
             }
         }
     }
 }
+
+/*
+// ...
+
+
+
+// ...
+ */

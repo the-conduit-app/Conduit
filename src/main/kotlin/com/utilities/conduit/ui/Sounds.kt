@@ -120,6 +120,16 @@ object Sounds {
         fun play() { if (!isSilent) sound.play() }
     }
 
+    object SuddenStop {
+        private val sound by lazy { createSound("sudden_stop.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+
+    object Braking {
+        private val sound by lazy { createSound("braking.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+
     // When initializing the system expert
     object Crunch {
         private val sound by lazy { createSound("crunch.wav") }

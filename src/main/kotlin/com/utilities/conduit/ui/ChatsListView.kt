@@ -192,10 +192,13 @@ fun ChatsListView(state: AppState, filterText: String) {
         showRenameDialog?.let { item ->
             ChatRenameDialog(
                 initialTitle = item.chat.title,
-                onCancel = { showRenameDialog = null },
+                onCancel = {
+                    showRenameDialog = null
+                    state.systemExpert.abortResponse()
+                },
                 onSuggest = {
-                        MaintenanceUtils.generateChatTitle(state.systemExpert, item.chat)
-                    },
+                    MaintenanceUtils.generateChatTitle(state.systemExpert, item.chat)
+                },
                 onOk = { newTitle ->
                     scope.launch {
                         val updatedChat = state.chatsList.rename(item, newTitle)

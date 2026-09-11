@@ -20,7 +20,8 @@ enum class ExpertType { INTERNAL, LLM, REMOTE }
 @Serializable
 class Expert(
     @Transient
-    val id: String = UUID.randomUUID().toString(),
+    // ephemeral id
+    val id: String = "E-${UUID.randomUUID().toString()}",
 
     val type: ExpertType,
     val nickname: String,
