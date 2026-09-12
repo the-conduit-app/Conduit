@@ -1,12 +1,12 @@
 package com.utilities.conduit.utils
 
+import com.utilities.conduit.AppJson
 import com.utilities.conduit.Expert
 import com.utilities.conduit.ExpertType
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.chat.ChatsListItem
 import com.utilities.conduit.chat.Node
-import com.utilities.conduit.ui.AppJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

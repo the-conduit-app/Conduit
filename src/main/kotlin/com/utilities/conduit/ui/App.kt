@@ -18,9 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.painterResource
 
-// App level global constants
 val LocalActions = staticCompositionLocalOf<AppActions> { error("No AppActions provided") }
-val AppJson = Json { prettyPrint = true; allowComments = true; ignoreUnknownKeys = true }
 
 @Composable
 fun App(appState: AppState) {

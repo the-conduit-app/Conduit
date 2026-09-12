@@ -34,8 +34,8 @@ data class Pack(
                 appState.conduitUserModel
             }
 
-            // Internal system experts (and maybe remote) are always ready
-            if (expert.type != ExpertType.LLM) {
+            // Internal system experts are always ready
+            if (expert.type == ExpertType.INTERNAL) {
                 expert.status = ExpertStatus.READY
                 return@forEach
             }

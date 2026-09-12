@@ -11,7 +11,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import com.utilities.conduit.chat.ChatSummary
 import com.utilities.conduit.utils.ChatUtils
 import com.utilities.conduit.debug.Trace
-import com.utilities.conduit.ui.AppJson
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.utils.MaintenanceUtils
 import kotlinx.coroutines.Dispatchers

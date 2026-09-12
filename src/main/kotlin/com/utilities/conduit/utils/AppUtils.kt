@@ -1,11 +1,11 @@
 package com.utilities.conduit.utils
 
+import com.utilities.conduit.AppJson
 import com.utilities.conduit.ConduitUserModel
 import com.utilities.conduit.Pack
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.ChatMessage
 import com.utilities.conduit.debug.Trace
-import com.utilities.conduit.ui.AppJson
 import com.utilities.conduit.utils.AppUtils.getAppDir
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

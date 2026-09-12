@@ -1,16 +1,24 @@
 package com.utilities.conduit.portals
 
+import com.utilities.conduit.AppJson
 import com.utilities.conduit.ConduitUserModel
 import com.utilities.conduit.Expert
 import com.utilities.conduit.UserModel
+import com.utilities.conduit.trails.ConduitTrails
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 
 object ConduitPortal {
     private var cancelRequested = false
+    private val conduitTrails = ConduitTrails()
+
+    fun initializeTrails() {
+        conduitTrails.initialize()
+    }
 
     internal fun getResponse(expert: Expert, prompt: String): Flow<String> {
         cancelRequested = false
@@ -45,9 +53,19 @@ object ConduitPortal {
                 getFriendlyConduitUserModel(conduitUserModel)
             }
 
-            else ->
-                "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer\n" +
-                        "the following question: 'What do you know about me?'"
+            prompt.equals("What do you really really know about me?", ignoreCase = true) -> {
+                AppJson.encodeToString(conduitUserModel)
+            }
+
+            prompt.equals("Thanks", ignoreCase = true) -> {
+                "You're welcome."
+            }
+
+            else -> {
+                conduitTrails.advance(prompt)
+                    ?: ("Hello, I am Condy, the Conduit. I'm not really an expert and " +
+                        "I can only answer the following question: 'What do you know about me?'")
+            }
         }
     }
 

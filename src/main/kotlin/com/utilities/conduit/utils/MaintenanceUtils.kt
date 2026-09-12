@@ -6,7 +6,6 @@ import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.chat.ChatSummary
 import com.utilities.conduit.chat.Node
 import com.utilities.conduit.debug.Trace
-import com.utilities.conduit.ui.AppJson
 import jdk.internal.org.jline.reader.LineReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext

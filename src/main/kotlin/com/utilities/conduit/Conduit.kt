@@ -2,8 +2,9 @@ package com.utilities.conduit
 
 import com.sun.beans.introspect.PropertyInfo
 import com.utilities.conduit.debug.Trace
+import com.utilities.conduit.portals.ConduitPortal
 import com.utilities.conduit.portals.LlmPortal
-import com.utilities.conduit.ui.AppJson
+import com.utilities.conduit.ui.App
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.utils.sha256
 import kotlinx.coroutines.Dispatchers
@@ -42,6 +43,9 @@ suspend fun initializeConduit(
 
     val echoExpert = defaultPack.experts.find { it.model == InternalExperts.SIMPLE_ECHO }
     appState.currentExpert.value = echoExpert
+
+    // ConduitExpert's hidden trails in Questopia
+    ConduitPortal.initializeTrails()
 
     val conduitInitResult = initializeSystemExpert(appState, systemModelPath, onVerified)
     if (conduitInitResult != ConduitInitResult.OK) {
