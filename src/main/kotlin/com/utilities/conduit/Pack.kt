@@ -4,10 +4,13 @@ import com.sun.beans.introspect.PropertyInfo
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.utils.AppUtils
+import com.utilities.conduit.utils.sha256
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import java.io.File
+import kotlin.math.abs
 
 @Serializable
 data class Pack(
@@ -31,21 +34,51 @@ data class Pack(
                 appState.conduitUserModel
             }
 
-            if (expert.type != ExpertType.LLM) return@forEach
+            // Internal system experts (and maybe remote) are always ready
+            if (expert.type != ExpertType.LLM) {
+                expert.status = ExpertStatus.READY
+                return@forEach
+            }
 
-            val modelFilename = expert.model ?: return@forEach
-            val modelSha = appState.approvedModels.entries
-                .firstOrNull { it.value.name == modelFilename }
-                ?.key ?: return@forEach
+            val modelFilename = expert.model
+            if (modelFilename == null) {
+                expert.status = ExpertStatus.FAILED
+                return@forEach
+            }
 
-            val absoluteModelPath = AppUtils.locateModelFile(modelFilename)
-                appState.scope.launch(Dispatchers.IO) {
-                    expert.sessionPtr = LlmPortal.initialize(
-                        conduitPtr =  appState.conduitPtr,
-                        modelSha = modelSha,
-                        absoluteModelPath = absoluteModelPath ?: ""
-                    )
+            val modelSha = appState.approvedModels.entries.firstOrNull { it.value.name == modelFilename }?.key
+            if (modelSha == null) {
+                expert.status = ExpertStatus.FAILED
+                return@forEach
+            }
+
+            // The way model loading works is as follows:
+            // the native module (libConduit) keeps a map of already loaded models keyed by their SHA
+            // LlmPortal.initialize sends both the modelSha and an absoluteModelPath to the native side
+            // to init. If it is already cached by SHA, then the given absoluteModelPath is IGNORED and
+            // it could essentially be "". If it is not already loaded in the native cache, that is the
+            // only case when it falls back to loading the raw file (when the absModelPath is actually used)
+
+            val absoluteModelPath = AppUtils.locateModelFile(modelFilename) // returns null if not found
+
+            appState.scope.launch(Dispatchers.IO) {
+                // If path is given, it MUST match the SHA
+                if (absoluteModelPath != null) {
+                    val actualSha = sha256(File(absoluteModelPath))
+                    if (modelSha != actualSha) {
+                        expert.status = ExpertStatus.FAILED
+                        return@launch
+                    }
                 }
+
+                expert.status = ExpertStatus.LOADING
+                expert.sessionPtr = LlmPortal.initialize(
+                    conduitPtr =  appState.conduitPtr,
+                    modelSha = modelSha,
+                    absoluteModelPath = absoluteModelPath ?: ""
+                )
+                expert.status = if (expert.sessionPtr == null) ExpertStatus.FAILED else ExpertStatus.READY
+            }
         }
     }
 }

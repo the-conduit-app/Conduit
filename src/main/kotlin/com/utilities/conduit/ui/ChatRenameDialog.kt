@@ -73,9 +73,7 @@ fun ChatRenameDialog(
 
     Dialog(
         onDismissRequest = {
-            if (isSuggesting) {
-                // Ignore outside clicks while busy.
-            } else {
+            if (!isSuggesting) { // Ignore outside clicks while busy.
                 onCancel()
             }
         }
@@ -100,7 +98,7 @@ fun ChatRenameDialog(
                     // title
                     Text(
                         text = "Rename Chat",
-                        color = Color.White.copy(alpha = 0.75f),
+                        color = Color.Black.copy(alpha = 0.75f),
                         style = MaterialTheme.typography.titleLarge
                     )
 
@@ -114,11 +112,15 @@ fun ChatRenameDialog(
                         singleLine = true,
                         textStyle = LocalTextStyle.current.copy(
                             fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            color = Color.Black
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = Color(0xFF007C91).copy(alpha = 0.4f),
-                            unfocusedBorderColor = Color(0xFF007C91).copy(alpha = 0.2f)
+                            unfocusedBorderColor = Color(0xFF007C91).copy(alpha = 0.2f),
+                            focusedContainerColor = Color.White.copy(alpha = 0.25f),
+                            unfocusedContainerColor = Color.White.copy(alpha = 0.1f),
+                            focusedTextColor = Color.Black,
+                            unfocusedTextColor = Color.Black.copy(alpha = 0.5f)
                         ),
                         trailingIcon = {
                             if (isSuggesting) {
@@ -175,8 +177,8 @@ fun ChatRenameDialog(
                                 onCancel()
                             },
                             colors = ButtonDefaults.textButtonColors(
-                                containerColor = Color.White.copy(alpha = 0.10f),
-                                contentColor = Color.White.copy(alpha = 0.9f)
+                                containerColor = Color.White.copy(alpha = 0.25f),
+                                contentColor = Color.Black.copy(alpha = 0.75f)
                             )
                         ) {
                             Text(
@@ -211,7 +213,8 @@ fun ChatRenameDialog(
                                 }
                             },
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = Color.White
+                                containerColor = Color.White.copy(alpha = 0.25f),
+                                contentColor = Color.Black.copy(alpha = 0.75f)
                             ),
                             border = BorderStroke(
                                 1.dp,
@@ -222,10 +225,12 @@ fun ChatRenameDialog(
                         }
                         Spacer(Modifier.width(12.dp))
 
+                        // OK button
                         Button(
                             enabled = !isSuggesting,
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.White.copy(alpha = 0.5f) // Color(0xFF007C91).copy(alpha = 0.75f),
+                                containerColor = Color.White.copy(alpha = 0.25f),
+                                contentColor = Color.Black.copy(alpha = 0.75f)
                             ),
                             onClick = {
                                 val title = chatTitle.trim()

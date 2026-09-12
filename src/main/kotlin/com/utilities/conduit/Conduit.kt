@@ -1,5 +1,6 @@
 package com.utilities.conduit
 
+import com.sun.beans.introspect.PropertyInfo
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.ui.AppJson
@@ -68,6 +69,7 @@ private suspend fun initializeSystemExpert(
         }
         onVerfified()
 
+        appState.systemExpert.status = ExpertStatus.LOADING
         appState.systemExpert.sessionPtr = withContext(Dispatchers.IO) {
             LlmPortal.initialize(
                 appState.conduitPtr,
@@ -75,6 +77,8 @@ private suspend fun initializeSystemExpert(
                 GEMMA_SHA256
             )
         }
+        appState.systemExpert.status =
+            if (appState.systemExpert.sessionPtr == null) ExpertStatus.FAILED else ExpertStatus.READY
 
         return if (appState.systemExpert.sessionPtr == null) {
             ConduitInitResult.FAILED_MODEL_LOAD

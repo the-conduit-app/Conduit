@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +34,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
 import com.utilities.conduit.Expert
+import com.utilities.conduit.ExpertStatus
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s1
 import conduit.generated.resources.plasma_s64
@@ -132,21 +134,37 @@ fun ExpertIcon(
                 )
             }
 
-            if (expert.isReady) {
-                Icon(
-                    imageVector = Icons.Filled.Person,
-                    contentDescription = null,
-                    tint = iconColor,
-                    modifier = Modifier.size(iconBoxSize * if (isCurrent) 0.85f else 0.69f)
-                )
-            } else {
-                ConduitProgressIndicator(
-                    images = listOf(
-                        painterResource(Res.drawable.plasma_s64),
-                        painterResource(Res.drawable.plasma_s1)
-                    ),
-                    modifier = Modifier.size(28.dp),
-                )
+            // The Person Icon
+            when (expert.status) {
+                ExpertStatus.READY -> {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = null,
+                        tint = expertColor,
+                        modifier = Modifier.size(
+                            iconBoxSize * if (isCurrent) 0.85f else 0.69f
+                        )
+                    )
+                }
+                ExpertStatus.LOADING -> {
+                    ConduitProgressIndicator(
+                        images = listOf(
+                            painterResource(Res.drawable.plasma_s64),
+                            painterResource(Res.drawable.plasma_s1)
+                        ),
+                        modifier = Modifier.size(28.dp),
+                    )
+                }
+                ExpertStatus.FAILED -> {
+                    Icon(
+                        imageVector = Icons.Filled.PersonOff,
+                        contentDescription = null,
+                        tint = Color.Black.copy(alpha = 0.15f),
+                        modifier = Modifier.size(
+                            iconBoxSize * if (isCurrent) 0.85f else 0.69f
+                        )
+                    )
+                }
             }
         }
 

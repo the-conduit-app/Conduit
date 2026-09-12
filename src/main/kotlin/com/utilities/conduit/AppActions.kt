@@ -11,6 +11,7 @@ import com.utilities.conduit.chat.MessageAuthor
 import com.utilities.conduit.chat.MessageStatus
 import com.utilities.conduit.chat.Node
 import com.utilities.conduit.chat.NodeType
+import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.ui.Sounds
 import com.utilities.conduit.utils.AppUtils
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.coroutines.cancellation.CancellationException
 
-class AppActions(private val state: AppState) {
+class AppActions(private val appState: AppState) {
     // For showing full large message content in an overlay panel separately
     var fullMessageText by mutableStateOf<String?>(null)
         private set
@@ -38,37 +39,39 @@ class AppActions(private val state: AppState) {
         private set
     fun scrollChatToNode(nodeId: String) { scrollChatToNodeRequest = nodeId }
 
+    // TODO: The foll two belong elsewhere, but they need access to appState
     fun switchExpert(newExpert: Expert?) {
-        if (state.currentExpert.value == newExpert) return
-        state.currentExpert.value = newExpert
+        if (appState.currentExpert.value == newExpert) return
+        appState.currentExpert.value = newExpert
 
        val msg = if (newExpert == null) {
                 "No expert is selected currently."
             } else {
                 "Current expert is now ${newExpert.nickname}."
             }
-        state.notification.trigger(msg)
+        appState.notification.trigger(msg)
     }
 
     // This is given just the name of the pack (from the JSON file name).
     fun switchPack(newPack: Pack) {
-        if (state.currentPack.value == newPack)
+        if (appState.currentPack.value == newPack)
             return
-        state.expertsMap.clear()
-        state.currentPack.value = newPack
-        state.currentExpert.value = null
+        appState.expertsMap.clear()
+        appState.currentPack.value = newPack
+        appState.currentExpert.value = null
 
         newPack.experts.forEach { expert ->
-            state.expertsMap[expert.id] = expert
+            appState.expertsMap[expert.id] = expert
         }
 
-        state.scope.launch(Dispatchers.IO) {
+        appState.scope.launch(Dispatchers.IO) {
             try {
-                newPack.initializeExperts(state)
+                Trace.log("Initing experts in ${newPack.name}")
+                newPack.initializeExperts(appState)
                 // state.notification.trigger("The current pack is now ${newPack.name}. Please select an expert.")
             }
             catch (e: Exception) {
-                state.notification.trigger("Error switching pack: ${e.message}")
+                appState.notification.trigger("Error switching pack: ${e.message}")
             }
         }
     }
@@ -78,21 +81,21 @@ class AppActions(private val state: AppState) {
     fun onSend(currentPrompt: String) {
         Maintenance.cancel() // Free up the cpu (may be exec native code)
 
-        val needsChatListInsertion = state.chatManager.currentChat.nodes.isEmpty()
-        val currentChat = state.chatManager.currentChat
+        val needsChatListInsertion = appState.chatManager.currentChat.nodes.isEmpty()
+        val currentChat = appState.chatManager.currentChat
 
         // First, find out if the user specifically mentioned (Hi, Hey) a particular expert in the prompt.
-        val expert = findTaggedExpert(currentPrompt, state.expertsMap.values.toList())
-            ?: state.currentExpert.value
+        val expert = findTaggedExpert(currentPrompt, appState.expertsMap.values.toList())
+            ?: appState.currentExpert.value
 
         // TODO - review currentGenerationJob - necessary?
-        state.chatManager.currentGenerationJob = state.scope.launch(Dispatchers.IO) {
+        appState.chatManager.currentGenerationJob = appState.scope.launch(Dispatchers.IO) {
             if (expert == null) {
-                state.notification.trigger("Please select or tag an expert to whom your prompt should be sent.")
+                appState.notification.trigger("Please select or address an expert to whom your prompt should be sent.", 2000L)
                 return@launch
             }
             if (!expert.isReady) {
-                state.notification.trigger("${expert.nickname} is still loading")
+                appState.notification.trigger("${expert.nickname} is still loading")
                 return@launch
             }
 
@@ -116,29 +119,29 @@ class AppActions(private val state: AppState) {
                     author = MessageAuthor(
                         type = if (expert.type == ExpertType.INTERNAL) { AuthorType.SYSTEM } else { AuthorType.ASSISTANT },
                         expertId = expert.id,
-                        packId = state.currentPack.value?.id
+                        packId = appState.currentPack.value?.id
                     ),
-                    title = makeResponseTitle(expert, state.currentPack.value, userNode.createdAt),
+                    title = makeResponseTitle(expert, appState.currentPack.value, userNode.createdAt),
                     text = "" // Placeholder for chunked results to come from conduit
                 )
             )
 
             //Trace.log("BEFORE user add: cursor=${state.chatManager.currentChat.cursorNodeId}")
-            val chatListItem: ChatsListItem = state.chatManager.addNode(userNode)
+            val chatListItem: ChatsListItem = appState.chatManager.addNode(userNode)
             //Trace.log("AFTER user add: cursor=${state.chatManager.currentChat.cursorNodeId}")
 
             if (needsChatListInsertion) { // first node in chat
                 withContext(Dispatchers.Main) {
-                    state.chatsList.add(chatListItem)
+                    appState.chatsList.add(chatListItem)
                 }
             }
 
             //Trace.log("BEFORE response add: cursor=${state.chatManager.currentChat.cursorNodeId}")
-            val item = state.chatManager.addNode(responseNode)
+            val item = appState.chatManager.addNode(responseNode)
             //Trace.log("AFTER response add: cursor=${state.chatManager.currentChat.cursorNodeId}")
 
             withContext(Dispatchers.Main) {
-                state.chatsList.touch(item)
+                appState.chatsList.touch(item)
                 responseNode.message?.textInProgress?.value = ""
             }
 
@@ -160,7 +163,7 @@ class AppActions(private val state: AppState) {
             // Note: Aug 7. beginResponse and finishResponse were put in to be able to
             // stop a response request while the decode hasn't yet started (i.e. spinner,
             // not streaming)
-            state.chatManager.onBeginCurrentResponse(expert)
+            appState.chatManager.onBeginCurrentResponse(expert)
 
             val startTime = System.currentTimeMillis()
             expert.getResponse(chatThusFar, currentPrompt, includeUserModel = true)
@@ -189,9 +192,9 @@ class AppActions(private val state: AppState) {
                     ChatUtils.saveChatToDisk(currentChat)
 
                     if (status == MessageStatus.INTERRUPTED) {
-                        state.notification.trigger("Response interrupted by user.")
+                        appState.notification.trigger("Response interrupted by user.")
                     }
-                    state.chatManager.onFinishCurrentResponse()
+                    appState.chatManager.onFinishCurrentResponse()
                     Sounds.Ting.play()
                 }
                 .collect { chunk ->

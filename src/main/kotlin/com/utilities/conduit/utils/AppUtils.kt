@@ -40,17 +40,6 @@ object AppUtils {
 
     fun getChatsDir(): String { return "${getAppDir()}/chats" }
 
-    // full pathline to the .gguf file
-//    fun getAbsoluteModelPath(modelPath: String): String {
-//        return if (Paths.get(modelPath).isAbsolute)
-//            modelPath
-//        else
-//            Paths.get(getAppDir(), modelPath).toString()
-//    }
-
-    //    return candidates.firstOrNull { file -> file.isFile && sha256(file) == GEMMA_SHA256 }
-//        ?.absolutePath
-
     // Returns the absolute path of the model file when given its filename,
     // searching a bunch of likely places
     fun locateModelFile(filename: String): String? {

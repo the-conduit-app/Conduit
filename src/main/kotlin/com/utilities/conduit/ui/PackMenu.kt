@@ -33,6 +33,7 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
@@ -69,14 +70,19 @@ fun PackMenu(state: AppState) {
                     contentDescription = null,
                     modifier = Modifier.matchParentSize(),
                     contentScale = ContentScale.Crop,
-                    alpha = 0.75f
+                    alpha = 0.5f
                 )
 
                 Row(
                     modifier = Modifier.padding(12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Pack: ${currentPack?.name ?: "Select"}")
+                    Text(
+                        text = "Pack: ${currentPack?.name ?: "Select"}",
+                        color = Color(0xFF006477),
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = ConduitIcons.ArrowDropDown,
@@ -138,7 +144,7 @@ fun PackMenu(state: AppState) {
                                         showPacksMenu = false
                                     },
                                     onFrontItemChanged = { item ->
-                                        ////Sounds.SwishSwash.play() // TODO
+                                        Sounds.SwishSwash.play()
                                         appActions.switchPack(item.content)
                                     },
                                     itemRenderer = ::renderPackInfo

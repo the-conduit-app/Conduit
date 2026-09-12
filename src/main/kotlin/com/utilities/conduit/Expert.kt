@@ -16,6 +16,7 @@ import kotlinx.serialization.Transient
 import java.util.*
 
 enum class ExpertType { INTERNAL, LLM, REMOTE }
+enum class ExpertStatus { LOADING, READY, FAILED }
 
 @Serializable
 class Expert(
@@ -35,6 +36,9 @@ class Expert(
     val seedPrompt: String
         get() = "You are: ${description ?: "a general expert"}"
 
+    // status is ONLY used for differentially rendering the ExpertIcon
+    // For all other uses, isReady is the state to check.
+    var status: ExpertStatus by mutableStateOf(ExpertStatus.LOADING)
     val isReady: Boolean
         get() = when (type) {
             ExpertType.LLM -> sessionPtr != null
