@@ -1,4 +1,4 @@
-package com.utilities.conduit
+package com.utilities.conduit.maintenance
 
 // Various Low priority maintenance jobs
 // 1. runTitleMaintenance: Periodically scan all chats and rename potential candidates automatically
@@ -8,14 +8,15 @@ package com.utilities.conduit
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
+import com.utilities.conduit.AppJson
+import com.utilities.conduit.AppState
+import com.utilities.conduit.UserModel
 import com.utilities.conduit.chat.ChatSummary
 import com.utilities.conduit.utils.ChatUtils
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.utils.AppUtils
-import com.utilities.conduit.utils.MaintenanceUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.NonCancellable.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -101,7 +102,7 @@ object Maintenance {
         val job = maintenanceJob ?: return
 
         //Trace.log("MAINT: STOPPING")
-        Maintenance.cancel()
+        cancel()
         job.cancel()
         job.join()
         //Trace.log("MAINT: STOPPED")
@@ -114,6 +115,7 @@ object Maintenance {
             return
         }
 
+        Trace.log("Starting Maintenance")
         currentCoroutineContext().ensureActive()
         runTitleMaintenance()
 
@@ -230,6 +232,7 @@ object Maintenance {
                 return
             }
 
+            //Trace.log("Summarizing chat ${item.chat.title}")
             val chat = item.chat
             val summaryFile = summariesDir.resolve("${chat.id}.json")
 
@@ -245,8 +248,10 @@ object Maintenance {
 
             val needsSummary = previousSummary == null || previousSummary.chatId != chat.id ||
                         previousSummary.chatModifiedTime < item.modificationTime
-            if (!needsSummary)
+            if (!needsSummary) {
+                //Trace.log("skipping - doesn't need summary")
                 continue
+            }
 
             //Trace.log("MAINT: generating chat summary for ${chat.title}")
 
@@ -268,7 +273,7 @@ object Maintenance {
                 )
             }
 
-            Trace.log("MAINT: generated and saved chat summary for ${chat.title}")
+            //Trace.log("MAINT: generated and saved chat summary for ${chat.title}")
             return
         }
     }

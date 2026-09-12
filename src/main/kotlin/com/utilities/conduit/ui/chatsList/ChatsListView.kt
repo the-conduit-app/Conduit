@@ -1,4 +1,4 @@
-package com.utilities.conduit.ui
+package com.utilities.conduit.ui.chatsList
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
@@ -26,8 +26,13 @@ import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.chat.ChatsListItem
+import com.utilities.conduit.ui.chatView.ConduitContextMenuRepresentation
+import com.utilities.conduit.ui.LeftPanelMode
+import com.utilities.conduit.ui.LocalLeftViewOpacity
+import com.utilities.conduit.ui.LocalRightViewOpacity
+import com.utilities.conduit.ui.Sounds
 import com.utilities.conduit.utils.ChatUtils.hasStringInChatPrefix
-import com.utilities.conduit.utils.MaintenanceUtils
+import com.utilities.conduit.maintenance.MaintenanceUtils
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 

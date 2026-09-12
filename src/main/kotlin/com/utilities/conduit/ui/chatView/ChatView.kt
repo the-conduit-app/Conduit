@@ -1,8 +1,7 @@
-package com.utilities.conduit.ui
+package com.utilities.conduit.ui.chatView
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -34,7 +33,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
 import com.utilities.conduit.utils.AppUtils
@@ -43,6 +41,10 @@ import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.utils.ChatUtils
 import com.utilities.conduit.chat.Node
 import com.utilities.conduit.debug.Trace
+import com.utilities.conduit.ui.LocalActions
+import com.utilities.conduit.ui.PulsingImage
+import com.utilities.conduit.ui.Sounds
+import com.utilities.conduit.ui.SubtleScrollbar
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.collections.forEach

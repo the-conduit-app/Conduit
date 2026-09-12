@@ -5,18 +5,18 @@ import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
+// Just a fun diversion - not core functionality:
+//
 // Trails maintains a cursor through a tree of predefined conversational
 // sequences.
 //
 // Each TrailNode contains a string and a list of child TrailNodes.
 //
-// The trails file consists of sections separated by a line containing
+// The trails data consists of sections separated by a line containing
 // "End Of Section". Each section is simply a sequence of strings:
 //
-//     prompt 1
-//     response 1
-//     prompt 2
-//     response 2
+//     str 1
+//     str 2
 //     ...
 //
 // Sections are overlaid into a single tree. Shared sequences therefore share
@@ -30,8 +30,8 @@ import javax.crypto.spec.SecretKeySpec
 //                   └── ...
 //
 // ConduitExpert.getResponse() keeps a Trails instance and, after trying its
-// stock responses, makes one final attempt to advance the trail using the
-// user's prompt.
+// stock responses ("What do you know about me?", etc.), makes one final attempt
+// to get a wacky response by trying to advance on the trail using the user's prompt.
 //
 // advance(prompt) performs two possible advances:
 //
@@ -48,7 +48,7 @@ import javax.crypto.spec.SecretKeySpec
 //
 // If either advance reaches a leaf, the trail has ended:
 //   - reset the cursor to root
-//   - return the End Of Trail reward.
+//   - return the End Of Trail reward (Yippee)
 //
 // Matching is case-insensitive.
 
@@ -61,7 +61,7 @@ class ConduitTrails {
     private lateinit var root: ConduitTrailNode
     private lateinit var cursor: ConduitTrailNode
     val TRAILS_RESOURCE = "/assets/ConduitTrails.enc"
-    val TRAILS_KEY = "       2_       ".toByteArray(Charsets.UTF_8)
+    val TRAILS_KEY = "உ             ".toByteArray(Charsets.UTF_8)
 
     fun initialize() {
         root = ConduitTrailNode("Trails")
@@ -69,19 +69,18 @@ class ConduitTrails {
 
         val stream = ConduitTrails::class.java.getResourceAsStream(TRAILS_RESOURCE)
         if (stream == null) {
-            Trace.log("No Conduit trails found")
+            Trace.log("No Conduit trails found - can't go hiking.")
             return
         }
 
         val encrypted = stream.use { it.readBytes() }
         if (encrypted.size < 12 + 16) {
-            Trace.log("Conduit trails could not be loaded")
+            Trace.log("Conduit trails could not be loaded - park that hike.")
             return
         }
 
         val nonce = encrypted.copyOfRange(0, 12)
         val ciphertextAndTag = encrypted.copyOfRange(12, encrypted.size)
-
         val cipher = Cipher.getInstance("AES/GCM/NoPadding")
 
         cipher.init(
@@ -90,12 +89,9 @@ class ConduitTrails {
             GCMParameterSpec(128, nonce)
         )
 
-        val plaintext = cipher
-            .doFinal(ciphertextAndTag)
-            .toString(Charsets.UTF_8)
+        val plaintext = cipher.doFinal(ciphertextAndTag).toString(Charsets.UTF_8)
 
         val trail = mutableListOf<String>()
-
         plaintext.lineSequence().forEach { line ->
             val text = line.trim()
 
@@ -112,31 +108,15 @@ class ConduitTrails {
         if (trail.isNotEmpty()) {
             addTrail(trail)
         }
-
-        root.children.forEach { it -> println("Loaded Trail: ${it.text}") }
     }
 
     private fun addTrail(trail: List<String>) {
         var node = root
-
         for (text in trail) {
             val child = node.children.firstOrNull { it.text == text } ?: ConduitTrailNode(text).also {
                 node.children.add(it)
             }
-
             node = child
-        }
-    }
-
-    fun printTrail() {
-        println(root.text)
-        printChildren(root, "")
-    }
-
-    private fun printChildren(node: ConduitTrailNode, indent: String) {
-        for (child in node.children) {
-            println("$indent${child.text}")
-            printChildren(child, "$indent    ")
         }
     }
 
@@ -170,11 +150,29 @@ class ConduitTrails {
 
         // If the response node is a leaf, this response completes the trail.
         if (cursor.children.isEmpty()) {
-            val response = "${cursor.text}\n\nYippee!"
+            val response = "${cursor.text}\n\nYip, Yip, Yippee!"
             cursor = root
             return response
         }
 
         return cursor.text
     }
+
+    // Debuggies -----------------------------------------------------------------------
+    fun printEntries() {
+        root.children.forEach { it -> println("Loaded Trail: ${it.text}") }
+    }
+
+    fun printTrail() {
+        println(root.text)
+        printChildren(root, "")
+    }
+
+    private fun printChildren(node: ConduitTrailNode, indent: String) {
+        for (child in node.children) {
+            println("$indent${child.text}")
+            printChildren(child, "$indent    ")
+        }
+    }
+
 }

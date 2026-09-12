@@ -23,6 +23,8 @@ import org.jetbrains.compose.resources.painterResource
 import conduit.generated.resources.Res
 import conduit.generated.resources.cycle_branches
 
+// Currently only used by ChatView to display an icon next to branching
+// nodes.
 @Composable
 fun PulsingImage(
     modifier: Modifier = Modifier,

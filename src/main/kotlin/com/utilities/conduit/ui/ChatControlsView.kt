@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
+import com.utilities.conduit.packs.PackMenu
 import io.github.fletchmckee.liquid.liquid
 
 // The area above the Chat Text Window, with the Packs Menu and Experts

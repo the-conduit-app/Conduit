@@ -1,4 +1,4 @@
-package com.utilities.conduit.debug
+package com.utilities.conduit.ui
 
 import com.sun.jna.Library
 import com.sun.jna.Native

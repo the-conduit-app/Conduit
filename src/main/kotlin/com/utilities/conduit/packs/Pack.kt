@@ -1,7 +1,9 @@
-package com.utilities.conduit
+package com.utilities.conduit.packs
 
-import com.sun.beans.introspect.PropertyInfo
-import com.utilities.conduit.debug.Trace
+import com.utilities.conduit.AppState
+import com.utilities.conduit.Expert
+import com.utilities.conduit.ExpertStatus
+import com.utilities.conduit.ExpertType
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.utils.sha256
@@ -10,7 +12,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import java.io.File
-import kotlin.math.abs
 
 @Serializable
 data class Pack(

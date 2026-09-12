@@ -1,4 +1,4 @@
-package com.utilities.conduit.ui
+package com.utilities.conduit.packs
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -43,13 +44,16 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.utilities.conduit.AppState
 import com.utilities.conduit.Expert
-import com.utilities.conduit.Pack
+import com.utilities.conduit.ui.CONDUIT_COLORS
+import com.utilities.conduit.ui.LocalActions
+import com.utilities.conduit.ui.LocalLiquidState
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s1
 import conduit.generated.resources.plasma_s64
 import io.github.fletchmckee.liquid.liquefiable
 import io.github.fletchmckee.liquid.liquid
 import org.jetbrains.compose.resources.painterResource
+import kotlin.collections.get
 
 @Composable
 fun PackMenu(state: AppState) {
@@ -85,7 +89,7 @@ fun PackMenu(state: AppState) {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
-                        imageVector = ConduitIcons.ArrowDropDown,
+                        imageVector = Icons.Default.ArrowDropDown,
                         contentDescription = null,
                         tint = Color(0xFF007C91),
                     )
@@ -144,7 +148,7 @@ fun PackMenu(state: AppState) {
                                         showPacksMenu = false
                                     },
                                     onFrontItemChanged = { item ->
-                                        Sounds.SwishSwash.play()
+                                        com.utilities.conduit.ui.Sounds.SwishSwash.play()
                                         appActions.switchPack(item.content)
                                     },
                                     itemRenderer = ::renderPackInfo

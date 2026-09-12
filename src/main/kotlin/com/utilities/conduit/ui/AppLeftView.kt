@@ -8,7 +8,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.automirrored.filled.VolumeOff
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.Add
@@ -26,6 +25,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.utilities.conduit.AppState
+import com.utilities.conduit.ui.chatsList.ChatsListView
+import com.utilities.conduit.ui.treeView.ChatTreeView
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s1
 import kotlinx.coroutines.launch

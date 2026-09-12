@@ -1,4 +1,4 @@
-package com.utilities.conduit.ui
+package com.utilities.conduit.ui.chatView
 
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.ContextMenuRepresentation
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -32,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.rememberCursorPositionProvider
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s64
-import io.github.fletchmckee.liquid.liquid
 import org.jetbrains.compose.resources.painterResource
 
 val ConduitContextMenuRepresentation = object : ContextMenuRepresentation

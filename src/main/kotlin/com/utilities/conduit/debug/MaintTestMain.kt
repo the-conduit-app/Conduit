@@ -5,7 +5,7 @@ package com.utilities.conduit.debug
  * changes in the rest of the code.
 
 import com.utilities.conduit.AppState
-import com.utilities.conduit.Maintenance
+import com.utilities.conduit.maintenance.Maintenance
 import com.utilities.conduit.UserModel
 import com.utilities.conduit.ConduitUserModelFeature
 import com.utilities.conduit.chat.ChatsList

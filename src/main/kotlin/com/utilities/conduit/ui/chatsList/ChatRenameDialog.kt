@@ -1,4 +1,4 @@
-package com.utilities.conduit.ui
+package com.utilities.conduit.ui.chatsList
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -40,7 +39,9 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.sp
 import com.utilities.conduit.debug.Trace
-import com.utilities.conduit.utils.MaintenanceUtils
+import com.utilities.conduit.ui.ConduitProgressIndicator
+import com.utilities.conduit.ui.ConduitTheme
+import com.utilities.conduit.ui.Sounds
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s1
 import conduit.generated.resources.plasma_s64

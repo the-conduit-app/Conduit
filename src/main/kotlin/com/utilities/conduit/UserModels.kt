@@ -124,6 +124,7 @@ data class UserModel(val text: String, val lastSummaryModifiedTime: Long)
             return mergedFeatures
         }
 
+        // Using DUI as short for Deterministic Uncertainty Injection (into the prompt)
         // DUI projection from the conduit internal representation into that exposed to the rest
         // of Conduit and ultimately supplied to the LLM.
         internal fun convertToExternalUserModel(

@@ -1,4 +1,4 @@
-package com.utilities.conduit.ui
+package com.utilities.conduit.ui.treeView
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
@@ -28,12 +28,13 @@ import com.dk.kuiver.renderer.KuiverViewerConfig
 import com.utilities.conduit.AppState
 import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.chat.Node
-import com.utilities.conduit.ui.treeView.ConduitTreeEdge
-import com.utilities.conduit.ui.treeView.ConduitTreeNode
-import com.utilities.conduit.ui.treeView.hierarchical
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.unit.DpOffset
+import com.utilities.conduit.ui.chatView.ConduitContextMenuRepresentation
+import com.utilities.conduit.ui.LocalActions
+import com.utilities.conduit.ui.LocalMessagePanelController
+import com.utilities.conduit.ui.Sounds
 
 @Composable
 fun ChatTreeView(

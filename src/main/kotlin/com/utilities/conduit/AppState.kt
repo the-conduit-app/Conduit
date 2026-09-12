@@ -10,6 +10,8 @@ import com.sun.jna.Pointer
 import com.utilities.conduit.chat.ChatManager
 import com.utilities.conduit.chat.ChatsList
 import com.utilities.conduit.debug.Trace
+import com.utilities.conduit.maintenance.Maintenance
+import com.utilities.conduit.packs.Pack
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.ui.LeftPanelMode
 import com.utilities.conduit.ui.Notification

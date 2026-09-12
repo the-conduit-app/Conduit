@@ -1,4 +1,4 @@
-package com.utilities.conduit.ui
+package com.utilities.conduit.ui.chatView
 
 import androidx.compose.foundation.ContextMenuArea
 import androidx.compose.foundation.ContextMenuItem
@@ -21,6 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.Node
+import com.utilities.conduit.ui.ConduitProgressIndicator
+import com.utilities.conduit.ui.LocalActions
+import com.utilities.conduit.ui.LocalLiquidState
 import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s1
 import conduit.generated.resources.plasma_s64
