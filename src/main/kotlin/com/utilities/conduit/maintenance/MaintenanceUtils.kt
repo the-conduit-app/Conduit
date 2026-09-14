@@ -70,7 +70,8 @@ object MaintenanceUtils {
     suspend fun generateHistorySummary(systemExpert: Expert, chat: Chat, node: Node): String? {
         ChatUtils.chatUtilsMutex.withLock {
 
-            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(chat, node.parentId, excludeSystemNodes = true)
+            // DO NOT exclude system (echo/conduit) responses for history summaries
+            val effectiveHistory = ChatUtils.getEffectiveNodeHistory(chat, node.parentId, excludeSystemNodes = false)
             if (effectiveHistory.nodes.size < HISTORY_LENGTH_THRESHOLD) return null
 
             // The history summary for `node` describes everything leading up to and including
@@ -114,7 +115,7 @@ object MaintenanceUtils {
         ChatUtils.chatUtilsMutex.withLock {
             val cursorNodeId = chat.cursorNodeId ?: return "" // NO CURSOR => Conduit can't do it
 
-            // Unlike history summarization, the cursor itself is included.
+            // Unlike history summarization, the cursor itself is included AND system nodes are excluded
             val effectiveHistory = ChatUtils.getEffectiveNodeHistory(chat, cursorNodeId, excludeSystemNodes = true)
             if (effectiveHistory.nodes.isEmpty()) return ""
 

@@ -3,7 +3,6 @@ package com.utilities.conduit.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.utilities.conduit.ui.Sounds.Space.clip
 import java.io.BufferedInputStream
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
@@ -60,9 +59,21 @@ object Sounds {
         fun play() { if (!isSilent) sound.play() }
     }
 
-    // Water drop on treeview node click
-    object Drop {
-        private val sound by lazy { createSound("waterdrop.wav") }
+    // Bubble on treeview node click
+    object Bubble {
+        private val sound by lazy { createSound("bubble.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+
+    // Water drop (unused)
+    object WaterDrop {
+        private val sound by lazy { createSound("water_drop.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+
+    // Morsing (from Sevalane)
+    object Morsing {
+        private val sound by lazy { createSound("morsing.wav") }
         fun play() { if (!isSilent) sound.play() }
     }
 
@@ -92,7 +103,7 @@ object Sounds {
 
     // Enter app when init is done (from splash screen)
     object EnterChime {
-        private val sound by lazy { createSound("enterChime.wav") }
+        private val sound by lazy { createSound("enter_chime.wav") }
         fun play() { if (!isSilent) sound.play() }
     }
 

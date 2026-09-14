@@ -4,6 +4,7 @@ import com.utilities.conduit.AppState
 import com.utilities.conduit.Expert
 import com.utilities.conduit.ExpertStatus
 import com.utilities.conduit.ExpertType
+import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.LlmPortal
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.utils.sha256
@@ -61,7 +62,6 @@ data class Pack(
             // only case when it falls back to loading the raw file (when the absModelPath is actually used)
 
             val absoluteModelPath = AppUtils.locateModelFile(modelFilename) // returns null if not found
-
             appState.scope.launch(Dispatchers.IO) {
                 // If path is given, it MUST match the SHA
                 if (absoluteModelPath != null) {
@@ -72,13 +72,19 @@ data class Pack(
                     }
                 }
 
-                expert.status = ExpertStatus.LOADING
-                expert.sessionPtr = LlmPortal.initialize(
-                    conduitPtr =  appState.conduitPtr,
-                    modelSha = modelSha,
-                    absoluteModelPath = absoluteModelPath ?: ""
-                )
-                expert.status = if (expert.sessionPtr == null) ExpertStatus.FAILED else ExpertStatus.READY
+                try {
+                    expert.status = ExpertStatus.LOADING
+                    //Trace.log("ABOUT TO INITIALIZE $modelFilename path=$absoluteModelPath sha=$modelSha")
+                    expert.sessionPtr = LlmPortal.initialize(
+                        conduitPtr = appState.conduitPtr,
+                        modelSha = modelSha,
+                        absoluteModelPath = absoluteModelPath ?: ""
+                    )
+                    //Trace.log("$absoluteModelPath got session pointer = ${expert.sessionPtr}")
+                    expert.status = if (expert.sessionPtr == null) ExpertStatus.FAILED else ExpertStatus.READY
+                } catch (e: Exception) {
+                    expert.status = ExpertStatus.FAILED
+                }
             }
         }
     }

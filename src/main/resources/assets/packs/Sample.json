@@ -10,7 +10,7 @@
         "expertise": "General",
         "model": "gemma-2-9b-it-Q4_K_M.gguf", 
         "description": "An all-round expert.",
-        "color" : "Terracotta"
+        "color" : "Gina Orangina"
     },
     {
         "type": "LLM",
@@ -18,16 +18,15 @@
         "expertise": "Babbling",
         "model": "SmolLM2-135M-Instruct-Q4_K_M.gguf", 
         "description": "Learning the ways of humans.",
-        "color": "Cutey Peach"
+        "color": "Lemony Lu"
     },
     {
         "type": "LLM",
-        "nickname": "Bob",
-        "expertise": "Buildings",
-        "model": "gemma-2-9b-it-Q4_K_M.gguf", 
-        "description": "An expert home builder.",
-        "color": "Arisi Mauve"
+        "nickname": "Matt",
+        "expertise": "Math",
+        "model": "Qwen2.5-Coder-14B-Instruct-Q5_K_M.gguf", 
+        "description": "A humble and able mathematican, striving to spread the love of the art.",
+        "color": "Misty Blue"
     }
   ]
 }
-

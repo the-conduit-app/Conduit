@@ -26,11 +26,9 @@ object LlmPortal {
 
     // ---------------------------------------------------------------------------------
     // Potentially time-consuming - Ensure it's called from an IO thread.
-    fun initialize(conduitPtr: Pointer, absoluteModelPath: String, modelSha: String): Pointer {
-        val sessionPtr = conduitLib.conduit_create_session(conduitPtr, absoluteModelPath, modelSha)
-            ?: throw RuntimeException("Failed to load model: $absoluteModelPath")
-
-        return sessionPtr
+    // Returns null if native create session fails.
+    fun initialize(conduitPtr: Pointer, absoluteModelPath: String, modelSha: String): Pointer? {
+        return conduitLib.conduit_create_session(conduitPtr, absoluteModelPath, modelSha)
     }
 
     // ---------------------------------------------------------------------------------

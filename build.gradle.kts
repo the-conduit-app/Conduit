@@ -18,7 +18,7 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.ui.tooling)
     implementation(compose.materialIconsExtended)
-    implementation(compose.components.resources)
+    implementation("org.jetbrains.compose.components:components-resources:1.10.3")
 
     // KotlinX
     implementation(libs.kotlinx.coroutines.core)
@@ -39,20 +39,43 @@ dependencies {
     implementation("io.github.fletchmckee.liquid:liquid:1.1.1")
 }
 
+// Done after distributable is created
+tasks.register<Sync>("copyNativeLibsToApp") {
+    dependsOn("createReleaseDistributable")
+
+    from("cpp/libConduit/libconduit.dylib")
+    from("cpp/macwindow/libmacwindow.dylib")
+
+//    into(layout.buildDirectory.dir(
+//        "compose/binaries/main/app/Conduit.app/Contents/Frameworks"
+//    ))
+    into(layout.buildDirectory.dir(
+        "compose/binaries/main-release/app/Conduit.app/Contents/Frameworks"
+    ))
+}
+
 compose.desktop {
     application {
         mainClass = "com.utilities.conduit.MainKt"
 
         jvmArgs("--enable-native-access=ALL-UNNAMED")
+
+        buildTypes {
+            release {
+                proguard {
+                    version.set("7.10.0")
+                    configurationFiles.from(project.file("proguard-rules.pro"))
+                }
+            }
+        }
+
+        nativeDistributions {
+            packageName = "Conduit"
+            packageVersion = "1.0.0"
+
+            macOS {
+                iconFile.set(project.file("packaging/Conduit.icns"))
+            }
+        }
     }
-}
-
-tasks.register<JavaExec>("runMaintTest") {
-    group = "verification"
-    description = "Run standalone maintenance test"
-
-    classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("com.utilities.conduit.debug.MaintTestMainKt")
-
-    jvmArgs("--enable-native-access=ALL-UNNAMED")
 }

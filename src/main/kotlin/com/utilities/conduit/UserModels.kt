@@ -25,8 +25,8 @@ private const val USER_MODEL_TOTAL_WEIGHT = 0.95
  * calculated confidence measures for user features that are used to select
  * features to build the run-time user model string for LLM context.
  *
- * This is a projection of the private ConduitUserModel stored in
- * APPDIR/.conduit-user-model.json. The persistent representation is NOT
+ * The run-time user model is a projection of this private ConduitUserModel
+ * stored in APPDIR/.conduit-user-model.json. The persistent representation is NOT
  * passed directly to the LLM or written directly from an LLM response.
  */
 @Serializable
@@ -48,6 +48,7 @@ data class UserModel(val text: String, val lastSummaryModifiedTime: Long)
             lastSummaryModifiedTime: Long): ConduitUserModel {
             val conduitUserModel = loadConduitUserModelFromFile()
 
+            // The LLM is explicitly instructed to respond with a JSON
             val externalUserModel = try {
                 AppJson.decodeFromString<UserModelGenerationResponse>(response.trim())
             } catch (e: Exception) {
@@ -127,6 +128,7 @@ data class UserModel(val text: String, val lastSummaryModifiedTime: Long)
         // Using DUI as short for Deterministic Uncertainty Injection (into the prompt)
         // DUI projection from the conduit internal representation into that exposed to the rest
         // of Conduit and ultimately supplied to the LLM.
+        private const val USER_MODEL_MIN_DUI = 0.05
         internal fun convertToExternalUserModel(
             conduitUserModel: ConduitUserModel?,
             now: Long = System.currentTimeMillis()
@@ -140,6 +142,7 @@ data class UserModel(val text: String, val lastSummaryModifiedTime: Long)
 
             val rankedFeatures = conduitUserModel.features
                 .map { feature -> feature to duiScore(feature, now) }
+                .filter { (_, score) -> score >= USER_MODEL_MIN_DUI }
                 .sortedWith(
                     compareByDescending<Pair<ConduitUserModelFeature, Double>> { it.second }
                         .thenByDescending { it.first.observationCount }

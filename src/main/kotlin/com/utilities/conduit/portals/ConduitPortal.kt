@@ -34,7 +34,7 @@ object ConduitPortal {
                 }
 
                 emit(char.toString())
-                delay(25.milliseconds)
+                delay(10.milliseconds)
             }
         }
     }

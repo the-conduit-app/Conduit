@@ -68,7 +68,7 @@ class AppActions(private val appState: AppState) {
 
         appState.scope.launch(Dispatchers.IO) {
             try {
-                Trace.log("Initing experts in ${newPack.name}")
+                //Trace.log("Initing experts in ${newPack.name}")
                 newPack.initializeExperts(appState)
                 // state.notification.trigger("The current pack is now ${newPack.name}. Please select an expert.")
             }
@@ -97,7 +97,12 @@ class AppActions(private val appState: AppState) {
                 return@launch
             }
             if (!expert.isReady) {
-                appState.notification.trigger("${expert.nickname} is still loading")
+                val msg = when (expert.status) {
+                    ExpertStatus.LOADING -> "${expert.nickname} is still loading"
+                    ExpertStatus.FAILED -> "Alas! ${expert.nickname} failed to load."
+                    else -> "Hmmm... ${expert.nickname} seems unresponsive!"
+                }
+                appState.notification.trigger(msg)
                 return@launch
             }
 

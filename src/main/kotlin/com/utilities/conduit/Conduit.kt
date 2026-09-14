@@ -31,10 +31,16 @@ suspend fun initializeConduit(
     if (systemModelPath == null)
         return ConduitInitResult.FAILED_MODEL_MISSING
 
+    // Only models whose SHAs are in .approved-models.json can load
     appState.approvedModels =  getApprovedModels()
 
+    // set current chat to most recent one.
     appState.conduitUserModel = UserModel.loadConduitUserModelFromFile()
+
     appState.chatsList.build()
+    if (appState.chatsList.items.isNotEmpty()) {
+        appState.chatManager.currentChat = appState.chatsList.items.first().chat
+    }
 
     val packs = withContext(Dispatchers.IO) { AppUtils.getAvailablePacks() }
     appState.availablePacks = packs

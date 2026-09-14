@@ -18,7 +18,7 @@
         "expertise": "General",
         "model": "gemma-2-9b-it-Q4_K_M.gguf", 
         "description": "An all-round expert.",
-        "color": "Cutey Peach"
+        "color": "Misty Blue"
     },
     {
         "type": "LLM",
@@ -46,4 +46,3 @@
     }
   ]
 }
-

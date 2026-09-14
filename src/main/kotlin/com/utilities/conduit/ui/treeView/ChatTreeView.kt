@@ -150,7 +150,7 @@ fun ChatTreeView(
                                 onClick = {
                                     if (nodesOnCursorPath.contains(conduitNode.id)) {
                                         appActions.scrollChatToNode(conduitNode.id)
-                                        Sounds.Drop.play()
+                                        Sounds.Morsing.play()
                                     }
                                 }
                             )

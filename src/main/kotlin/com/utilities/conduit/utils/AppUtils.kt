@@ -4,6 +4,7 @@ import com.utilities.conduit.AppJson
 import com.utilities.conduit.packs.Pack
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.ChatMessage
+import com.utilities.conduit.debug.Trace
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -31,7 +32,27 @@ object AppUtils {
         return path
     }
 
-    fun getNativeLibDir(libName: String): String { return "${getAppDir()}/lib/$libName" }
+    //fun getNativeLibDir(libName: String): String { return "${getAppDir()}/lib/$libName" }
+    fun getNativeLibDir(libName: String): String {
+        val codeSource = File(
+            AppUtils::class.java.protectionDomain.codeSource.location.toURI()
+        )
+        println("codeSource = ${AppUtils::class.java.protectionDomain.codeSource.location}")
+
+        val contentsDir = codeSource
+            .parentFile
+            ?.parentFile
+            ?.takeIf { it.name == "Contents" }
+
+        if (contentsDir != null) {
+            val frameworks = File(contentsDir, "Frameworks")
+            if (frameworks.isDirectory) {
+                return File(frameworks, libName).absolutePath
+            }
+        }
+
+        return "${getAppDir()}/lib/$libName"
+    }
 
     fun getPacksDir(): String { return "${getAppDir()}/packs" }
 
@@ -51,7 +72,7 @@ object AppUtils {
     }
 
     // Reads all .json files in the packs directory and parses them into Pack objects
-     // IMPORTANT: NO PACK EXPERT INITIALIZATIONS (Hence not time-consuming)
+    // IMPORTANT: NO PACK EXPERT INITIALIZATIONS (Hence not time-consuming)
     suspend fun getAvailablePacks(): List<Pack> = withContext(Dispatchers.IO) {
          val packsDir = Paths.get(getAppDir(), "packs")
 
@@ -68,7 +89,7 @@ object AppUtils {
                          val json = Files.readString(path)
                          AppJson.decodeFromString<Pack>(json).copy(id = id)
                      } catch (e: Exception) {
-                         println("Error loading pack ${path.fileName}: ${e.message}")
+                         Trace.log("Error loading pack ${path.fileName}: ${e.message}")
                          null
                      }
                  }

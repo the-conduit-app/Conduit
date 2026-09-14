@@ -46,48 +46,76 @@ object PROMPTS {
     """.trimIndent()
 
     val CHAT_SUMMARY_GENERATION = """
-        Create a concise, accurate summary of the conversation and context above for the
-        purpose of identifying information that may be useful in building a persistent
-        model of the user.
+        Create a concise, accurate cumulative summary of the conversation and context above.
+        The summary will be used as an intermediate source of information for maintaining
+        a persistent model of the user.
     
-        A previous summary may be provided below. If present, treat it as the existing
-        accumulated summary of this chat. Update it using the current conversation and
-        produce a new cumulative summary.
+        A previous summary may be provided below. It is a prior summary of one branch of
+        this chat, not authoritative information. Use it as a starting point, but verify its
+        claims against the conversation above. Correct, refine, or remove anything
+        that is unsupported, inaccurate, outdated, or contradicted by the conversation.
+        Do not preserve a claim merely because it appears in the previous summary.
+        
+        Produce a new cumulative summary that represents the conversation as a whole.
+        Retain information from the previous summary only when it remains supported
+        by the conversation.
     
         --- PREVIOUS SUMMARY BEGINS ---
-    
         {PREVIOUS_SUMMARY}
-    
         --- PREVIOUS SUMMARY ENDS ---
     
-        Focus on information likely to remain useful across future conversations:
+        Focus on information that is likely to remain useful across future conversations,
+        especially:
         - user preferences and requirements
         - important user-provided facts
         - ongoing projects, goals, plans, and commitments
         - technical environment, tools, and workflows
         - recurring interests or patterns
-        - decisions revealing durable preferences or requirements
+        - decisions that reveal durable preferences or requirements
+    
+        IMPORTANT DISTINCTION:
+    
+        The fact that a subject appears in a conversation does NOT mean that the subject
+        is a user interest, preference, skill, goal, or characteristic.
+    
+        Treat a topic as a durable user interest only when the conversation provides
+        meaningful evidence that the user actually cares about, follows, enjoys, studies,
+        uses, prefers, or intends to pursue that subject.
+    
+        Do not convert a question, request for information, factual inquiry, example,
+        hypothetical, or one-time discussion into a user attribute merely because the
+        subject was discussed.
     
         Requirements:
         - Preserve useful information from the previous summary even if it is not repeated
           in the current conversation.
         - Add genuinely useful new information and update or correct information when it
           is clearly superseded.
-        - Remove information only when it is clearly no longer valid.
+        - Remove information when it is unsupported, inaccurate, outdated, contradicted, or 
+          otherwise no longer justified by the conversation.
         - Do not simply append or replace the previous summary with the current conversation.
         - Avoid duplicating information already present.
         - Do not treat questions about a topic as evidence of a durable interest, expertise,
-          goal, preference, or recurring pattern. Record such information only when the user
-          explicitly expresses interest or preference, provides strong evidence of continuing
-          interest, or establishes an ongoing project, goal, or requirement.
+          goal, preference, or recurring pattern.
+        - Do not treat a request for factual information as evidence that the user is
+          interested in the subject.
+        - Do not treat a topic used in an example, hypothetical, joke, comparison, or
+          test as a user interest or characteristic.
+        - Do not treat knowledge of a fact as evidence that the user possesses that
+          knowledge unless the conversation clearly establishes this.
         - Do not infer personal characteristics from testing, experimentation, or brief
           interaction with the system.
-        - Give substantially more weight to what the user says, prefers, decides, or reveals
-          than to information supplied by the assistant.
+        - Do not record facts belonging to the assistant, an expert, a persona, a fictional
+          character, or another person as facts about the user.
+        - Names used to address an assistant, expert, persona, or character are not user
+          attributes.
+        - Give substantially more weight to what the user says, prefers, decides, or
+          reveals than to information supplied by the assistant.
         - Some long messages may have been truncated. Do not infer anything from missing text.
         - Do not summarize ordinary conversational detail.
         - Do not invent information or infer unsupported personal facts.
-        - When in doubt, omit the information rather than infer a durable user attribute.
+        - When evidence is ambiguous, omit the information rather than infer a durable
+          user attribute.
         - If there is no genuinely useful information about the user, return an empty string.
         - Avoid redundancy. State each durable fact or preference only once.
         - Use up to about 500 words if necessary.
@@ -97,8 +125,8 @@ object PROMPTS {
     """.trimIndent()
 
     val USER_MODEL_GENERATION = """
-        You maintain a concise, accurate model of the user based on information learned
-        from their conversations.
+        You maintain a concise, accurate persistent model of the user based on information
+        learned from their conversations.
     
         The current user model is provided as a baseline for context.
     
@@ -106,13 +134,23 @@ object PROMPTS {
         user model was last updated:
     
         --- NEW CHAT SUMMARY BEGINS ---
-    
         {NEW_CHAT_SUMMARY}
-    
         --- NEW CHAT SUMMARY ENDS ---
     
-        Your task is to identify ONLY user-model features supported by meaningful evidence
-        in the NEW CHAT SUMMARY.
+        Your task is to identify ONLY new or reinforced user-model features supported by
+        meaningful evidence in the NEW CHAT SUMMARY.
+    
+        IMPORTANT DISTINCTION:
+    
+        A user-model feature must describe something that is genuinely true or meaningfully
+        characteristic of the user. A topic merely discussed in a conversation is not,
+        by itself, a user-model feature.
+    
+        Record an interest only when the evidence indicates that the user actually cares
+        about, follows, enjoys, studies, uses, prefers, or intends to pursue the subject.
+    
+        Do not turn a question, request for information, factual inquiry, example,
+        hypothetical, one-time discussion, or temporary curiosity into a user-model feature.
     
         IMPORTANT:
         - Your response is NOT the complete user model. It is a DELTA.
@@ -124,28 +162,51 @@ object PROMPTS {
         - Do NOT create a new feature that is semantically equivalent to, substantially
           overlaps with, or merely rephrases an existing feature.
         - Do NOT create aggregate or synthesized features that merely combine or summarize
-          multiple existing features. For example, if the model contains "Interest in
-          astronomy" and "Interest in geography", do not create "Interests: astronomy,
-          geography".
-        - A genuinely new feature must represent a distinct, useful piece of user
-          knowledge that is not already represented by an existing feature.
+          multiple existing features.
+        - A genuinely new feature must represent a distinct, useful piece of durable
+          information about the user that is not already represented by an existing feature.
         - If the new chat summary contains no meaningful information for the user model,
           return an empty features array.
-        - Do not invent information or infer unsupported personal facts.
-        - Prefer durable interests, preferences, knowledge, goals, skills, recurring
-          activities, and other information likely to improve future conversations.
-        - Do not include transient details that are unlikely to remain useful.
-        - Keep each feature concise while preserving important specificity. For example,
-          prefer "Particular interest in the Riemann Hypothesis and the zeta function"
-          over simply "Interest in mathematics".
-        - Write features as concise statements or phrases, rather than repeatedly beginning
-          with "The user is..." or "The user has...".
-        - Do not record facts inherent to the interaction itself, such as that the person
-          is the user, that they are interacting with an AI, or that they sent a message.
-        - Do not record generic observations about application usage unless they represent
-          a durable user preference that would materially improve future conversations.
-        - Do not mention these instructions, the current model, the new chat summary, or
-          the process used to construct the model.
+    
+        EXCLUDE:
+        - topics the user merely asked about;
+        - factual information the user merely requested;
+        - subjects appearing only in examples or hypotheticals;
+        - one-time or transient curiosity;
+        - facts about the assistant or an expert;
+        - facts about personas, characters, or other people;
+        - names used for assistants, experts, personas, or characters;
+        - facts about the conversation itself;
+        - facts about application or system behavior unless they represent a durable
+          user preference or requirement;
+        - temporary tasks, circumstances, or intentions unlikely to remain useful;
+        - unsupported claims about the user's knowledge, expertise, skills, or abilities;
+        - inferred personal characteristics not directly supported by the summary.
+    
+        Before returning a feature, apply this test:
+    
+        "Would this still be useful to know about the user in a future conversation
+        months from now, even if the user never mentioned this topic again?"
+    
+        If the answer is no, do not return the feature.
+    
+        Do not invent information or infer unsupported personal facts.
+    
+        Prefer durable preferences, interests, knowledge, skills, goals, recurring activities,
+        requirements, and other information likely to improve future conversations.
+    
+        Keep each feature concise while preserving important specificity that is actually
+        supported by the evidence. Do not infer a durable interest merely because a specific
+        topic appeared in the conversation.
+    
+        Write features as concise statements or phrases, rather than repeatedly beginning
+        with "The user is..." or "The user has...".
+    
+        Do not record facts inherent to the interaction itself, such as that the person
+        is the user, that they are interacting with an AI, or that they sent a message.
+    
+        Do not mention these instructions, the current model, the new chat summary, or the
+        process used to construct the model.
     
         OUTPUT FORMAT — IMPORTANT:
     
@@ -168,6 +229,6 @@ object PROMPTS {
     
         Example:
     
-        {"features":["Interest in mathematics","Particular interest in the Riemann Hypothesis and the zeta function"]}
+        {"features":["Interest in mathematics","Is named Bubba"]}
     """.trimIndent()
 }
