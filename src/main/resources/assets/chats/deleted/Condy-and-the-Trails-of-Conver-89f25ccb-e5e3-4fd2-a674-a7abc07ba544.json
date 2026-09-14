@@ -1,0 +1,451 @@
+{
+    "id": "89f25ccb-e5e3-4fd2-a674-a7abc07ba544",
+    "createdAt": 1789197672098,
+    "rootNodeId": "acd7f8af-573e-4277-baca-3fa6c8911bea",
+    "cursorNodeId": "3d52bc54-ee8b-4199-8de2-5ed1a5898307",
+    "title": "Condy and the Trails of Conversation",
+    "needsHumanReview": true,
+    "nodes": {
+        "acd7f8af-573e-4277-baca-3fa6c8911bea": {
+            "id": "acd7f8af-573e-4277-baca-3fa6c8911bea",
+            "type": "TEXT",
+            "createdAt": 1789197695582,
+            "parentId": null,
+            "children": [
+                "ae02a3c4-e228-4250-bd5a-2c32c30640af"
+            ],
+            "message": {
+                "title": "You · 12 Sep",
+                "timestamp": 1789197695582,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Condy\n"
+            }
+        },
+        "ae02a3c4-e228-4250-bd5a-2c32c30640af": {
+            "id": "ae02a3c4-e228-4250-bd5a-2c32c30640af",
+            "type": "TEXT",
+            "createdAt": 1789197695582,
+            "parentId": "acd7f8af-573e-4277-baca-3fa6c8911bea",
+            "children": [
+                "6a694db6-0c10-41c0-a174-76a2a5eeae5c"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789197695582,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-c6f234ce-680f-4bfe-9c60-577837165715",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3803
+            }
+        },
+        "6a694db6-0c10-41c0-a174-76a2a5eeae5c": {
+            "id": "6a694db6-0c10-41c0-a174-76a2a5eeae5c",
+            "type": "TEXT",
+            "createdAt": 1789197707399,
+            "parentId": "ae02a3c4-e228-4250-bd5a-2c32c30640af",
+            "children": [
+                "2f7d12e9-badf-4804-8d1c-725bfb3fe3ed"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789197707399,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Trails\n"
+            }
+        },
+        "2f7d12e9-badf-4804-8d1c-725bfb3fe3ed": {
+            "id": "2f7d12e9-badf-4804-8d1c-725bfb3fe3ed",
+            "type": "TEXT",
+            "createdAt": 1789197707399,
+            "parentId": "6a694db6-0c10-41c0-a174-76a2a5eeae5c",
+            "children": [
+                "7b7ab1d2-ddf9-4bf3-b19d-cfd5e182ce4d"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789197707399,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-c6f234ce-680f-4bfe-9c60-577837165715",
+                    "packId": "Default"
+                },
+                "text": "just simply bee",
+                "responseTime": 442
+            }
+        },
+        "7b7ab1d2-ddf9-4bf3-b19d-cfd5e182ce4d": {
+            "id": "7b7ab1d2-ddf9-4bf3-b19d-cfd5e182ce4d",
+            "type": "TEXT",
+            "createdAt": 1789197720706,
+            "parentId": "2f7d12e9-badf-4804-8d1c-725bfb3fe3ed",
+            "children": [
+                "3c952d0a-07ea-4ac8-9940-a5848433a7f3"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789197720706,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Trails\n"
+            }
+        },
+        "3c952d0a-07ea-4ac8-9940-a5848433a7f3": {
+            "id": "3c952d0a-07ea-4ac8-9940-a5848433a7f3",
+            "type": "TEXT",
+            "createdAt": 1789197720706,
+            "parentId": "7b7ab1d2-ddf9-4bf3-b19d-cfd5e182ce4d",
+            "children": [
+                "dc9d828d-34f9-42e8-bdad-05ebdb354914"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789197720706,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-c6f234ce-680f-4bfe-9c60-577837165715",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3814
+            }
+        },
+        "dc9d828d-34f9-42e8-bdad-05ebdb354914": {
+            "id": "dc9d828d-34f9-42e8-bdad-05ebdb354914",
+            "type": "TEXT",
+            "createdAt": 1789197729025,
+            "parentId": "3c952d0a-07ea-4ac8-9940-a5848433a7f3",
+            "children": [
+                "e6f048ed-5b2d-41c7-bb39-64a60a94b45c"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789197729024,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Trails\n"
+            }
+        },
+        "e6f048ed-5b2d-41c7-bb39-64a60a94b45c": {
+            "id": "e6f048ed-5b2d-41c7-bb39-64a60a94b45c",
+            "type": "TEXT",
+            "createdAt": 1789197729025,
+            "parentId": "dc9d828d-34f9-42e8-bdad-05ebdb354914",
+            "children": [
+                "dc28b4fc-a485-4c37-8865-6712270a791d"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789197729025,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-c6f234ce-680f-4bfe-9c60-577837165715",
+                    "packId": "Default"
+                },
+                "text": "curiouser and curiouser",
+                "responseTime": 664
+            }
+        },
+        "dc28b4fc-a485-4c37-8865-6712270a791d": {
+            "id": "dc28b4fc-a485-4c37-8865-6712270a791d",
+            "type": "TEXT",
+            "createdAt": 1789197757299,
+            "parentId": "e6f048ed-5b2d-41c7-bb39-64a60a94b45c",
+            "children": [
+                "77a0df78-fedb-47d6-95da-379ab7841a8b"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789197757299,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "1 modest gangster thought himself a mode-ster\n"
+            }
+        },
+        "77a0df78-fedb-47d6-95da-379ab7841a8b": {
+            "id": "77a0df78-fedb-47d6-95da-379ab7841a8b",
+            "type": "TEXT",
+            "createdAt": 1789197757299,
+            "parentId": "dc28b4fc-a485-4c37-8865-6712270a791d",
+            "children": [
+                "eadded98-a09d-43b4-bf4b-eeb8de93ac55"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789197757299,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-c6f234ce-680f-4bfe-9c60-577837165715",
+                    "packId": "Default"
+                },
+                "text": "1 mode-ster thought nobuddy was bester!",
+                "responseTime": 1145
+            }
+        },
+        "eadded98-a09d-43b4-bf4b-eeb8de93ac55": {
+            "id": "eadded98-a09d-43b4-bf4b-eeb8de93ac55",
+            "type": "TEXT",
+            "createdAt": 1789197781178,
+            "parentId": "77a0df78-fedb-47d6-95da-379ab7841a8b",
+            "children": [
+                "82cb1506-b660-4ae1-abac-611dbea3432d"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789197781178,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi\n"
+            }
+        },
+        "82cb1506-b660-4ae1-abac-611dbea3432d": {
+            "id": "82cb1506-b660-4ae1-abac-611dbea3432d",
+            "type": "TEXT",
+            "createdAt": 1789197781178,
+            "parentId": "eadded98-a09d-43b4-bf4b-eeb8de93ac55",
+            "children": [
+                "46dcbc77-3165-44e5-8b7a-74acddd86556"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789197781178,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-c6f234ce-680f-4bfe-9c60-577837165715",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3768
+            }
+        },
+        "46dcbc77-3165-44e5-8b7a-74acddd86556": {
+            "id": "46dcbc77-3165-44e5-8b7a-74acddd86556",
+            "type": "TEXT",
+            "createdAt": 1789197916544,
+            "parentId": "82cb1506-b660-4ae1-abac-611dbea3432d",
+            "children": [
+                "18866df2-a48f-4a99-8382-8739615eacca"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789197916544,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi\n"
+            }
+        },
+        "18866df2-a48f-4a99-8382-8739615eacca": {
+            "id": "18866df2-a48f-4a99-8382-8739615eacca",
+            "type": "TEXT",
+            "createdAt": 1789197916545,
+            "parentId": "46dcbc77-3165-44e5-8b7a-74acddd86556",
+            "children": [
+                "f2f083c6-79f6-4bea-bb9c-9736464e8b74"
+            ],
+            "message": {
+                "title": "Simple (Echoing) · Pack: Default",
+                "timestamp": 1789197916545,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-c8c034f8-b4ab-4b3a-929b-233b0af87b56",
+                    "packId": "Default"
+                },
+                "text": "hi",
+                "responseTime": 112
+            }
+        },
+        "f2f083c6-79f6-4bea-bb9c-9736464e8b74": {
+            "id": "f2f083c6-79f6-4bea-bb9c-9736464e8b74",
+            "type": "TEXT",
+            "createdAt": 1789197923192,
+            "parentId": "18866df2-a48f-4a99-8382-8739615eacca",
+            "children": [
+                "c481b471-f29b-4612-a359-b2db811ae7d0"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789197923192,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi\n"
+            }
+        },
+        "c481b471-f29b-4612-a359-b2db811ae7d0": {
+            "id": "c481b471-f29b-4612-a359-b2db811ae7d0",
+            "type": "TEXT",
+            "createdAt": 1789197923192,
+            "parentId": "f2f083c6-79f6-4bea-bb9c-9736464e8b74",
+            "children": [
+                "a97c36a1-a53e-484c-a63f-9628bd8cd8e1"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789197923192,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-93b34c7e-5b16-45a1-8b0e-6a0b0222d7b9",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3807
+            }
+        },
+        "a97c36a1-a53e-484c-a63f-9628bd8cd8e1": {
+            "id": "a97c36a1-a53e-484c-a63f-9628bd8cd8e1",
+            "type": "TEXT",
+            "createdAt": 1789197938912,
+            "parentId": "c481b471-f29b-4612-a359-b2db811ae7d0",
+            "children": [
+                "9101f844-5e52-4ff6-bfa1-faaa887f35c9"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789197938912,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hare today hanoi tomorrow\n"
+            }
+        },
+        "9101f844-5e52-4ff6-bfa1-faaa887f35c9": {
+            "id": "9101f844-5e52-4ff6-bfa1-faaa887f35c9",
+            "type": "TEXT",
+            "createdAt": 1789197938912,
+            "parentId": "a97c36a1-a53e-484c-a63f-9628bd8cd8e1",
+            "children": [
+                "0221481c-882e-43f7-a864-668817b7d388"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789197938912,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-93b34c7e-5b16-45a1-8b0e-6a0b0222d7b9",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3830
+            }
+        },
+        "0221481c-882e-43f7-a864-668817b7d388": {
+            "id": "0221481c-882e-43f7-a864-668817b7d388",
+            "type": "TEXT",
+            "createdAt": 1789197964341,
+            "parentId": "9101f844-5e52-4ff6-bfa1-faaa887f35c9",
+            "children": [
+                "1fc6c716-c967-4f34-8e8b-33cc00ccff24"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789197964341,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Trails\n"
+            }
+        },
+        "1fc6c716-c967-4f34-8e8b-33cc00ccff24": {
+            "id": "1fc6c716-c967-4f34-8e8b-33cc00ccff24",
+            "type": "TEXT",
+            "createdAt": 1789197964341,
+            "parentId": "0221481c-882e-43f7-a864-668817b7d388",
+            "children": [
+                "72874875-7953-42cb-a5db-4a978b9e0a8b"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789197964341,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-93b34c7e-5b16-45a1-8b0e-6a0b0222d7b9",
+                    "packId": "Default"
+                },
+                "text": "hare today hanoi tomorrow",
+                "responseTime": 736
+            }
+        },
+        "72874875-7953-42cb-a5db-4a978b9e0a8b": {
+            "id": "72874875-7953-42cb-a5db-4a978b9e0a8b",
+            "type": "TEXT",
+            "createdAt": 1789197970007,
+            "parentId": "1fc6c716-c967-4f34-8e8b-33cc00ccff24",
+            "children": [
+                "8ce3a0de-8fda-485f-922b-cc7e10e120fd"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789197970006,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi\n"
+            }
+        },
+        "8ce3a0de-8fda-485f-922b-cc7e10e120fd": {
+            "id": "8ce3a0de-8fda-485f-922b-cc7e10e120fd",
+            "type": "TEXT",
+            "createdAt": 1789197970007,
+            "parentId": "72874875-7953-42cb-a5db-4a978b9e0a8b",
+            "children": [
+                "2e61df40-b120-4d20-989f-b9c7b67328bc"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789197970007,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-93b34c7e-5b16-45a1-8b0e-6a0b0222d7b9",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3820
+            }
+        },
+        "2e61df40-b120-4d20-989f-b9c7b67328bc": {
+            "id": "2e61df40-b120-4d20-989f-b9c7b67328bc",
+            "type": "TEXT",
+            "createdAt": 1789197975778,
+            "parentId": "8ce3a0de-8fda-485f-922b-cc7e10e120fd",
+            "children": [
+                "3d52bc54-ee8b-4199-8de2-5ed1a5898307"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789197975778,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Trails\n"
+            }
+        },
+        "3d52bc54-ee8b-4199-8de2-5ed1a5898307": {
+            "id": "3d52bc54-ee8b-4199-8de2-5ed1a5898307",
+            "type": "TEXT",
+            "createdAt": 1789197975778,
+            "parentId": "2e61df40-b120-4d20-989f-b9c7b67328bc",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789197975778,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-93b34c7e-5b16-45a1-8b0e-6a0b0222d7b9",
+                    "packId": "Default"
+                },
+                "text": "hare today hanoi tomorrow",
+                "responseTime": 718
+            }
+        }
+    }
+}

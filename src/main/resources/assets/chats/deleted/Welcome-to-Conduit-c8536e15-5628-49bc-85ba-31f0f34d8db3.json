@@ -1,0 +1,117 @@
+{
+    "id": "c8536e15-5628-49bc-85ba-31f0f34d8db3",
+    "createdAt": 1789199086522,
+    "rootNodeId": "0aa4eae8-147e-4b67-af7f-7e29044d6709",
+    "cursorNodeId": "08ed5b5c-e25b-4cc6-8fcd-ff2b6ce16d05",
+    "title": "Welcome to Conduit",
+    "nodes": {
+        "0aa4eae8-147e-4b67-af7f-7e29044d6709": {
+            "id": "0aa4eae8-147e-4b67-af7f-7e29044d6709",
+            "type": "TEXT",
+            "createdAt": 1789199095918,
+            "parentId": null,
+            "children": [
+                "12e27757-bcd9-4790-91bf-bc053a08eb29"
+            ],
+            "message": {
+                "title": "You · 12 Sep",
+                "timestamp": 1789199095918,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "A tiger named fangs\n"
+            }
+        },
+        "12e27757-bcd9-4790-91bf-bc053a08eb29": {
+            "id": "12e27757-bcd9-4790-91bf-bc053a08eb29",
+            "type": "TEXT",
+            "createdAt": 1789199095919,
+            "parentId": "0aa4eae8-147e-4b67-af7f-7e29044d6709",
+            "children": [
+                "c4901ab6-7c93-4573-9673-8343d66eeac3"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789199095918,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-84678fa0-ff57-4c81-b008-04a15ef06b13",
+                    "packId": "Default"
+                },
+                "text": "Yip Yip Yippee!",
+                "responseTime": 459
+            }
+        },
+        "c4901ab6-7c93-4573-9673-8343d66eeac3": {
+            "id": "c4901ab6-7c93-4573-9673-8343d66eeac3",
+            "type": "TEXT",
+            "createdAt": 1789199220703,
+            "parentId": "12e27757-bcd9-4790-91bf-bc053a08eb29",
+            "children": [
+                "a36cf19e-7c92-474e-acdb-4f69a799aa7f"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789199220703,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "a tiger named fangs\n"
+            }
+        },
+        "a36cf19e-7c92-474e-acdb-4f69a799aa7f": {
+            "id": "a36cf19e-7c92-474e-acdb-4f69a799aa7f",
+            "type": "TEXT",
+            "createdAt": 1789199220704,
+            "parentId": "c4901ab6-7c93-4573-9673-8343d66eeac3",
+            "children": [
+                "c882ee7e-8030-4be1-8c17-d7e75992229c"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789199220704,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-fd845f25-17b3-49fc-a299-79fd99f537cb",
+                    "packId": "Default"
+                },
+                "text": "1 Slickerberry Snoozlestone mined\n\nYippee!}",
+                "responseTime": 1269
+            }
+        },
+        "c882ee7e-8030-4be1-8c17-d7e75992229c": {
+            "id": "c882ee7e-8030-4be1-8c17-d7e75992229c",
+            "type": "TEXT",
+            "createdAt": 1789199255600,
+            "parentId": "a36cf19e-7c92-474e-acdb-4f69a799aa7f",
+            "children": [
+                "08ed5b5c-e25b-4cc6-8fcd-ff2b6ce16d05"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789199255600,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "a tiger named fangs\n"
+            }
+        },
+        "08ed5b5c-e25b-4cc6-8fcd-ff2b6ce16d05": {
+            "id": "08ed5b5c-e25b-4cc6-8fcd-ff2b6ce16d05",
+            "type": "TEXT",
+            "createdAt": 1789199255600,
+            "parentId": "c882ee7e-8030-4be1-8c17-d7e75992229c",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789199255600,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-fcfae4bf-91a6-457d-a907-95a6acac7dec",
+                    "packId": "Default"
+                },
+                "text": "1 Slickerberry Snoozlestone mined\n\nYippee!",
+                "responseTime": 1241
+            }
+        }
+    }
+}

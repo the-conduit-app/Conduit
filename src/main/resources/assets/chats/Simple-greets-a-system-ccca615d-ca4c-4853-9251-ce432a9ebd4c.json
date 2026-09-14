@@ -1,0 +1,80 @@
+{
+    "id": "ccca615d-ca4c-4853-9251-ce432a9ebd4c",
+    "createdAt": 1788488639299,
+    "rootNodeId": "81b0d798-44b6-4739-a3ca-8a56daa0a164",
+    "cursorNodeId": "05bb6e4c-85ab-4bb3-bcf9-5fad41fd8383",
+    "title": "Simple greets a system",
+    "nodes": {
+        "81b0d798-44b6-4739-a3ca-8a56daa0a164": {
+            "id": "81b0d798-44b6-4739-a3ca-8a56daa0a164",
+            "type": "TEXT",
+            "createdAt": 1788488646587,
+            "parentId": null,
+            "children": [
+                "f22236c3-73c4-4e2a-8f5c-b9ad9d1dd2f7"
+            ],
+            "message": {
+                "title": "You · 4 Sep",
+                "timestamp": 1788488646587,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Simple\n"
+            }
+        },
+        "f22236c3-73c4-4e2a-8f5c-b9ad9d1dd2f7": {
+            "id": "f22236c3-73c4-4e2a-8f5c-b9ad9d1dd2f7",
+            "type": "TEXT",
+            "createdAt": 1788488646587,
+            "parentId": "81b0d798-44b6-4739-a3ca-8a56daa0a164",
+            "children": [
+                "14fcd336-8165-402a-be51-86fc5be32589"
+            ],
+            "message": {
+                "title": "Simple (Echoing) · Pack: Default",
+                "timestamp": 1788488646587,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "054940c9-8ecd-4073-87e8-4c8a2ea8640b",
+                    "packId": "Default"
+                },
+                "text": "Hi Simple",
+                "responseTime": 486
+            }
+        },
+        "14fcd336-8165-402a-be51-86fc5be32589": {
+            "id": "14fcd336-8165-402a-be51-86fc5be32589",
+            "type": "TEXT",
+            "createdAt": 1789124609562,
+            "parentId": "f22236c3-73c4-4e2a-8f5c-b9ad9d1dd2f7",
+            "children": [
+                "05bb6e4c-85ab-4bb3-bcf9-5fad41fd8383"
+            ],
+            "message": {
+                "title": "You · 11 Sep",
+                "timestamp": 1789124609562,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Silly, how are you?\n"
+            }
+        },
+        "05bb6e4c-85ab-4bb3-bcf9-5fad41fd8383": {
+            "id": "05bb6e4c-85ab-4bb3-bcf9-5fad41fd8383",
+            "type": "TEXT",
+            "createdAt": 1789124609563,
+            "parentId": "14fcd336-8165-402a-be51-86fc5be32589",
+            "message": {
+                "title": "Silly (Echoing) · Pack: Echo",
+                "timestamp": 1789124609563,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-ec8bfa7b-8b95-4198-8fa0-00d68812b608",
+                    "packId": "Echoes"
+                },
+                "text": "¿noʎ ǝɹɐ ʍoɥ 'ʎllᴉS ᴉH",
+                "responseTime": 1197
+            }
+        }
+    }
+}

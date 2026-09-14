@@ -1,0 +1,51 @@
+{
+  "13b2a7b4115bbd0900162edcebe476da1ba1fc24e718e8b40d32f6e300f56dfe": {
+    "name": "gemma-2-9b-it-Q4_K_M.gguf",
+    "description": "General-purpose Gemma"
+  },
+  "83cdc1c91550c438e1a2dbdc26fbb920c16864aa3bcda9e81b86050cd7a91c63": {
+    "name": "gemma-3-12b-it-Q4_K_M.gguf",
+    "description": "General-purpose multimodal Gemma"
+  },
+  "120307ba529eb2439d6c430d94104dabd578497bc7bfe7e322b5d9933b449bd4": {
+    "name": "Qwen3-8B-Q4_K_M.gguf",
+    "description": "General-purpose instruction and reasoning model"
+  },
+  "01e1f25b3e6931054c6c2227b06f4969828434eebc299e8e171f55dab6814485": {
+    "name": "phi-4-Q4_K_M.gguf",
+    "description": "General-purpose reasoning and instruction model"
+  },
+  "b3bdbf23b47d7e6bb791c99b206deb169cd5a96362a9e3399028df2faacdc506": {
+    "name": "Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+    "description": "General-purpose instruction model"
+  },
+  "13dec282d3ac9a87896248d5f69187102fad7c56315c553d2fab5403121702fe": {
+    "name": "Qwen2.5-Coder-14B-Instruct-Q4_K_M.gguf",
+    "description": "Tuned for software development and coding"
+  },
+  "68701e9ffaab69e42827524f604bf71b375b7ed8f0c59f6a8c3d646c963b3e2c": {
+    "name": "Qwen2.5-Coder-14B-Instruct-Q5_K_M.gguf",
+    "description": "Tuned for software development and coding"
+  },
+  "d842e8d2aca3fc5e613c5f9255e693768eeccae729e5c2653159eb79afe751f3": {
+    "name": "medgemma-4b-it-Q4_K_M.gguf",
+    "description": "Tuned for medicine and clinical reasoning"
+  },
+  "c2929074c75b2b37e9a732bc842ef10b3287230102efd43d9a7872207599b345": {
+    "name": "ggml-model-Q4_K_M.gguf",
+    "description": "Tuned for medicine and biomedical text"
+  },
+  "fafe6e14252a94d92dbf56408568f79bde5dd7f3d8e7bc0eb6275195c6214d31": {
+    "name": "Qwen2.5-Math-7B-Instruct-Q4_K_M.gguf",
+    "description": "Tuned for mathematics and mathematical reasoning"
+  },
+  "d6b7e8d72c5394c0387bd0bc1742fe38ab8da82f2821778ced088574a8553c2b": {
+    "name": "law-llm.Q4_K_M.gguf",
+    "description": "Tuned for legal text and law"
+  }
+    ,
+  "ed5fa30c487b282ec156c29062f1222e5c20875a944ac98289dbd242e947f747": {
+    "name": "SmolLM2-135M-Instruct-Q4_K_M.gguf",
+    "description": "A small model for debugging (but make sure to cap output)"
+  }
+}

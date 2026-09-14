@@ -1,0 +1,80 @@
+{
+    "id": "4b798ac6-9997-4a3d-b9cf-4f9d374b067d",
+    "createdAt": 1789281176430,
+    "rootNodeId": "a205924a-be22-4989-bb15-1307279f1087",
+    "cursorNodeId": "8ebb7b26-cf2b-4247-97b6-a21b7efd55c5",
+    "title": "Modifying User Data",
+    "nodes": {
+        "a205924a-be22-4989-bb15-1307279f1087": {
+            "id": "a205924a-be22-4989-bb15-1307279f1087",
+            "type": "TEXT",
+            "createdAt": 1789281199693,
+            "parentId": null,
+            "children": [
+                "e1c2978b-2d19-4ad7-840d-442b0b481695"
+            ],
+            "message": {
+                "title": "You · 13 Sep",
+                "timestamp": 1789281199693,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "can i change what you know about me?\n"
+            }
+        },
+        "e1c2978b-2d19-4ad7-840d-442b0b481695": {
+            "id": "e1c2978b-2d19-4ad7-840d-442b0b481695",
+            "type": "TEXT",
+            "createdAt": 1789281199694,
+            "parentId": "a205924a-be22-4989-bb15-1307279f1087",
+            "children": [
+                "07536766-35d0-43ab-9135-5d9e2c422baf"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789281199694,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-9614322a-35ef-4baa-9ad8-8f07b2f0da61",
+                    "packId": "Default"
+                },
+                "text": "Of course you can. Every time you talk to someone here, you change what I know about you.",
+                "responseTime": 1141
+            }
+        },
+        "07536766-35d0-43ab-9135-5d9e2c422baf": {
+            "id": "07536766-35d0-43ab-9135-5d9e2c422baf",
+            "type": "TEXT",
+            "createdAt": 1789281215725,
+            "parentId": "e1c2978b-2d19-4ad7-840d-442b0b481695",
+            "children": [
+                "8ebb7b26-cf2b-4247-97b6-a21b7efd55c5"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789281215725,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "no i mean can I directly change it?\n"
+            }
+        },
+        "8ebb7b26-cf2b-4247-97b6-a21b7efd55c5": {
+            "id": "8ebb7b26-cf2b-4247-97b6-a21b7efd55c5",
+            "type": "TEXT",
+            "createdAt": 1789281215725,
+            "parentId": "07536766-35d0-43ab-9135-5d9e2c422baf",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789281215725,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-9614322a-35ef-4baa-9ad8-8f07b2f0da61",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 1646
+            }
+        }
+    }
+}

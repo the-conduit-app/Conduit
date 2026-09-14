@@ -1,0 +1,43 @@
+{
+    "id": "ad15d7cd-126f-4324-a1cb-bf4aa281bdd8",
+    "createdAt": 1789125711429,
+    "rootNodeId": "84b5f030-ad32-4556-a46b-4536f3f406b2",
+    "cursorNodeId": "a7308ed7-2487-4f3d-afa8-757357ea629b",
+    "title": "Welcome to Conduit",
+    "nodes": {
+        "84b5f030-ad32-4556-a46b-4536f3f406b2": {
+            "id": "84b5f030-ad32-4556-a46b-4536f3f406b2",
+            "type": "TEXT",
+            "createdAt": 1789125728387,
+            "parentId": null,
+            "children": [
+                "a7308ed7-2487-4f3d-afa8-757357ea629b"
+            ],
+            "message": {
+                "title": "You · 11 Sep",
+                "timestamp": 1789125728387,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi\n"
+            }
+        },
+        "a7308ed7-2487-4f3d-afa8-757357ea629b": {
+            "id": "a7308ed7-2487-4f3d-afa8-757357ea629b",
+            "type": "TEXT",
+            "createdAt": 1789125728388,
+            "parentId": "84b5f030-ad32-4556-a46b-4536f3f406b2",
+            "message": {
+                "title": "Simple (Echoing) · Pack: Default",
+                "timestamp": 1789125728388,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-8e60e932-75e1-406c-90b3-c5bf921a324c",
+                    "packId": "Default"
+                },
+                "text": "hi",
+                "responseTime": 113
+            }
+        }
+    }
+}

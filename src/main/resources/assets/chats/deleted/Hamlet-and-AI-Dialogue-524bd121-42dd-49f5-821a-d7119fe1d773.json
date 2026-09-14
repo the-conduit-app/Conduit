@@ -1,0 +1,377 @@
+{
+    "id": "524bd121-42dd-49f5-821a-d7119fe1d773",
+    "createdAt": 1789195409424,
+    "rootNodeId": "c8648338-3b5d-4b4b-a102-202cb2da18cc",
+    "cursorNodeId": "3bc6a0a6-c769-4dc7-a772-f5a5b4952c68",
+    "title": "Hamlet and AI Dialogue",
+    "nodes": {
+        "c8648338-3b5d-4b4b-a102-202cb2da18cc": {
+            "id": "c8648338-3b5d-4b4b-a102-202cb2da18cc",
+            "type": "TEXT",
+            "createdAt": 1789195429103,
+            "parentId": null,
+            "children": [
+                "9683e94f-d692-4266-b47a-135a9fba8545"
+            ],
+            "message": {
+                "title": "You · 12 Sep",
+                "timestamp": 1789195429103,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Condy\n"
+            }
+        },
+        "9683e94f-d692-4266-b47a-135a9fba8545": {
+            "id": "9683e94f-d692-4266-b47a-135a9fba8545",
+            "type": "TEXT",
+            "createdAt": 1789195429104,
+            "parentId": "c8648338-3b5d-4b4b-a102-202cb2da18cc",
+            "children": [
+                "3fb77eb5-7359-4558-affb-f232b83baaa2"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789195429104,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-5bae7256-e051-4d67-80cc-069d470a27ce",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3806
+            }
+        },
+        "3fb77eb5-7359-4558-affb-f232b83baaa2": {
+            "id": "3fb77eb5-7359-4558-affb-f232b83baaa2",
+            "type": "TEXT",
+            "createdAt": 1789195440661,
+            "parentId": "9683e94f-d692-4266-b47a-135a9fba8545",
+            "children": [
+                "82b3ccfc-18c2-48b8-8e4f-0c32304143ae"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789195440661,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "What do you know about me?\n"
+            }
+        },
+        "82b3ccfc-18c2-48b8-8e4f-0c32304143ae": {
+            "id": "82b3ccfc-18c2-48b8-8e4f-0c32304143ae",
+            "type": "TEXT",
+            "createdAt": 1789195440661,
+            "parentId": "3fb77eb5-7359-4558-affb-f232b83baaa2",
+            "children": [
+                "03fd3c8f-7e38-4ef5-923d-86a54f308a7e"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789195440661,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-5bae7256-e051-4d67-80cc-069d470a27ce",
+                    "packId": "Default"
+                },
+                "text": "You are interested in astronomical phenomena, law, space law, US-Canada border regions, legal implications of AI, astronomy, Sicilian GDP, Sicilian economy, geography, legal ramifications of AI, and open-sourcing AI models.",
+                "responseTime": 6403
+            }
+        },
+        "03fd3c8f-7e38-4ef5-923d-86a54f308a7e": {
+            "id": "03fd3c8f-7e38-4ef5-923d-86a54f308a7e",
+            "type": "TEXT",
+            "createdAt": 1789195463638,
+            "parentId": "82b3ccfc-18c2-48b8-8e4f-0c32304143ae",
+            "children": [
+                "df79b214-4279-49b8-a41d-050c5d0ef98e"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789195463638,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "what do you really really know about me?\n"
+            }
+        },
+        "df79b214-4279-49b8-a41d-050c5d0ef98e": {
+            "id": "df79b214-4279-49b8-a41d-050c5d0ef98e",
+            "type": "TEXT",
+            "createdAt": 1789195463638,
+            "parentId": "03fd3c8f-7e38-4ef5-923d-86a54f308a7e",
+            "children": [
+                "3b68d17e-578b-4aec-84f3-9f44fff6bbde"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789195463638,
+                "status": "INTERRUPTED",
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-5bae7256-e051-4d67-80cc-069d470a27ce",
+                    "packId": "Default"
+                },
+                "text": "{\n    \"features\": [\n        {\n            \"text\": \"Prefers concise answers\",\n            \"firstSeen\": 1788689119769,\n            \"lastSeen\": 1789112641336,\n            \"observationCount\": 8\n        },\n        {\n            \"text\": \"Name is Bubba\",\n            \"firstSeen\": 1788689119769,\n            \"lastSeen\": 1789112641336,\n            \"observationCount\": 8\n        },\n        {\n            \"text\": \"Favorite color is orange\",\n            \"firstSeen\": 1788689119769,\n            \"lastSeen\": 1789112641336,\n            \"observationCount\": 8\n        },\n        {\n            \"text\": \"Interest in astronomical phenomena\",\n            \"firstSeen\": 1788689184706,\n            \"lastSeen\": ^C",
+                "responseTime": 19750
+            }
+        },
+        "3b68d17e-578b-4aec-84f3-9f44fff6bbde": {
+            "id": "3b68d17e-578b-4aec-84f3-9f44fff6bbde",
+            "type": "TEXT",
+            "createdAt": 1789195491986,
+            "parentId": "df79b214-4279-49b8-a41d-050c5d0ef98e",
+            "children": [
+                "95a77893-da3b-4a54-98f9-987d278afe96"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789195491986,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "thanks\n"
+            }
+        },
+        "95a77893-da3b-4a54-98f9-987d278afe96": {
+            "id": "95a77893-da3b-4a54-98f9-987d278afe96",
+            "type": "TEXT",
+            "createdAt": 1789195491986,
+            "parentId": "3b68d17e-578b-4aec-84f3-9f44fff6bbde",
+            "children": [
+                "e6a9e78e-0ace-4f6c-ad3a-2264f7e3fb54"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789195491986,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-5bae7256-e051-4d67-80cc-069d470a27ce",
+                    "packId": "Default"
+                },
+                "text": "You're welcome.",
+                "responseTime": 430
+            }
+        },
+        "e6a9e78e-0ace-4f6c-ad3a-2264f7e3fb54": {
+            "id": "e6a9e78e-0ace-4f6c-ad3a-2264f7e3fb54",
+            "type": "TEXT",
+            "createdAt": 1789195498928,
+            "parentId": "95a77893-da3b-4a54-98f9-987d278afe96",
+            "children": [
+                "4e050b95-7abf-4831-94bb-29b75c733fe5"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789195498928,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Trails\n"
+            }
+        },
+        "4e050b95-7abf-4831-94bb-29b75c733fe5": {
+            "id": "4e050b95-7abf-4831-94bb-29b75c733fe5",
+            "type": "TEXT",
+            "createdAt": 1789195498928,
+            "parentId": "e6a9e78e-0ace-4f6c-ad3a-2264f7e3fb54",
+            "children": [
+                "46e8f7d1-400b-4cbb-88c8-dd02df819692"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789195498928,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-5bae7256-e051-4d67-80cc-069d470a27ce",
+                    "packId": "Default"
+                },
+                "text": "To be, or not to be, that is the question:",
+                "responseTime": 1234
+            }
+        },
+        "46e8f7d1-400b-4cbb-88c8-dd02df819692": {
+            "id": "46e8f7d1-400b-4cbb-88c8-dd02df819692",
+            "type": "TEXT",
+            "createdAt": 1789195528236,
+            "parentId": "4e050b95-7abf-4831-94bb-29b75c733fe5",
+            "children": [
+                "cf950e99-050b-4b6f-bfeb-0614b693fe82"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789195528235,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Whether 'tis nobler in the mind to suffer\n"
+            }
+        },
+        "cf950e99-050b-4b6f-bfeb-0614b693fe82": {
+            "id": "cf950e99-050b-4b6f-bfeb-0614b693fe82",
+            "type": "TEXT",
+            "createdAt": 1789195528236,
+            "parentId": "46e8f7d1-400b-4cbb-88c8-dd02df819692",
+            "children": [
+                "65d5ba7a-62b5-4470-b940-73d367a4666f"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789195528236,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-5bae7256-e051-4d67-80cc-069d470a27ce",
+                    "packId": "Default"
+                },
+                "text": "The slings and arrows of outrageous fortune,",
+                "responseTime": 1276
+            }
+        },
+        "65d5ba7a-62b5-4470-b940-73d367a4666f": {
+            "id": "65d5ba7a-62b5-4470-b940-73d367a4666f",
+            "type": "TEXT",
+            "createdAt": 1789195557692,
+            "parentId": "cf950e99-050b-4b6f-bfeb-0614b693fe82",
+            "children": [
+                "e994a0ff-9e39-49ef-bd5f-2afe84d38f4b"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789195557692,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "wow thanks. you seem to know some stuff\n?"
+            }
+        },
+        "e994a0ff-9e39-49ef-bd5f-2afe84d38f4b": {
+            "id": "e994a0ff-9e39-49ef-bd5f-2afe84d38f4b",
+            "type": "TEXT",
+            "createdAt": 1789195557692,
+            "parentId": "65d5ba7a-62b5-4470-b940-73d367a4666f",
+            "children": [
+                "3485e0cf-4d79-44c3-8081-89b8fc8f48bd"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789195557692,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-5bae7256-e051-4d67-80cc-069d470a27ce",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3790
+            }
+        },
+        "3485e0cf-4d79-44c3-8081-89b8fc8f48bd": {
+            "id": "3485e0cf-4d79-44c3-8081-89b8fc8f48bd",
+            "type": "TEXT",
+            "createdAt": 1789195579400,
+            "parentId": "e994a0ff-9e39-49ef-bd5f-2afe84d38f4b",
+            "children": [
+                "89ec9877-07f0-4b72-a40e-b49c4bb7b203"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789195579400,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Or to take arms against a sea of troubles\n"
+            }
+        },
+        "89ec9877-07f0-4b72-a40e-b49c4bb7b203": {
+            "id": "89ec9877-07f0-4b72-a40e-b49c4bb7b203",
+            "type": "TEXT",
+            "createdAt": 1789195579400,
+            "parentId": "3485e0cf-4d79-44c3-8081-89b8fc8f48bd",
+            "children": [
+                "4f274487-8083-4bc0-afb0-02efef246f5a"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789195579400,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-5bae7256-e051-4d67-80cc-069d470a27ce",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3797
+            }
+        },
+        "4f274487-8083-4bc0-afb0-02efef246f5a": {
+            "id": "4f274487-8083-4bc0-afb0-02efef246f5a",
+            "type": "TEXT",
+            "createdAt": 1789195606601,
+            "parentId": "89ec9877-07f0-4b72-a40e-b49c4bb7b203",
+            "children": [
+                "de844673-d67c-4da3-83e1-cd1ee33c4a6e"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789195606601,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "To be, or not to be, that is the question:\n"
+            }
+        },
+        "de844673-d67c-4da3-83e1-cd1ee33c4a6e": {
+            "id": "de844673-d67c-4da3-83e1-cd1ee33c4a6e",
+            "type": "TEXT",
+            "createdAt": 1789195606601,
+            "parentId": "4f274487-8083-4bc0-afb0-02efef246f5a",
+            "children": [
+                "3e66b800-0c69-4059-81f8-d79fddda934f"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789195606601,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-5bae7256-e051-4d67-80cc-069d470a27ce",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3788
+            }
+        },
+        "3e66b800-0c69-4059-81f8-d79fddda934f": {
+            "id": "3e66b800-0c69-4059-81f8-d79fddda934f",
+            "type": "TEXT",
+            "createdAt": 1789195613564,
+            "parentId": "de844673-d67c-4da3-83e1-cd1ee33c4a6e",
+            "children": [
+                "3bc6a0a6-c769-4dc7-a772-f5a5b4952c68"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789195613564,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Trails\n"
+            }
+        },
+        "3bc6a0a6-c769-4dc7-a772-f5a5b4952c68": {
+            "id": "3bc6a0a6-c769-4dc7-a772-f5a5b4952c68",
+            "type": "TEXT",
+            "createdAt": 1789195613565,
+            "parentId": "3e66b800-0c69-4059-81f8-d79fddda934f",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789195613565,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-5bae7256-e051-4d67-80cc-069d470a27ce",
+                    "packId": "Default"
+                },
+                "text": "To be, or not to be, that is the question:",
+                "responseTime": 1204
+            }
+        }
+    }
+}

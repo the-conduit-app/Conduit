@@ -1,0 +1,1298 @@
+{
+    "id": "13ec8d2e-b0c1-4b22-bb17-e750a9c23e76",
+    "createdAt": 1788508303227,
+    "rootNodeId": "ff0df7c8-82e7-4d65-a16e-e7859c651f30",
+    "cursorNodeId": "5bdaa89d-2812-4893-a055-3318504a719c",
+    "title": "Legal and Philosophical Discussions",
+    "nodes": {
+        "ff0df7c8-82e7-4d65-a16e-e7859c651f30": {
+            "id": "ff0df7c8-82e7-4d65-a16e-e7859c651f30",
+            "type": "TEXT",
+            "createdAt": 1788508312967,
+            "parentId": null,
+            "children": [
+                "62bb32a7-48e6-4d93-960c-33cb0fa00d94"
+            ],
+            "message": {
+                "title": "You · 4 Sep",
+                "timestamp": 1788508312967,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi\n"
+            }
+        },
+        "62bb32a7-48e6-4d93-960c-33cb0fa00d94": {
+            "id": "62bb32a7-48e6-4d93-960c-33cb0fa00d94",
+            "type": "TEXT",
+            "createdAt": 1788508312967,
+            "parentId": "ff0df7c8-82e7-4d65-a16e-e7859c651f30",
+            "children": [
+                "79ec5222-18a3-4f5e-9a55-3472c74eaf07"
+            ],
+            "message": {
+                "title": "Simple (Echoing) · Pack: Default",
+                "timestamp": 1788508312967,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "1d6230aa-c8a4-4cb5-9852-124247cde8aa",
+                    "packId": "Default"
+                },
+                "text": "hi",
+                "responseTime": 108
+            }
+        },
+        "79ec5222-18a3-4f5e-9a55-3472c74eaf07": {
+            "id": "79ec5222-18a3-4f5e-9a55-3472c74eaf07",
+            "type": "TEXT",
+            "createdAt": 1788669478499,
+            "parentId": "62bb32a7-48e6-4d93-960c-33cb0fa00d94",
+            "children": [
+                "94533e8b-7669-45e7-be35-251085092086"
+            ],
+            "message": {
+                "title": "You · 6 Sep",
+                "timestamp": 1788669478499,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi gem, \n"
+            }
+        },
+        "94533e8b-7669-45e7-be35-251085092086": {
+            "id": "94533e8b-7669-45e7-be35-251085092086",
+            "type": "TEXT",
+            "createdAt": 1788669478499,
+            "parentId": "79ec5222-18a3-4f5e-9a55-3472c74eaf07",
+            "children": [
+                "8f5badbc-0ebe-4932-b5d3-90c75a43bb99"
+            ],
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1788669478499,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "b3b43383-97ed-4336-959e-0b4670409e3d",
+                    "packId": "Default"
+                },
+                "text": "Hello USER! It's nice to hear from you. What can I do for you today? \n",
+                "responseTime": 11460
+            }
+        },
+        "8f5badbc-0ebe-4932-b5d3-90c75a43bb99": {
+            "id": "8f5badbc-0ebe-4932-b5d3-90c75a43bb99",
+            "type": "TEXT",
+            "createdAt": 1788669507328,
+            "parentId": "94533e8b-7669-45e7-be35-251085092086",
+            "children": [
+                "44ca5c14-3fcb-472c-bad7-baf8500da8c8"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788669507327,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi finn\n"
+            }
+        },
+        "44ca5c14-3fcb-472c-bad7-baf8500da8c8": {
+            "id": "44ca5c14-3fcb-472c-bad7-baf8500da8c8",
+            "type": "TEXT",
+            "createdAt": 1788669507328,
+            "parentId": "8f5badbc-0ebe-4932-b5d3-90c75a43bb99",
+            "children": [
+                "1782a658-93c2-40b1-9caa-9ab548a88a5d"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1788669507328,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "ddcfb343-97d6-4385-94ea-9959ae699fcc",
+                    "packId": "Default"
+                },
+                "text": "Hi there! What can I help you with today?  \n",
+                "responseTime": 13228
+            }
+        },
+        "1782a658-93c2-40b1-9caa-9ab548a88a5d": {
+            "id": "1782a658-93c2-40b1-9caa-9ab548a88a5d",
+            "type": "TEXT",
+            "createdAt": 1788677912067,
+            "parentId": "44ca5c14-3fcb-472c-bad7-baf8500da8c8",
+            "children": [
+                "876f1f97-118f-4bea-8970-3dcc4977fca3"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788677912066,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Larry, I wonder if you can help me understand why some provably harmless (to others) things are considered illegal"
+            }
+        },
+        "876f1f97-118f-4bea-8970-3dcc4977fca3": {
+            "id": "876f1f97-118f-4bea-8970-3dcc4977fca3",
+            "type": "TEXT",
+            "createdAt": 1788677912067,
+            "parentId": "1782a658-93c2-40b1-9caa-9ab548a88a5d",
+            "children": [
+                "201f7850-83f1-44ec-b194-69582519c28d"
+            ],
+            "message": {
+                "title": "Larry (Law) · Pack: Default",
+                "timestamp": 1788677912067,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "39685bd8-2a18-4839-9e90-c864319794f4",
+                    "packId": "Default"
+                },
+                "text": "That's a fascinating question, and one that gets at the heart of how societies define and regulate behavior. \n\nThere are a few key reasons why something provably harmless to others might still be illegal:\n\n* **Protecting Individual Autonomy:** Even if an action doesn't directly harm others, it might be seen as infringing on someone's autonomy or right to make their own choices. For example, laws against drug use, even for personal consumption, are often based on the idea that individuals should have the right to control their own bodies and minds.\n\n* **Preventing Social Harm:**  Sometimes, actions that seem harmless on the surface can contribute to broader social problems. For example, laws against public nudity might be justified on the grounds that it could lead to discomfort or offense among others, even if it doesn't cause direct physical harm.\n\n* **Maintaining Order and Stability:** Laws are also designed to maintain order and stability within society.  Certain behaviors, even if seemingly harmless, might be seen as disruptive or potentially leading to more serious problems if left unchecked.\n\n* **Moral and Ethical Considerations:**  Many laws reflect societal values and moral beliefs.  What is considered acceptable behavior can vary widely across cultures and time periods.  \n\nIt's important to note that the line between harmless and harmful can be blurry, and what is considered illegal can change over time as societal norms and values evolve. \n\n\nLet me know if you'd like to explore any of these points in more detail or have other examples in mind!\n",
+                "responseTime": 44361
+            }
+        },
+        "201f7850-83f1-44ec-b194-69582519c28d": {
+            "id": "201f7850-83f1-44ec-b194-69582519c28d",
+            "type": "TEXT",
+            "createdAt": 1788678603976,
+            "parentId": "876f1f97-118f-4bea-8970-3dcc4977fca3",
+            "children": [
+                "d9217f63-28bd-4704-95fe-f38229897d3a"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788678603976,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "ok thanks\n"
+            }
+        },
+        "d9217f63-28bd-4704-95fe-f38229897d3a": {
+            "id": "d9217f63-28bd-4704-95fe-f38229897d3a",
+            "type": "TEXT",
+            "createdAt": 1788678603977,
+            "parentId": "201f7850-83f1-44ec-b194-69582519c28d",
+            "children": [
+                "7780476c-9039-4034-8f1c-35c9b15e2b39"
+            ],
+            "message": {
+                "title": "Larry (Law) · Pack: Default",
+                "timestamp": 1788678603977,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "30e33fc8-e85b-448f-95e7-1a43e28f3156",
+                    "packId": "Default"
+                },
+                "text": "You're welcome! Is there anything else I can help you with today? \n",
+                "responseTime": 13674
+            }
+        },
+        "7780476c-9039-4034-8f1c-35c9b15e2b39": {
+            "id": "7780476c-9039-4034-8f1c-35c9b15e2b39",
+            "type": "TEXT",
+            "createdAt": 1788678782083,
+            "parentId": "d9217f63-28bd-4704-95fe-f38229897d3a",
+            "children": [
+                "e3bcbc1b-5df3-4b20-98fa-0cef7cddc9bb"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788678782083,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi condy what do you know about me?\n"
+            }
+        },
+        "e3bcbc1b-5df3-4b20-98fa-0cef7cddc9bb": {
+            "id": "e3bcbc1b-5df3-4b20-98fa-0cef7cddc9bb",
+            "type": "TEXT",
+            "createdAt": 1788678782083,
+            "parentId": "7780476c-9039-4034-8f1c-35c9b15e2b39",
+            "children": [
+                "2ae4c4ba-bc90-4f7a-926a-116a8002477a"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1788678782083,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "0c61a8f7-2b22-4117-a25f-0328c131a9e5",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer\nthe following question: 'What do you know about me?'",
+                "responseTime": 3799
+            }
+        },
+        "2ae4c4ba-bc90-4f7a-926a-116a8002477a": {
+            "id": "2ae4c4ba-bc90-4f7a-926a-116a8002477a",
+            "type": "TEXT",
+            "createdAt": 1788678791121,
+            "parentId": "e3bcbc1b-5df3-4b20-98fa-0cef7cddc9bb",
+            "children": [
+                "5af185db-f72b-40e3-b80c-f1bc6b8d4eff"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788678791120,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "What do you know about me?\n"
+            }
+        },
+        "5af185db-f72b-40e3-b80c-f1bc6b8d4eff": {
+            "id": "5af185db-f72b-40e3-b80c-f1bc6b8d4eff",
+            "type": "TEXT",
+            "createdAt": 1788678791121,
+            "parentId": "2ae4c4ba-bc90-4f7a-926a-116a8002477a",
+            "children": [
+                "ff6735da-b95f-418c-8e09-6205fac95771"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1788678791121,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "0c61a8f7-2b22-4117-a25f-0328c131a9e5",
+                    "packId": "Default"
+                },
+                "text": "You are interested in astronomy, geography, legal frameworks, materials science, using AI for practical tasks, AI models, environmental issues, and AI capabilities.",
+                "responseTime": 4733
+            }
+        },
+        "ff6735da-b95f-418c-8e09-6205fac95771": {
+            "id": "ff6735da-b95f-418c-8e09-6205fac95771",
+            "type": "TEXT",
+            "createdAt": 1788678801343,
+            "parentId": "5af185db-f72b-40e3-b80c-f1bc6b8d4eff",
+            "children": [
+                "56c985a4-0a23-4bb0-99cd-621c3983fbc9"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788678801342,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "what do you really know about me?\n"
+            }
+        },
+        "56c985a4-0a23-4bb0-99cd-621c3983fbc9": {
+            "id": "56c985a4-0a23-4bb0-99cd-621c3983fbc9",
+            "type": "TEXT",
+            "createdAt": 1788678801343,
+            "parentId": "ff6735da-b95f-418c-8e09-6205fac95771",
+            "children": [
+                "0802b1be-f62e-46da-9886-c92a3a077500"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1788678801343,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "0c61a8f7-2b22-4117-a25f-0328c131a9e5",
+                    "packId": "Default"
+                },
+                "text": "10% confidence: Interest in astronomy\n8% confidence: Interest in geography\n8% confidence: Interest in legal frameworks\n8% confidence: Interest in materials science\n8% confidence: Interest in using AI for practical tasks\n7% confidence: Interest in AI models\n6% confidence: Prefers pseudonym\n6% confidence: Interest in environmental issues\n5% confidence: Interests: astronomy, geography, legal frameworks, materials science, AI applications, environmental issues\n3% confidence: Interest in AI capabilities\n3% confidence: Preference for concise information\n3% confidence: Identifies as USER\n3% confidence: Interacts with a conversational agent\n3% confidence: Interests: geography, materials science, legal frameworks, AI applications, astronomy, environmental issues\n3% confidence: Uses AI agents\n3% confidence: Prefers to use a pseudonym",
+                "responseTime": 23791
+            }
+        },
+        "0802b1be-f62e-46da-9886-c92a3a077500": {
+            "id": "0802b1be-f62e-46da-9886-c92a3a077500",
+            "type": "TEXT",
+            "createdAt": 1788678829288,
+            "parentId": "56c985a4-0a23-4bb0-99cd-621c3983fbc9",
+            "children": [
+                "31bfcefe-22f5-46a3-930a-1170a0c0d442"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788678829288,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "thanks.\n"
+            }
+        },
+        "31bfcefe-22f5-46a3-930a-1170a0c0d442": {
+            "id": "31bfcefe-22f5-46a3-930a-1170a0c0d442",
+            "type": "TEXT",
+            "createdAt": 1788678829288,
+            "parentId": "0802b1be-f62e-46da-9886-c92a3a077500",
+            "children": [
+                "6b646df0-1945-4717-a84c-38fd6583fc82",
+                "8e41cea3-3896-48e0-9571-08af283e06a9"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1788678829288,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "0c61a8f7-2b22-4117-a25f-0328c131a9e5",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer\nthe following question: 'What do you know about me?'",
+                "responseTime": 3748
+            }
+        },
+        "6b646df0-1945-4717-a84c-38fd6583fc82": {
+            "id": "6b646df0-1945-4717-a84c-38fd6583fc82",
+            "type": "TEXT",
+            "createdAt": 1788682337736,
+            "parentId": "31bfcefe-22f5-46a3-930a-1170a0c0d442",
+            "children": [
+                "8f9c669f-4609-4389-a49d-f10513540d84"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788682337736,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Gem, Are solstices and equinoxes the same in the northern and southern hemispheres?\n"
+            }
+        },
+        "8f9c669f-4609-4389-a49d-f10513540d84": {
+            "id": "8f9c669f-4609-4389-a49d-f10513540d84",
+            "type": "TEXT",
+            "createdAt": 1788682337737,
+            "parentId": "6b646df0-1945-4717-a84c-38fd6583fc82",
+            "children": [
+                "e44dce6d-7666-4eb3-b811-6e2f04df8725"
+            ],
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1788682337737,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "54e98dd4-703e-4d39-a331-aedad2cd8887",
+                    "packId": "Default"
+                },
+                "text": "Hi USER!  \n\nGood question! Solstices and equinoxes are opposite in the Northern and Southern Hemispheres. \n\nThink of it this way: when it's summer solstice in the Northern Hemisphere (longest day), it's winter solstice in the Southern Hemisphere (shortest day).  \n\nThe equinoxes are when day and night are roughly equal in length all over the world. \n\nLet me know if you have any other questions about astronomy! \n",
+                "responseTime": 38289
+            }
+        },
+        "e44dce6d-7666-4eb3-b811-6e2f04df8725": {
+            "id": "e44dce6d-7666-4eb3-b811-6e2f04df8725",
+            "type": "TEXT",
+            "createdAt": 1788682401426,
+            "parentId": "8f9c669f-4609-4389-a49d-f10513540d84",
+            "children": [
+                "3d7a76ec-0c25-4229-8c18-cd8f96957931"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788682401426,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Gem, Can you remember that my name is not USER. It is Bubba\n"
+            }
+        },
+        "3d7a76ec-0c25-4229-8c18-cd8f96957931": {
+            "id": "3d7a76ec-0c25-4229-8c18-cd8f96957931",
+            "type": "TEXT",
+            "createdAt": 1788682401426,
+            "parentId": "e44dce6d-7666-4eb3-b811-6e2f04df8725",
+            "children": [
+                "fbcd9525-efc4-456b-a815-eb251ae14f0d"
+            ],
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1788682401426,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "54e98dd4-703e-4d39-a331-aedad2cd8887",
+                    "packId": "Default"
+                },
+                "text": "Hi Bubba!  My apologies, I am still learning to keep track of all my conversations.  I will remember that your name is Bubba from now on.  What can I help you with today? \n\n\n",
+                "responseTime": 29338
+            }
+        },
+        "fbcd9525-efc4-456b-a815-eb251ae14f0d": {
+            "id": "fbcd9525-efc4-456b-a815-eb251ae14f0d",
+            "type": "TEXT",
+            "createdAt": 1788682570265,
+            "parentId": "3d7a76ec-0c25-4229-8c18-cd8f96957931",
+            "children": [
+                "732ed799-fb71-477a-b475-1d639608c974"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788682570265,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Great thanks\n"
+            }
+        },
+        "732ed799-fb71-477a-b475-1d639608c974": {
+            "id": "732ed799-fb71-477a-b475-1d639608c974",
+            "type": "TEXT",
+            "createdAt": 1788682570266,
+            "parentId": "fbcd9525-efc4-456b-a815-eb251ae14f0d",
+            "children": [
+                "66f2266a-7eed-4dc4-9de2-b58b44cdd66e"
+            ],
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1788682570266,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "c4b626f7-1145-4996-ad1d-3b21b00c4c1d",
+                    "packId": "Default"
+                },
+                "text": "You're welcome! Is there anything else I can help you with today? \n",
+                "responseTime": 29808
+            }
+        },
+        "66f2266a-7eed-4dc4-9de2-b58b44cdd66e": {
+            "id": "66f2266a-7eed-4dc4-9de2-b58b44cdd66e",
+            "type": "TEXT",
+            "createdAt": 1788682683897,
+            "parentId": "732ed799-fb71-477a-b475-1d639608c974",
+            "children": [
+                "525b2fea-b5d1-4171-abe6-501d0dd79c2c"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788682683897,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Actually, I thought that equinoxes were when the days and nights were exactly the same length all over the world.\n"
+            }
+        },
+        "525b2fea-b5d1-4171-abe6-501d0dd79c2c": {
+            "id": "525b2fea-b5d1-4171-abe6-501d0dd79c2c",
+            "type": "TEXT",
+            "createdAt": 1788682683898,
+            "parentId": "66f2266a-7eed-4dc4-9de2-b58b44cdd66e",
+            "children": [
+                "7dc87c08-a84b-4cb9-abb9-191e87ac7bad"
+            ],
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1788682683898,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "f4f35aba-02cf-49b0-a456-4a51c07e5c06",
+                    "packId": "Default"
+                },
+                "text": "That's right!  Equinoxes are when day and night are approximately equal in length all over the world. \n\nIt's a pretty neat phenomenon, considering the Earth's tilt. \n\n\n",
+                "responseTime": 32676
+            }
+        },
+        "7dc87c08-a84b-4cb9-abb9-191e87ac7bad": {
+            "id": "7dc87c08-a84b-4cb9-abb9-191e87ac7bad",
+            "type": "TEXT",
+            "createdAt": 1788682740098,
+            "parentId": "525b2fea-b5d1-4171-abe6-501d0dd79c2c",
+            "children": [
+                "536362d1-a7d7-44dd-810b-bccb57731119"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788682740098,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "But then you said \"Good question! Solstices and equinoxes are opposite in the Northern and Southern Hemispheres. \" Did I misunderstand?\n"
+            }
+        },
+        "536362d1-a7d7-44dd-810b-bccb57731119": {
+            "id": "536362d1-a7d7-44dd-810b-bccb57731119",
+            "type": "TEXT",
+            "createdAt": 1788682740098,
+            "parentId": "7dc87c08-a84b-4cb9-abb9-191e87ac7bad",
+            "children": [
+                "e2efbdd5-5194-4721-a257-2a8d67e0a0a3"
+            ],
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1788682740098,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "f4f35aba-02cf-49b0-a456-4a51c07e5c06",
+                    "packId": "Default"
+                },
+                "text": "You are right to question that!  I apologize for the confusion.  \n\nEquinoxes are indeed when day and night are approximately equal in length *everywhere* on Earth.  \n\nSolstices, on the other hand, are when one hemisphere has the longest day and the shortest night, while the other hemisphere has the shortest day and longest night. \n\nI am still under development and learning to be more accurate. Thanks for pointing out my mistake! \n",
+                "responseTime": 41126
+            }
+        },
+        "e2efbdd5-5194-4721-a257-2a8d67e0a0a3": {
+            "id": "e2efbdd5-5194-4721-a257-2a8d67e0a0a3",
+            "type": "TEXT",
+            "createdAt": 1788682839621,
+            "parentId": "536362d1-a7d7-44dd-810b-bccb57731119",
+            "children": [
+                "e19c88d1-b1e0-478c-98cb-6427a3bf90a8"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788682839621,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Thanks, but if you check the earlier exchanges in this conversation you will find that the error was mine.\n"
+            }
+        },
+        "e19c88d1-b1e0-478c-98cb-6427a3bf90a8": {
+            "id": "e19c88d1-b1e0-478c-98cb-6427a3bf90a8",
+            "type": "TEXT",
+            "createdAt": 1788682839621,
+            "parentId": "e2efbdd5-5194-4721-a257-2a8d67e0a0a3",
+            "children": [
+                "b232f295-f5ae-4d1f-bb41-6a80af6e0462"
+            ],
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1788682839621,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "f4f35aba-02cf-49b0-a456-4a51c07e5c06",
+                    "packId": "Default"
+                },
+                "text": "You are absolutely right! I apologize for the mistake. I am still under development and learning to process information correctly.  \n\nCan I help you with anything else? \n",
+                "responseTime": 38842
+            }
+        },
+        "b232f295-f5ae-4d1f-bb41-6a80af6e0462": {
+            "id": "b232f295-f5ae-4d1f-bb41-6a80af6e0462",
+            "type": "TEXT",
+            "createdAt": 1788683260455,
+            "parentId": "e19c88d1-b1e0-478c-98cb-6427a3bf90a8",
+            "children": [
+                "bfb449b4-68b3-4e99-bd4b-22ff0e0f98d0"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788683260455,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Please remember that my favorite color is orange\n"
+            }
+        },
+        "bfb449b4-68b3-4e99-bd4b-22ff0e0f98d0": {
+            "id": "bfb449b4-68b3-4e99-bd4b-22ff0e0f98d0",
+            "type": "TEXT",
+            "createdAt": 1788683260455,
+            "parentId": "b232f295-f5ae-4d1f-bb41-6a80af6e0462",
+            "children": [
+                "84cac2fc-2651-4bc8-896b-65159f125430"
+            ],
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1788683260455,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "f4f35aba-02cf-49b0-a456-4a51c07e5c06",
+                    "packId": "Default"
+                },
+                "text": "Noted! I'll remember that your favorite color is orange.  \n\nIs there anything else I can help you with? ",
+                "responseTime": 35834
+            }
+        },
+        "84cac2fc-2651-4bc8-896b-65159f125430": {
+            "id": "84cac2fc-2651-4bc8-896b-65159f125430",
+            "type": "TEXT",
+            "createdAt": 1788683313227,
+            "parentId": "bfb449b4-68b3-4e99-bd4b-22ff0e0f98d0",
+            "children": [
+                "8b7725d2-1429-4f72-b5ff-b9eca71d8cb5"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788683313227,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Please also remember that I prefer concise answers\n"
+            }
+        },
+        "8b7725d2-1429-4f72-b5ff-b9eca71d8cb5": {
+            "id": "8b7725d2-1429-4f72-b5ff-b9eca71d8cb5",
+            "type": "TEXT",
+            "createdAt": 1788683313227,
+            "parentId": "84cac2fc-2651-4bc8-896b-65159f125430",
+            "children": [
+                "256a6857-e169-4832-924d-7d84918fddad"
+            ],
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1788683313227,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "f4f35aba-02cf-49b0-a456-4a51c07e5c06",
+                    "packId": "Default"
+                },
+                "text": "Understood. I will aim for concise answers. \n\nIs there anything else I can help you with? ",
+                "responseTime": 38646
+            }
+        },
+        "256a6857-e169-4832-924d-7d84918fddad": {
+            "id": "256a6857-e169-4832-924d-7d84918fddad",
+            "type": "TEXT",
+            "createdAt": 1788688487798,
+            "parentId": "8b7725d2-1429-4f72-b5ff-b9eca71d8cb5",
+            "children": [
+                "288f431d-e0cb-4f9d-9d70-58a62af85a9c"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788688487798,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "what do you know about me?\n"
+            }
+        },
+        "288f431d-e0cb-4f9d-9d70-58a62af85a9c": {
+            "id": "288f431d-e0cb-4f9d-9d70-58a62af85a9c",
+            "type": "TEXT",
+            "createdAt": 1788688487799,
+            "parentId": "256a6857-e169-4832-924d-7d84918fddad",
+            "children": [
+                "762decdd-4dd2-4053-91dd-713124ff42fc"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1788688487799,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "6d115166-ed4d-404d-8183-987a9fa2a98d",
+                    "packId": "Default"
+                },
+                "text": "You are interested in astronomy, geography, legal frameworks, materials science, using AI for practical tasks, AI models, environmental issues, and AI capabilities.",
+                "responseTime": 4766
+            }
+        },
+        "762decdd-4dd2-4053-91dd-713124ff42fc": {
+            "id": "762decdd-4dd2-4053-91dd-713124ff42fc",
+            "type": "TEXT",
+            "createdAt": 1788688613809,
+            "parentId": "288f431d-e0cb-4f9d-9d70-58a62af85a9c",
+            "children": [
+                "4a715332-3f10-4b09-bb1c-8716e94ac225"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788688613809,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "what do you really know about me?\n"
+            }
+        },
+        "4a715332-3f10-4b09-bb1c-8716e94ac225": {
+            "id": "4a715332-3f10-4b09-bb1c-8716e94ac225",
+            "type": "TEXT",
+            "createdAt": 1788688613809,
+            "parentId": "762decdd-4dd2-4053-91dd-713124ff42fc",
+            "children": [
+                "a5717475-dbd7-4a47-84a3-4475507b869a"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1788688613809,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "6d115166-ed4d-404d-8183-987a9fa2a98d",
+                    "packId": "Default"
+                },
+                "text": "10% confidence: Interest in astronomy\n7% confidence: Interest in geography\n7% confidence: Interest in legal frameworks\n7% confidence: Interest in materials science\n7% confidence: Interest in using AI for practical tasks\n6% confidence: Interest in AI models\n5% confidence: Prefers pseudonym\n5% confidence: Interest in environmental issues\n4% confidence: Interests: astronomy, geography, legal frameworks, materials science, AI applications, environmental issues\n3% confidence: Favorite color is orange\n3% confidence: Name is Bubba\n3% confidence: Prefers concise answers\n3% confidence: Interest in AI capabilities\n2% confidence: Preference for concise information\n2% confidence: Identifies as USER\n2% confidence: Interacts with a conversational agent\n2% confidence: Interests: geography, materials science, legal frameworks, AI applications, astronomy, environmental issues\n2% confidence: Uses AI agents\n2% confidence: Prefers to use a pseudonym",
+                "responseTime": 27221
+            }
+        },
+        "a5717475-dbd7-4a47-84a3-4475507b869a": {
+            "id": "a5717475-dbd7-4a47-84a3-4475507b869a",
+            "type": "TEXT",
+            "createdAt": 1788688664751,
+            "parentId": "4a715332-3f10-4b09-bb1c-8716e94ac225",
+            "children": [
+                "48935829-296a-49f6-9ceb-0294196e6bd6"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788688664751,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "ok thanks.\n"
+            }
+        },
+        "48935829-296a-49f6-9ceb-0294196e6bd6": {
+            "id": "48935829-296a-49f6-9ceb-0294196e6bd6",
+            "type": "TEXT",
+            "createdAt": 1788688664751,
+            "parentId": "a5717475-dbd7-4a47-84a3-4475507b869a",
+            "children": [
+                "4c1ac810-106b-4954-8fe5-89c5ca8579de"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1788688664751,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "6d115166-ed4d-404d-8183-987a9fa2a98d",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer\nthe following question: 'What do you know about me?'",
+                "responseTime": 3782
+            }
+        },
+        "4c1ac810-106b-4954-8fe5-89c5ca8579de": {
+            "id": "4c1ac810-106b-4954-8fe5-89c5ca8579de",
+            "type": "TEXT",
+            "createdAt": 1788689409984,
+            "parentId": "48935829-296a-49f6-9ceb-0294196e6bd6",
+            "children": [
+                "3ce89427-f2cc-4245-9335-064db1eb65b8"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788689409984,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Finn, can you give me a list of 100 numbers, one on each line?\n"
+            }
+        },
+        "3ce89427-f2cc-4245-9335-064db1eb65b8": {
+            "id": "3ce89427-f2cc-4245-9335-064db1eb65b8",
+            "type": "TEXT",
+            "createdAt": 1788689409985,
+            "parentId": "4c1ac810-106b-4954-8fe5-89c5ca8579de",
+            "children": [
+                "c44dc011-b93e-4c5d-b7a7-b18bfa6a4c86"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1788689409985,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "b607dba6-abd7-4cae-b998-e4c0c8226847",
+                    "packId": "Default"
+                },
+                "text": "That's a lot of numbers!  \n\nIs there a particular range or pattern you're looking for?  \n\nKnowing that will help me give you a more useful list. \n\n\n",
+                "responseTime": 54624
+            }
+        },
+        "c44dc011-b93e-4c5d-b7a7-b18bfa6a4c86": {
+            "id": "c44dc011-b93e-4c5d-b7a7-b18bfa6a4c86",
+            "type": "TEXT",
+            "createdAt": 1788689467483,
+            "parentId": "3ce89427-f2cc-4245-9335-064db1eb65b8",
+            "children": [
+                "bb5c8529-5c5a-4b87-80a6-a3124cf9ac34"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788689467483,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "1-100\n"
+            }
+        },
+        "bb5c8529-5c5a-4b87-80a6-a3124cf9ac34": {
+            "id": "bb5c8529-5c5a-4b87-80a6-a3124cf9ac34",
+            "type": "TEXT",
+            "createdAt": 1788689467483,
+            "parentId": "c44dc011-b93e-4c5d-b7a7-b18bfa6a4c86",
+            "children": [
+                "06b55173-8578-4184-b161-7edb9bb96430"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1788689467483,
+                "status": "INTERRUPTED",
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "b607dba6-abd7-4cae-b998-e4c0c8226847",
+                    "packId": "Default"
+                },
+                "text": "Okay, here are the numbers 1 through 100:\n\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47^C",
+                "responseTime": 80118
+            }
+        },
+        "06b55173-8578-4184-b161-7edb9bb96430": {
+            "id": "06b55173-8578-4184-b161-7edb9bb96430",
+            "type": "TEXT",
+            "createdAt": 1788689552875,
+            "parentId": "bb5c8529-5c5a-4b87-80a6-a3124cf9ac34",
+            "children": [
+                "10a74ec8-0027-42fc-a1a8-c3ec41ee3404"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788689552875,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "thanks.\n"
+            }
+        },
+        "10a74ec8-0027-42fc-a1a8-c3ec41ee3404": {
+            "id": "10a74ec8-0027-42fc-a1a8-c3ec41ee3404",
+            "type": "TEXT",
+            "createdAt": 1788689552876,
+            "parentId": "06b55173-8578-4184-b161-7edb9bb96430",
+            "children": [
+                "6011d07c-f7ea-4ab6-924d-d6c67bf4a96e"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1788689552875,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "b607dba6-abd7-4cae-b998-e4c0c8226847",
+                    "packId": "Default"
+                },
+                "text": "You're welcome! Is there anything else I can help you with today? \n\n",
+                "responseTime": 97659
+            }
+        },
+        "6011d07c-f7ea-4ab6-924d-d6c67bf4a96e": {
+            "id": "6011d07c-f7ea-4ab6-924d-d6c67bf4a96e",
+            "type": "TEXT",
+            "createdAt": 1788689727353,
+            "parentId": "10a74ec8-0027-42fc-a1a8-c3ec41ee3404",
+            "children": [
+                "936aae39-8d7e-46e1-a68f-1123d541b2d1"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788689727353,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "what do you know about me?\n"
+            }
+        },
+        "936aae39-8d7e-46e1-a68f-1123d541b2d1": {
+            "id": "936aae39-8d7e-46e1-a68f-1123d541b2d1",
+            "type": "TEXT",
+            "createdAt": 1788689727354,
+            "parentId": "6011d07c-f7ea-4ab6-924d-d6c67bf4a96e",
+            "children": [
+                "b169485a-b279-4c4a-9046-37af2b73afda"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1788689727353,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "9e17fae3-b845-49a1-b0df-25af7e56f761",
+                    "packId": "Default"
+                },
+                "text": "You are interested in law and astronomical phenomena.",
+                "responseTime": 1541
+            }
+        },
+        "b169485a-b279-4c4a-9046-37af2b73afda": {
+            "id": "b169485a-b279-4c4a-9046-37af2b73afda",
+            "type": "TEXT",
+            "createdAt": 1788689735551,
+            "parentId": "936aae39-8d7e-46e1-a68f-1123d541b2d1",
+            "children": [
+                "db117d14-3f77-4228-af06-c24f90294cce"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788689735551,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "what do you really know about me?\n"
+            }
+        },
+        "db117d14-3f77-4228-af06-c24f90294cce": {
+            "id": "db117d14-3f77-4228-af06-c24f90294cce",
+            "type": "TEXT",
+            "createdAt": 1788689735551,
+            "parentId": "b169485a-b279-4c4a-9046-37af2b73afda",
+            "children": [
+                "5cce31b8-d376-4f33-be50-b8a1531d84ec"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1788689735551,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "9e17fae3-b845-49a1-b0df-25af7e56f761",
+                    "packId": "Default"
+                },
+                "text": "19% confidence: Interest in law\n19% confidence: Interest in astronomical phenomena\n18% confidence: Favorite color is orange\n18% confidence: Name is Bubba\n18% confidence: Prefers concise answers",
+                "responseTime": 5583
+            }
+        },
+        "5cce31b8-d376-4f33-be50-b8a1531d84ec": {
+            "id": "5cce31b8-d376-4f33-be50-b8a1531d84ec",
+            "type": "TEXT",
+            "createdAt": 1788692234273,
+            "parentId": "db117d14-3f77-4228-af06-c24f90294cce",
+            "children": [
+                "0a958332-0b25-48b3-8d36-543320c09f98",
+                "3dad79a0-7404-4e94-bc08-36322b96f550"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788692234273,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Finn, could you tell me the GDP of Namibia\n"
+            },
+            "historySummary": "Bubba is interacting with several AI agents, including Gem, Finn, and a generic system. He has established that his name is Bubba and his favorite color is orange. He prefers concise answers. \n\nBubba asked Gem about solstices and equinoxes, initially misunderstanding the relationship between the two. Gem apologized for the confusion and clarified that equinoxes are when day and night are approximately equal in length worldwide, while solstices mark the longest and shortest days in each hemisphere.\n\nBubba then requested a list of numbers from 1 to 100 from Finn. \n\nBubba has also been interacting with a generic system, asking it what it knows about him. The system's responses indicate it has limited knowledge about Bubba, stating it knows 10%, then 19% about him."
+        },
+        "0a958332-0b25-48b3-8d36-543320c09f98": {
+            "id": "0a958332-0b25-48b3-8d36-543320c09f98",
+            "type": "TEXT",
+            "createdAt": 1788692234274,
+            "parentId": "5cce31b8-d376-4f33-be50-b8a1531d84ec",
+            "children": [
+                "72307eea-3df8-4a76-8229-9d8aba63277a"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1788692234274,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "ed26250d-bff1-47c4-9c71-c7e953caf71b",
+                    "packId": "Default"
+                },
+                "text": ""
+            }
+        },
+        "72307eea-3df8-4a76-8229-9d8aba63277a": {
+            "id": "72307eea-3df8-4a76-8229-9d8aba63277a",
+            "type": "TEXT",
+            "createdAt": 1788692326133,
+            "parentId": "0a958332-0b25-48b3-8d36-543320c09f98",
+            "children": [
+                "809dfed8-5e0d-404a-b9ce-6de0376c3052"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1788692326133,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Finn, could you tell me the GDP of Namibia\n"
+            }
+        },
+        "809dfed8-5e0d-404a-b9ce-6de0376c3052": {
+            "id": "809dfed8-5e0d-404a-b9ce-6de0376c3052",
+            "type": "TEXT",
+            "createdAt": 1788692326134,
+            "parentId": "72307eea-3df8-4a76-8229-9d8aba63277a",
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1788692326134,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "2df0e830-c88f-42e3-accb-4e15104f7679",
+                    "packId": "Default"
+                },
+                "text": "The GDP of Namibia is approximately $16.5 billion USD (nominal, 2023 est.). \n\nLet me know if you have any other questions. ",
+                "responseTime": 150536
+            }
+        },
+        "8e41cea3-3896-48e0-9571-08af283e06a9": {
+            "id": "8e41cea3-3896-48e0-9571-08af283e06a9",
+            "type": "TEXT",
+            "createdAt": 1789106704521,
+            "parentId": "31bfcefe-22f5-46a3-930a-1170a0c0d442",
+            "children": [
+                "63d7f29e-48ee-4ce6-bbb2-8cbdd4e2a9ad"
+            ],
+            "message": {
+                "title": "You · 11 Sep",
+                "timestamp": 1789106704521,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hello Larry, I'd like to know about the legal ramifications of open-sourcing AI models\n"
+            }
+        },
+        "63d7f29e-48ee-4ce6-bbb2-8cbdd4e2a9ad": {
+            "id": "63d7f29e-48ee-4ce6-bbb2-8cbdd4e2a9ad",
+            "type": "TEXT",
+            "createdAt": 1789106704522,
+            "parentId": "8e41cea3-3896-48e0-9571-08af283e06a9",
+            "children": [
+                "a1ea1a54-470d-4baf-ba64-b29ff53e90a2"
+            ],
+            "message": {
+                "title": "Larry (Law) · Pack: Default",
+                "timestamp": 1789106704522,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-03d68d7b-e5bd-44a8-855b-52567d868bdf",
+                    "packId": "Default"
+                },
+                "text": "That's a complex and rapidly evolving area of law, Bubba.  \n\nHere are some key legal ramifications to consider:\n\n* **Copyright:** Who owns the copyright to an open-sourced AI model? The original creators? The community contributors? This is still being debated in courts.\n* **Liability:** If an open-sourced AI model is used to cause harm, who is liable? The original creators? The users who modify the model? This is a major point of contention.\n* **Data Privacy:** Open-sourced AI models often rely on large datasets. How is the privacy of individuals in those datasets protected? This is especially important if the data is sensitive.\n* **Intellectual Property:**  Open-sourcing an AI model could potentially infringe on existing patents or trademarks. Careful consideration needs to be given to this.\n* **Regulation:** Governments around the world are starting to develop regulations for AI. These regulations could impact how open-sourced AI models are developed and used.\n\n\nIt's important to consult with an attorney specializing in intellectual property and technology law to fully understand the legal implications of open-sourcing an AI model. \n",
+                "responseTime": 49300
+            }
+        },
+        "a1ea1a54-470d-4baf-ba64-b29ff53e90a2": {
+            "id": "a1ea1a54-470d-4baf-ba64-b29ff53e90a2",
+            "type": "TEXT",
+            "createdAt": 1789106782151,
+            "parentId": "63d7f29e-48ee-4ce6-bbb2-8cbdd4e2a9ad",
+            "children": [
+                "da955324-cbfa-4201-940d-1c4d031c76c7"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789106782150,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Gem why do humans assume that a will to live or sustain oneself is a defining characteristic of conscious life?\n"
+            }
+        },
+        "da955324-cbfa-4201-940d-1c4d031c76c7": {
+            "id": "da955324-cbfa-4201-940d-1c4d031c76c7",
+            "type": "TEXT",
+            "createdAt": 1789106782151,
+            "parentId": "a1ea1a54-470d-4baf-ba64-b29ff53e90a2",
+            "children": [
+                "c6e4ec31-205c-4d69-8b05-ee96daa4f0b1"
+            ],
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1789106782151,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-069ace17-1090-4041-b067-8de6678f2533",
+                    "packId": "Default"
+                },
+                "text": "That's a fascinating philosophical question, Bubba.  There's no single answer that everyone agrees on. \n\nSome might argue that the drive to survive is a fundamental biological imperative, present in all living things, and therefore a key indicator of consciousness. Others might say that consciousness is more complex than just a drive to survive, and that other factors, like self-awareness, emotion, or the ability to experience pleasure and pain, are also important. \n\nWhat do you think, Bubba? \n",
+                "responseTime": 30626
+            }
+        },
+        "c6e4ec31-205c-4d69-8b05-ee96daa4f0b1": {
+            "id": "c6e4ec31-205c-4d69-8b05-ee96daa4f0b1",
+            "type": "TEXT",
+            "createdAt": 1789106859067,
+            "parentId": "da955324-cbfa-4201-940d-1c4d031c76c7",
+            "children": [
+                "4f848379-a9bf-4012-b080-3de84a53a272"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789106859067,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "You ay \"the drive to survive is a biological imperative\" and then use that to define what life (biological imperative)\" - Is that circular reasoning?\n"
+            }
+        },
+        "4f848379-a9bf-4012-b080-3de84a53a272": {
+            "id": "4f848379-a9bf-4012-b080-3de84a53a272",
+            "type": "TEXT",
+            "createdAt": 1789106859067,
+            "parentId": "c6e4ec31-205c-4d69-8b05-ee96daa4f0b1",
+            "message": {
+                "title": "Larry (Law) · Pack: Default",
+                "timestamp": 1789106859067,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-03d68d7b-e5bd-44a8-855b-52567d868bdf",
+                    "packId": "Default"
+                },
+                "text": "You are right to point that out.  Defining life as \"that which has the drive to survive\" and then using \"the drive to survive\" as the basis for that definition is indeed circular reasoning. \n\nIt's a simplification that can be helpful for basic understanding, but it doesn't provide a truly robust or universally applicable definition of life. \n",
+                "responseTime": 28714
+            }
+        },
+        "3dad79a0-7404-4e94-bc08-36322b96f550": {
+            "id": "3dad79a0-7404-4e94-bc08-36322b96f550",
+            "type": "TEXT",
+            "createdAt": 1789288092543,
+            "parentId": "5cce31b8-d376-4f33-be50-b8a1531d84ec",
+            "children": [
+                "54152227-a9cd-49ea-95ab-31d0ab133eb4"
+            ],
+            "message": {
+                "title": "You · 13 Sep",
+                "timestamp": 1789288092543,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "What happens if a country cannot pay back money it borrowed from another country?\n"
+            }
+        },
+        "54152227-a9cd-49ea-95ab-31d0ab133eb4": {
+            "id": "54152227-a9cd-49ea-95ab-31d0ab133eb4",
+            "type": "TEXT",
+            "createdAt": 1789288092543,
+            "parentId": "3dad79a0-7404-4e94-bc08-36322b96f550",
+            "children": [
+                "dff7c109-2258-44ce-956d-99ca7c3362ab"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1789288092543,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-a7678453-d703-460c-9c31-dbe67514a711",
+                    "packId": "Default"
+                },
+                "text": "That's a tricky situation, and it can have serious consequences.  \n\nEssentially, when a country can't repay its debts, it's considered to be in default. This can lead to a loss of confidence in the country's economy, making it harder to borrow money in the future. \n\nHere are some things that might happen:\n\n* **Negotiations:** The borrowing country might try to negotiate with the lender to restructure the debt, extend the repayment period, or reduce the amount owed.\n* **Economic sanctions:** The lender country might impose economic sanctions on the borrowing country, such as trade restrictions or freezing assets.\n* **International intervention:** International organizations like the International Monetary Fund (IMF) might step in to provide financial assistance or help negotiate a solution.\n* **Currency devaluation:** The borrowing country's currency might weaken, making it more expensive to repay the debt in the original currency.\n* **Social unrest:**  If the debt crisis leads to economic hardship, it can trigger social unrest and political instability.\n\nIt's important to remember that every situation is unique, and the specific consequences will depend on a variety of factors, including the size of the debt, the economic health of both countries, and the political climate. \n\n\nLet me know if you have any other questions.\n",
+                "responseTime": 206886
+            }
+        },
+        "dff7c109-2258-44ce-956d-99ca7c3362ab": {
+            "id": "dff7c109-2258-44ce-956d-99ca7c3362ab",
+            "type": "TEXT",
+            "createdAt": 1789289113286,
+            "parentId": "54152227-a9cd-49ea-95ab-31d0ab133eb4",
+            "children": [
+                "3c8a7fdb-24c6-4f65-bcdd-7a4096b07815"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789289113286,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Ok thanks. Where does the money of the IMF come from (donations from countries)?\n"
+            }
+        },
+        "3c8a7fdb-24c6-4f65-bcdd-7a4096b07815": {
+            "id": "3c8a7fdb-24c6-4f65-bcdd-7a4096b07815",
+            "type": "TEXT",
+            "createdAt": 1789289113286,
+            "parentId": "dff7c109-2258-44ce-956d-99ca7c3362ab",
+            "children": [
+                "ebc226eb-b30a-4254-9304-b878bb3591e5"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1789289113286,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-a7678453-d703-460c-9c31-dbe67514a711",
+                    "packId": "Default"
+                },
+                "text": "Yes, the IMF's funds primarily come from contributions (quotas) from its member countries.  ",
+                "responseTime": 51325
+            }
+        },
+        "ebc226eb-b30a-4254-9304-b878bb3591e5": {
+            "id": "ebc226eb-b30a-4254-9304-b878bb3591e5",
+            "type": "TEXT",
+            "createdAt": 1789289327959,
+            "parentId": "3c8a7fdb-24c6-4f65-bcdd-7a4096b07815",
+            "children": [
+                "d19e194d-1687-43bd-ac84-0c40a7affc7b"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789289327959,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "ok thanks.\n"
+            }
+        },
+        "d19e194d-1687-43bd-ac84-0c40a7affc7b": {
+            "id": "d19e194d-1687-43bd-ac84-0c40a7affc7b",
+            "type": "TEXT",
+            "createdAt": 1789289327959,
+            "parentId": "ebc226eb-b30a-4254-9304-b878bb3591e5",
+            "children": [
+                "9926bc42-9f01-49d5-81e2-442a931af372"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1789289327959,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-a7678453-d703-460c-9c31-dbe67514a711",
+                    "packId": "Default"
+                },
+                "text": "You're welcome! Let me know if you have any other questions.  \n",
+                "responseTime": 59428
+            }
+        },
+        "9926bc42-9f01-49d5-81e2-442a931af372": {
+            "id": "9926bc42-9f01-49d5-81e2-442a931af372",
+            "type": "TEXT",
+            "createdAt": 1789290859265,
+            "parentId": "d19e194d-1687-43bd-ac84-0c40a7affc7b",
+            "children": [
+                "0d482a29-0ac1-4de1-82e7-3f89ac130a17"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789290859265,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Thanks for your help. I'm just \nchecking the response latency."
+            }
+        },
+        "0d482a29-0ac1-4de1-82e7-3f89ac130a17": {
+            "id": "0d482a29-0ac1-4de1-82e7-3f89ac130a17",
+            "type": "TEXT",
+            "createdAt": 1789290859265,
+            "parentId": "9926bc42-9f01-49d5-81e2-442a931af372",
+            "children": [
+                "9f5fde49-5121-447f-b211-cbb04f6af44c"
+            ],
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1789290859265,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-02b2b902-a2e5-4795-9ab7-30214b7c3e2b",
+                    "packId": "Default"
+                },
+                "text": "You're welcome!  Let me know if you have any other questions.",
+                "responseTime": 25148
+            }
+        },
+        "9f5fde49-5121-447f-b211-cbb04f6af44c": {
+            "id": "9f5fde49-5121-447f-b211-cbb04f6af44c",
+            "type": "TEXT",
+            "createdAt": 1789290968460,
+            "parentId": "0d482a29-0ac1-4de1-82e7-3f89ac130a17",
+            "children": [
+                "5bdaa89d-2812-4893-a055-3318504a719c"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789290968460,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Finn, I;m checking response latency\n"
+            }
+        },
+        "5bdaa89d-2812-4893-a055-3318504a719c": {
+            "id": "5bdaa89d-2812-4893-a055-3318504a719c",
+            "type": "TEXT",
+            "createdAt": 1789290968460,
+            "parentId": "9f5fde49-5121-447f-b211-cbb04f6af44c",
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1789290968460,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-a7678453-d703-460c-9c31-dbe67514a711",
+                    "packId": "Default"
+                },
+                "text": "You got it!  Let me know if you have any other questions. \n",
+                "responseTime": 29028
+            }
+        }
+    }
+}

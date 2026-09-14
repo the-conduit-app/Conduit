@@ -1,0 +1,189 @@
+{
+    "id": "b0d33652-ba63-4bf8-85e8-4f0571a70180",
+    "createdAt": 1789213438886,
+    "rootNodeId": "0d7dd316-68f4-4b4b-9cdb-b4c830458d97",
+    "cursorNodeId": "4b97ad9c-2024-48ba-b0cb-2729db36b760",
+    "title": "Lawyer Jokes and Professional Courtesy",
+    "nodes": {
+        "0d7dd316-68f4-4b4b-9cdb-b4c830458d97": {
+            "id": "0d7dd316-68f4-4b4b-9cdb-b4c830458d97",
+            "type": "TEXT",
+            "createdAt": 1789213455916,
+            "parentId": null,
+            "children": [
+                "c2c4b46e-2c80-4f0c-ba36-6a97065e64fb"
+            ],
+            "message": {
+                "title": "You · 12 Sep",
+                "timestamp": 1789213455916,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hi Larry, do you know any good lawyer jokes?\n"
+            }
+        },
+        "c2c4b46e-2c80-4f0c-ba36-6a97065e64fb": {
+            "id": "c2c4b46e-2c80-4f0c-ba36-6a97065e64fb",
+            "type": "TEXT",
+            "createdAt": 1789213455917,
+            "parentId": "0d7dd316-68f4-4b4b-9cdb-b4c830458d97",
+            "children": [
+                "25b3abeb-2d33-4032-995a-90037fdd3cf8"
+            ],
+            "message": {
+                "title": "Larry (Law) · Pack: Default",
+                "timestamp": 1789213455917,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-f6bac8c9-5f16-4e9d-982d-9a6cdc563322",
+                    "packId": "Default"
+                },
+                "text": "Why don't sharks attack lawyers? \n\nProfessional courtesy. \n",
+                "responseTime": 11818
+            }
+        },
+        "25b3abeb-2d33-4032-995a-90037fdd3cf8": {
+            "id": "25b3abeb-2d33-4032-995a-90037fdd3cf8",
+            "type": "TEXT",
+            "createdAt": 1789213491523,
+            "parentId": "c2c4b46e-2c80-4f0c-ba36-6a97065e64fb",
+            "children": [
+                "8e7db2c8-b282-4803-8296-fdc765e117da",
+                "ab45af5b-95d6-4a46-a519-553084a0ab3b"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789213491523,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Thanks. I thought you might say \"I don't know any good lawyer jokes because there are no good lawyers\"\n"
+            }
+        },
+        "8e7db2c8-b282-4803-8296-fdc765e117da": {
+            "id": "8e7db2c8-b282-4803-8296-fdc765e117da",
+            "type": "TEXT",
+            "createdAt": 1789213491523,
+            "parentId": "25b3abeb-2d33-4032-995a-90037fdd3cf8",
+            "message": {
+                "title": "Larry (Law) · Pack: Default",
+                "timestamp": 1789213491523,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-f6bac8c9-5f16-4e9d-982d-9a6cdc563322",
+                    "packId": "Default"
+                },
+                "text": "That's a good one!  I'm glad you found my joke amusing. \n\nDo you have any other questions for me? \n",
+                "responseTime": 13856
+            }
+        },
+        "ab45af5b-95d6-4a46-a519-553084a0ab3b": {
+            "id": "ab45af5b-95d6-4a46-a519-553084a0ab3b",
+            "type": "TEXT",
+            "createdAt": 1789213542551,
+            "parentId": "25b3abeb-2d33-4032-995a-90037fdd3cf8",
+            "children": [
+                "1692585a-55fa-4b09-b525-63b90bcb8172"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789213542551,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "I thought you might say \"No good lawyer jokes. They're always dead serious\"\n"
+            }
+        },
+        "1692585a-55fa-4b09-b525-63b90bcb8172": {
+            "id": "1692585a-55fa-4b09-b525-63b90bcb8172",
+            "type": "TEXT",
+            "createdAt": 1789213542551,
+            "parentId": "ab45af5b-95d6-4a46-a519-553084a0ab3b",
+            "children": [
+                "851776a4-a2a2-4b5c-a914-62573deb163f"
+            ],
+            "message": {
+                "title": "Larry (Law) · Pack: Default",
+                "timestamp": 1789213542551,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-f6bac8c9-5f16-4e9d-982d-9a6cdc563322",
+                    "packId": "Default"
+                },
+                "text": "You got me there.  That's a good one.  \n",
+                "responseTime": 12894
+            }
+        },
+        "851776a4-a2a2-4b5c-a914-62573deb163f": {
+            "id": "851776a4-a2a2-4b5c-a914-62573deb163f",
+            "type": "TEXT",
+            "createdAt": 1789213595440,
+            "parentId": "1692585a-55fa-4b09-b525-63b90bcb8172",
+            "children": [
+                "b94e036b-70b2-4545-9a5d-dca4a3cdfe98"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789213595440,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Or perhaps \"I don't know good lawyer jokes, but I know no-good lawyer jokes\"\n"
+            }
+        },
+        "b94e036b-70b2-4545-9a5d-dca4a3cdfe98": {
+            "id": "b94e036b-70b2-4545-9a5d-dca4a3cdfe98",
+            "type": "TEXT",
+            "createdAt": 1789213595440,
+            "parentId": "851776a4-a2a2-4b5c-a914-62573deb163f",
+            "children": [
+                "f3daba7e-ed7d-468c-871a-7b9f5a231ea3"
+            ],
+            "message": {
+                "title": "Larry (Law) · Pack: Default",
+                "timestamp": 1789213595440,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-f6bac8c9-5f16-4e9d-982d-9a6cdc563322",
+                    "packId": "Default"
+                },
+                "text": "That's a good one too!  I'm learning a lot about lawyer jokes today.  \n\n",
+                "responseTime": 14650
+            }
+        },
+        "f3daba7e-ed7d-468c-871a-7b9f5a231ea3": {
+            "id": "f3daba7e-ed7d-468c-871a-7b9f5a231ea3",
+            "type": "TEXT",
+            "createdAt": 1789213628384,
+            "parentId": "b94e036b-70b2-4545-9a5d-dca4a3cdfe98",
+            "children": [
+                "4b97ad9c-2024-48ba-b0cb-2729db36b760"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789213628384,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Well you are a lawyer after all. Helps to be prepared, don't it?\n"
+            }
+        },
+        "4b97ad9c-2024-48ba-b0cb-2729db36b760": {
+            "id": "4b97ad9c-2024-48ba-b0cb-2729db36b760",
+            "type": "TEXT",
+            "createdAt": 1789213628384,
+            "parentId": "f3daba7e-ed7d-468c-871a-7b9f5a231ea3",
+            "message": {
+                "title": "Larry (Law) · Pack: Default",
+                "timestamp": 1789213628384,
+                "author": {
+                    "type": "ASSISTANT",
+                    "expertId": "E-f6bac8c9-5f16-4e9d-982d-9a6cdc563322",
+                    "packId": "Default"
+                },
+                "text": "You're absolutely right.  It never hurts to be prepared, especially in my line of work.  \n\nWhat can I help you with today?  \n",
+                "responseTime": 17689
+            }
+        }
+    }
+}

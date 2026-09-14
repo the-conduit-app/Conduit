@@ -1,0 +1,997 @@
+{
+    "id": "c66fb69d-f5e1-43db-b4bb-ee32ec4f3c66",
+    "createdAt": 1789200187659,
+    "rootNodeId": "ca86c12d-78fe-44c8-90c6-f6b02fc601e1",
+    "cursorNodeId": "db5f6a38-8345-40ac-97d3-333794340cbb",
+    "title": "Conduit Conversation Examples",
+    "nodes": {
+        "ca86c12d-78fe-44c8-90c6-f6b02fc601e1": {
+            "id": "ca86c12d-78fe-44c8-90c6-f6b02fc601e1",
+            "type": "TEXT",
+            "createdAt": 1789200192381,
+            "parentId": null,
+            "children": [
+                "1f70605d-a959-4c22-aa91-f8671efc27a6"
+            ],
+            "message": {
+                "title": "You · 12 Sep",
+                "timestamp": 1789200192381,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "a tiger named fangs\n"
+            }
+        },
+        "1f70605d-a959-4c22-aa91-f8671efc27a6": {
+            "id": "1f70605d-a959-4c22-aa91-f8671efc27a6",
+            "type": "TEXT",
+            "createdAt": 1789200192382,
+            "parentId": "ca86c12d-78fe-44c8-90c6-f6b02fc601e1",
+            "children": [
+                "768c707a-f394-4a4a-b24f-03746a1fbf90",
+                "8f4ad4c5-7f93-4d26-881e-68f92148d049"
+            ],
+            "message": {
+                "title": "Simple (Echoing) · Pack: Default",
+                "timestamp": 1789200192382,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-57b8f613-bdf0-4bbf-a27e-903b0368f5a2",
+                    "packId": "Default"
+                },
+                "text": "a tiger named fangs",
+                "responseTime": 1019
+            }
+        },
+        "768c707a-f394-4a4a-b24f-03746a1fbf90": {
+            "id": "768c707a-f394-4a4a-b24f-03746a1fbf90",
+            "type": "TEXT",
+            "createdAt": 1789200211260,
+            "parentId": "1f70605d-a959-4c22-aa91-f8671efc27a6",
+            "children": [
+                "b9915786-3bc8-4a37-9c2e-f6c48d6652e7",
+                "48975d57-7532-4c1e-a1dd-0f7108030b8b",
+                "84134c11-8c55-4e97-be19-c15803919085",
+                "b22ead58-6c08-43f9-9c14-338614f256d0"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200211260,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "A tiger named fangs\n"
+            }
+        },
+        "b9915786-3bc8-4a37-9c2e-f6c48d6652e7": {
+            "id": "b9915786-3bc8-4a37-9c2e-f6c48d6652e7",
+            "type": "TEXT",
+            "createdAt": 1789200211260,
+            "parentId": "768c707a-f394-4a4a-b24f-03746a1fbf90",
+            "children": [
+                "d7613d51-f952-4bee-bf84-97a164620aed"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200211260,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "1 Slickerberry Snoozlestone mined\n\nYippee!",
+                "responseTime": 1214
+            }
+        },
+        "d7613d51-f952-4bee-bf84-97a164620aed": {
+            "id": "d7613d51-f952-4bee-bf84-97a164620aed",
+            "type": "TEXT",
+            "createdAt": 1789200220723,
+            "parentId": "b9915786-3bc8-4a37-9c2e-f6c48d6652e7",
+            "children": [
+                "8b38af5d-df5e-4c45-b394-03de7b37fdce"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200220723,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Hare today hanoi tomorrow\n"
+            }
+        },
+        "8b38af5d-df5e-4c45-b394-03de7b37fdce": {
+            "id": "8b38af5d-df5e-4c45-b394-03de7b37fdce",
+            "type": "TEXT",
+            "createdAt": 1789200220723,
+            "parentId": "d7613d51-f952-4bee-bf84-97a164620aed",
+            "children": [
+                "db5f6a38-8345-40ac-97d3-333794340cbb"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200220723,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "3 Catacombs of Crossfire successfully crossed at midday",
+                "responseTime": 1579
+            }
+        },
+        "db5f6a38-8345-40ac-97d3-333794340cbb": {
+            "id": "db5f6a38-8345-40ac-97d3-333794340cbb",
+            "type": "TEXT",
+            "createdAt": 1789200234826,
+            "parentId": "8b38af5d-df5e-4c45-b394-03de7b37fdce",
+            "children": [
+                "4ee63954-d2a9-415d-bb6e-70fd61e37a12"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200234826,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "5 Grand Prizes awarded at Graspro Grinstock Grand Prix\n\n"
+            }
+        },
+        "4ee63954-d2a9-415d-bb6e-70fd61e37a12": {
+            "id": "4ee63954-d2a9-415d-bb6e-70fd61e37a12",
+            "type": "TEXT",
+            "createdAt": 1789200234826,
+            "parentId": "db5f6a38-8345-40ac-97d3-333794340cbb",
+            "children": [
+                "6d0134eb-11f0-428f-bccb-e88bb639e10f"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200234826,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "5 Dubbadoo Dubbada Dubbadubba Doodas wish for your wellbeing",
+                "responseTime": 1726
+            }
+        },
+        "6d0134eb-11f0-428f-bccb-e88bb639e10f": {
+            "id": "6d0134eb-11f0-428f-bccb-e88bb639e10f",
+            "type": "TEXT",
+            "createdAt": 1789200242634,
+            "parentId": "4ee63954-d2a9-415d-bb6e-70fd61e37a12",
+            "children": [
+                "ac3f4fc4-43ef-41d9-824c-045c9cdd11d7"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200242633,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "2 Dances of Din-dinad'ash performed in mid-air\n\n"
+            }
+        },
+        "ac3f4fc4-43ef-41d9-824c-045c9cdd11d7": {
+            "id": "ac3f4fc4-43ef-41d9-824c-045c9cdd11d7",
+            "type": "TEXT",
+            "createdAt": 1789200242634,
+            "parentId": "6d0134eb-11f0-428f-bccb-e88bb639e10f",
+            "children": [
+                "cf9436ad-752d-4735-a711-f7af58d0c670"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200242634,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "Hooray, Hooray. Merry Mynahs show the way",
+                "responseTime": 1202
+            }
+        },
+        "cf9436ad-752d-4735-a711-f7af58d0c670": {
+            "id": "cf9436ad-752d-4735-a711-f7af58d0c670",
+            "type": "TEXT",
+            "createdAt": 1789200253619,
+            "parentId": "ac3f4fc4-43ef-41d9-824c-045c9cdd11d7",
+            "children": [
+                "4ed45d1e-4faf-4275-9e1e-dc70593e6305"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200253619,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "8 Leaf Cloverfields as far as eye could see\n\n"
+            }
+        },
+        "4ed45d1e-4faf-4275-9e1e-dc70593e6305": {
+            "id": "4ed45d1e-4faf-4275-9e1e-dc70593e6305",
+            "type": "TEXT",
+            "createdAt": 1789200253619,
+            "parentId": "cf9436ad-752d-4735-a711-f7af58d0c670",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200253619,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "Yippee!",
+                "responseTime": 214
+            }
+        },
+        "48975d57-7532-4c1e-a1dd-0f7108030b8b": {
+            "id": "48975d57-7532-4c1e-a1dd-0f7108030b8b",
+            "type": "TEXT",
+            "createdAt": 1789200292737,
+            "parentId": "768c707a-f394-4a4a-b24f-03746a1fbf90",
+            "children": [
+                "7d0b104b-cf02-4395-9838-c335ca2c0a80"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200292737,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "a platypus-bodied duck\n"
+            }
+        },
+        "7d0b104b-cf02-4395-9838-c335ca2c0a80": {
+            "id": "7d0b104b-cf02-4395-9838-c335ca2c0a80",
+            "type": "TEXT",
+            "createdAt": 1789200292737,
+            "parentId": "48975d57-7532-4c1e-a1dd-0f7108030b8b",
+            "children": [
+                "89e4250d-8a2b-43fd-b3bb-42cc60924840"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200292737,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3747
+            }
+        },
+        "89e4250d-8a2b-43fd-b3bb-42cc60924840": {
+            "id": "89e4250d-8a2b-43fd-b3bb-42cc60924840",
+            "type": "TEXT",
+            "createdAt": 1789200303736,
+            "parentId": "7d0b104b-cf02-4395-9838-c335ca2c0a80",
+            "children": [
+                "b13422cc-8155-42a7-8a46-224d39f124a0"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200303736,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "the platypus-bodied duck\n"
+            }
+        },
+        "b13422cc-8155-42a7-8a46-224d39f124a0": {
+            "id": "b13422cc-8155-42a7-8a46-224d39f124a0",
+            "type": "TEXT",
+            "createdAt": 1789200303736,
+            "parentId": "89e4250d-8a2b-43fd-b3bb-42cc60924840",
+            "children": [
+                "20a8e036-5f87-43c1-873b-78597bdd9dbf"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200303736,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "4 Overhead Goals scored before the match even started",
+                "responseTime": 1497
+            }
+        },
+        "20a8e036-5f87-43c1-873b-78597bdd9dbf": {
+            "id": "20a8e036-5f87-43c1-873b-78597bdd9dbf",
+            "type": "TEXT",
+            "createdAt": 1789200316987,
+            "parentId": "b13422cc-8155-42a7-8a46-224d39f124a0",
+            "children": [
+                "208b55eb-cfdf-4999-8507-30b73e8daa8c"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200316987,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi\n"
+            }
+        },
+        "208b55eb-cfdf-4999-8507-30b73e8daa8c": {
+            "id": "208b55eb-cfdf-4999-8507-30b73e8daa8c",
+            "type": "TEXT",
+            "createdAt": 1789200316987,
+            "parentId": "20a8e036-5f87-43c1-873b-78597bdd9dbf",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200316987,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3767
+            }
+        },
+        "84134c11-8c55-4e97-be19-c15803919085": {
+            "id": "84134c11-8c55-4e97-be19-c15803919085",
+            "type": "TEXT",
+            "createdAt": 1789200327920,
+            "parentId": "768c707a-f394-4a4a-b24f-03746a1fbf90",
+            "children": [
+                "ff97eb5f-ff7e-433c-b3d8-83fd03a1a8f5"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200327920,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "universal mouse\n"
+            }
+        },
+        "ff97eb5f-ff7e-433c-b3d8-83fd03a1a8f5": {
+            "id": "ff97eb5f-ff7e-433c-b3d8-83fd03a1a8f5",
+            "type": "TEXT",
+            "createdAt": 1789200327920,
+            "parentId": "84134c11-8c55-4e97-be19-c15803919085",
+            "children": [
+                "856ba982-33e0-491a-a4a9-0938b3e88d29"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200327920,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "2 Teeny helixes. They drive the magic merry-go-round",
+                "responseTime": 1507
+            }
+        },
+        "856ba982-33e0-491a-a4a9-0938b3e88d29": {
+            "id": "856ba982-33e0-491a-a4a9-0938b3e88d29",
+            "type": "TEXT",
+            "createdAt": 1789200348288,
+            "parentId": "ff97eb5f-ff7e-433c-b3d8-83fd03a1a8f5",
+            "children": [
+                "fd61bcd5-5032-4818-8f25-95f164ce3075"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200348288,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "ok\n"
+            }
+        },
+        "fd61bcd5-5032-4818-8f25-95f164ce3075": {
+            "id": "fd61bcd5-5032-4818-8f25-95f164ce3075",
+            "type": "TEXT",
+            "createdAt": 1789200348288,
+            "parentId": "856ba982-33e0-491a-a4a9-0938b3e88d29",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200348288,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3771
+            }
+        },
+        "b22ead58-6c08-43f9-9c14-338614f256d0": {
+            "id": "b22ead58-6c08-43f9-9c14-338614f256d0",
+            "type": "TEXT",
+            "createdAt": 1789200377226,
+            "parentId": "768c707a-f394-4a4a-b24f-03746a1fbf90",
+            "children": [
+                "3ec29fd0-4c64-4bb0-8e40-74f9cdc90136"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200377226,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "gangaram the grateful gator\n"
+            }
+        },
+        "3ec29fd0-4c64-4bb0-8e40-74f9cdc90136": {
+            "id": "3ec29fd0-4c64-4bb0-8e40-74f9cdc90136",
+            "type": "TEXT",
+            "createdAt": 1789200377226,
+            "parentId": "b22ead58-6c08-43f9-9c14-338614f256d0",
+            "children": [
+                "ea6c21e5-3692-4778-b197-ad12b25ff59b"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200377226,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3720
+            }
+        },
+        "ea6c21e5-3692-4778-b197-ad12b25ff59b": {
+            "id": "ea6c21e5-3692-4778-b197-ad12b25ff59b",
+            "type": "TEXT",
+            "createdAt": 1789200390356,
+            "parentId": "3ec29fd0-4c64-4bb0-8e40-74f9cdc90136",
+            "children": [
+                "b16e4a1d-f4de-4237-b3a2-31ddd7577791"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200390356,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "chump - the shark\n"
+            }
+        },
+        "b16e4a1d-f4de-4237-b3a2-31ddd7577791": {
+            "id": "b16e4a1d-f4de-4237-b3a2-31ddd7577791",
+            "type": "TEXT",
+            "createdAt": 1789200390356,
+            "parentId": "ea6c21e5-3692-4778-b197-ad12b25ff59b",
+            "children": [
+                "d08e4945-e580-40d2-b32d-2297cede15dd"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200390356,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "1 Blot of gibberish, became flibberished, and then vanished",
+                "responseTime": 1704
+            }
+        },
+        "d08e4945-e580-40d2-b32d-2297cede15dd": {
+            "id": "d08e4945-e580-40d2-b32d-2297cede15dd",
+            "type": "TEXT",
+            "createdAt": 1789200401969,
+            "parentId": "b16e4a1d-f4de-4237-b3a2-31ddd7577791",
+            "children": [
+                "d04222bc-e5d1-4500-a506-05492c79fbbe"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200401969,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "gangaram - the grateful gator\n"
+            }
+        },
+        "d04222bc-e5d1-4500-a506-05492c79fbbe": {
+            "id": "d04222bc-e5d1-4500-a506-05492c79fbbe",
+            "type": "TEXT",
+            "createdAt": 1789200401969,
+            "parentId": "d08e4945-e580-40d2-b32d-2297cede15dd",
+            "children": [
+                "7db9adc6-b93b-4d18-88b5-1cd7153d8764"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200401969,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3771
+            }
+        },
+        "7db9adc6-b93b-4d18-88b5-1cd7153d8764": {
+            "id": "7db9adc6-b93b-4d18-88b5-1cd7153d8764",
+            "type": "TEXT",
+            "createdAt": 1789200412455,
+            "parentId": "d04222bc-e5d1-4500-a506-05492c79fbbe",
+            "children": [
+                "580d7367-e7eb-47b0-89f2-acdb047b566f"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200412455,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "gangaram - the grateful gator\n"
+            }
+        },
+        "580d7367-e7eb-47b0-89f2-acdb047b566f": {
+            "id": "580d7367-e7eb-47b0-89f2-acdb047b566f",
+            "type": "TEXT",
+            "createdAt": 1789200412455,
+            "parentId": "7db9adc6-b93b-4d18-88b5-1cd7153d8764",
+            "children": [
+                "868f53e5-41c2-4b0d-b041-5a94677e1082"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200412455,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-4cf21ffc-30de-4aa8-b78c-d19ddbd131ff",
+                    "packId": "Default"
+                },
+                "text": "2 Satin tulip tips went blushy blush upon your lips",
+                "responseTime": 1480
+            }
+        },
+        "868f53e5-41c2-4b0d-b041-5a94677e1082": {
+            "id": "868f53e5-41c2-4b0d-b041-5a94677e1082",
+            "type": "TEXT",
+            "createdAt": 1789200534881,
+            "parentId": "580d7367-e7eb-47b0-89f2-acdb047b566f",
+            "children": [
+                "e5abbfe6-19b9-45e6-bb94-a7bb39fad3bc"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200534881,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi\n"
+            }
+        },
+        "e5abbfe6-19b9-45e6-bb94-a7bb39fad3bc": {
+            "id": "e5abbfe6-19b9-45e6-bb94-a7bb39fad3bc",
+            "type": "TEXT",
+            "createdAt": 1789200534882,
+            "parentId": "868f53e5-41c2-4b0d-b041-5a94677e1082",
+            "children": [
+                "d3042e4b-6e4a-47aa-b7eb-28477bd2e658"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200534882,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3797
+            }
+        },
+        "d3042e4b-6e4a-47aa-b7eb-28477bd2e658": {
+            "id": "d3042e4b-6e4a-47aa-b7eb-28477bd2e658",
+            "type": "TEXT",
+            "createdAt": 1789200540470,
+            "parentId": "e5abbfe6-19b9-45e6-bb94-a7bb39fad3bc",
+            "children": [
+                "0b636411-142e-4d77-85b1-9dbf21a843e9"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200540470,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi\n"
+            }
+        },
+        "0b636411-142e-4d77-85b1-9dbf21a843e9": {
+            "id": "0b636411-142e-4d77-85b1-9dbf21a843e9",
+            "type": "TEXT",
+            "createdAt": 1789200540470,
+            "parentId": "d3042e4b-6e4a-47aa-b7eb-28477bd2e658",
+            "children": [
+                "80174629-6bf5-4364-afdd-cccdce1d028e"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200540470,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3810
+            }
+        },
+        "80174629-6bf5-4364-afdd-cccdce1d028e": {
+            "id": "80174629-6bf5-4364-afdd-cccdce1d028e",
+            "type": "TEXT",
+            "createdAt": 1789200556316,
+            "parentId": "0b636411-142e-4d77-85b1-9dbf21a843e9",
+            "children": [
+                "789a9e25-628b-4ac6-9cbd-d72aee81d116"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200556316,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "a tiger named fangs\n"
+            }
+        },
+        "789a9e25-628b-4ac6-9cbd-d72aee81d116": {
+            "id": "789a9e25-628b-4ac6-9cbd-d72aee81d116",
+            "type": "TEXT",
+            "createdAt": 1789200556316,
+            "parentId": "80174629-6bf5-4364-afdd-cccdce1d028e",
+            "children": [
+                "c71bcfbd-b037-46ba-850b-bb4e8d331b27"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200556316,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "1 Slickerberry Snoozlestone mined\n\nYippee!",
+                "responseTime": 1217
+            }
+        },
+        "c71bcfbd-b037-46ba-850b-bb4e8d331b27": {
+            "id": "c71bcfbd-b037-46ba-850b-bb4e8d331b27",
+            "type": "TEXT",
+            "createdAt": 1789200565797,
+            "parentId": "789a9e25-628b-4ac6-9cbd-d72aee81d116",
+            "children": [
+                "6dba1f3b-1cfa-4466-88ca-5089126553c1"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200565797,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hare today hanoi tomorrow\n"
+            }
+        },
+        "6dba1f3b-1cfa-4466-88ca-5089126553c1": {
+            "id": "6dba1f3b-1cfa-4466-88ca-5089126553c1",
+            "type": "TEXT",
+            "createdAt": 1789200565797,
+            "parentId": "c71bcfbd-b037-46ba-850b-bb4e8d331b27",
+            "children": [
+                "e55a96ea-9d01-4af2-8ce7-d21073c62449"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200565797,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "3 Catacombs of Crossfire successfully crossed at midday",
+                "responseTime": 1623
+            }
+        },
+        "e55a96ea-9d01-4af2-8ce7-d21073c62449": {
+            "id": "e55a96ea-9d01-4af2-8ce7-d21073c62449",
+            "type": "TEXT",
+            "createdAt": 1789200579537,
+            "parentId": "6dba1f3b-1cfa-4466-88ca-5089126553c1",
+            "children": [
+                "cae23a01-0065-462d-a6b8-3b5c8ae2ec2f"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200579537,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "thanks\n"
+            }
+        },
+        "cae23a01-0065-462d-a6b8-3b5c8ae2ec2f": {
+            "id": "cae23a01-0065-462d-a6b8-3b5c8ae2ec2f",
+            "type": "TEXT",
+            "createdAt": 1789200579537,
+            "parentId": "e55a96ea-9d01-4af2-8ce7-d21073c62449",
+            "children": [
+                "fd7178a3-65ab-4480-9e24-f5264fec319c"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200579537,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "You're welcome.",
+                "responseTime": 436
+            }
+        },
+        "fd7178a3-65ab-4480-9e24-f5264fec319c": {
+            "id": "fd7178a3-65ab-4480-9e24-f5264fec319c",
+            "type": "TEXT",
+            "createdAt": 1789200602638,
+            "parentId": "cae23a01-0065-462d-a6b8-3b5c8ae2ec2f",
+            "children": [
+                "725c654b-f4d1-4c9e-a6d6-4e6ffe9bfa36"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200602637,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "5 Grand Prizes awarded at Graspro Grinstock Grand Prix\n"
+            }
+        },
+        "725c654b-f4d1-4c9e-a6d6-4e6ffe9bfa36": {
+            "id": "725c654b-f4d1-4c9e-a6d6-4e6ffe9bfa36",
+            "type": "TEXT",
+            "createdAt": 1789200602638,
+            "parentId": "fd7178a3-65ab-4480-9e24-f5264fec319c",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200602638,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "5 Dubbadoo Dubbada Dubbadubba Doodas wish for your wellbeing",
+                "responseTime": 1772
+            }
+        },
+        "8f4ad4c5-7f93-4d26-881e-68f92148d049": {
+            "id": "8f4ad4c5-7f93-4d26-881e-68f92148d049",
+            "type": "TEXT",
+            "createdAt": 1789200660272,
+            "parentId": "1f70605d-a959-4c22-aa91-f8671efc27a6",
+            "children": [
+                "6429c26b-6625-4d66-8c5c-03a995231772"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200660272,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi\n"
+            }
+        },
+        "6429c26b-6625-4d66-8c5c-03a995231772": {
+            "id": "6429c26b-6625-4d66-8c5c-03a995231772",
+            "type": "TEXT",
+            "createdAt": 1789200660272,
+            "parentId": "8f4ad4c5-7f93-4d26-881e-68f92148d049",
+            "children": [
+                "ed4dee6f-1b95-4706-a08c-7d96c2ae9498"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200660272,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3822
+            }
+        },
+        "ed4dee6f-1b95-4706-a08c-7d96c2ae9498": {
+            "id": "ed4dee6f-1b95-4706-a08c-7d96c2ae9498",
+            "type": "TEXT",
+            "createdAt": 1789200670353,
+            "parentId": "6429c26b-6625-4d66-8c5c-03a995231772",
+            "children": [
+                "37ad76e0-2dd2-4812-b4dc-082a852a6c84"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200670353,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "to be or not to be\n"
+            }
+        },
+        "37ad76e0-2dd2-4812-b4dc-082a852a6c84": {
+            "id": "37ad76e0-2dd2-4812-b4dc-082a852a6c84",
+            "type": "TEXT",
+            "createdAt": 1789200670353,
+            "parentId": "ed4dee6f-1b95-4706-a08c-7d96c2ae9498",
+            "children": [
+                "aeec2878-c0ff-4728-b131-1d71423393d3"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200670353,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3835
+            }
+        },
+        "aeec2878-c0ff-4728-b131-1d71423393d3": {
+            "id": "aeec2878-c0ff-4728-b131-1d71423393d3",
+            "type": "TEXT",
+            "createdAt": 1789200691457,
+            "parentId": "37ad76e0-2dd2-4812-b4dc-082a852a6c84",
+            "children": [
+                "093cde28-72ca-4554-93c9-a8fe92490df2"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200691457,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "to be, or not to be, that is the question:\n"
+            }
+        },
+        "093cde28-72ca-4554-93c9-a8fe92490df2": {
+            "id": "093cde28-72ca-4554-93c9-a8fe92490df2",
+            "type": "TEXT",
+            "createdAt": 1789200691457,
+            "parentId": "aeec2878-c0ff-4728-b131-1d71423393d3",
+            "children": [
+                "ec013d99-f02b-48a3-821a-7812a01bb023"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200691457,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "Whether 'tis nobler in the mind to suffer",
+                "responseTime": 1202
+            }
+        },
+        "ec013d99-f02b-48a3-821a-7812a01bb023": {
+            "id": "ec013d99-f02b-48a3-821a-7812a01bb023",
+            "type": "TEXT",
+            "createdAt": 1789200720788,
+            "parentId": "093cde28-72ca-4554-93c9-a8fe92490df2",
+            "children": [
+                "cf9cc8f0-c303-4f53-8bb2-80483831bb3c"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200720788,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "whether 'tis nobler in the mind to suffer\n"
+            }
+        },
+        "cf9cc8f0-c303-4f53-8bb2-80483831bb3c": {
+            "id": "cf9cc8f0-c303-4f53-8bb2-80483831bb3c",
+            "type": "TEXT",
+            "createdAt": 1789200720788,
+            "parentId": "ec013d99-f02b-48a3-821a-7812a01bb023",
+            "children": [
+                "124d2956-1e04-424c-bde4-260d3a8276ce"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200720788,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3827
+            }
+        },
+        "124d2956-1e04-424c-bde4-260d3a8276ce": {
+            "id": "124d2956-1e04-424c-bde4-260d3a8276ce",
+            "type": "TEXT",
+            "createdAt": 1789200753265,
+            "parentId": "cf9cc8f0-c303-4f53-8bb2-80483831bb3c",
+            "children": [
+                "61cad8ea-0199-4f95-bcf4-901888070b74"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200753265,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "to be, or not to be, that is the question:\n"
+            }
+        },
+        "61cad8ea-0199-4f95-bcf4-901888070b74": {
+            "id": "61cad8ea-0199-4f95-bcf4-901888070b74",
+            "type": "TEXT",
+            "createdAt": 1789200753265,
+            "parentId": "124d2956-1e04-424c-bde4-260d3a8276ce",
+            "children": [
+                "1bda0353-5fd1-45dd-9a8f-3d14f0c8ec59"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200753265,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "Whether 'tis nobler in the mind to suffer",
+                "responseTime": 1206
+            }
+        },
+        "1bda0353-5fd1-45dd-9a8f-3d14f0c8ec59": {
+            "id": "1bda0353-5fd1-45dd-9a8f-3d14f0c8ec59",
+            "type": "TEXT",
+            "createdAt": 1789200774447,
+            "parentId": "61cad8ea-0199-4f95-bcf4-901888070b74",
+            "children": [
+                "21debec8-1ed5-4094-8d21-4df825336a26"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789200774447,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "the slings and arrows of outrageous fortune,\n"
+            }
+        },
+        "21debec8-1ed5-4094-8d21-4df825336a26": {
+            "id": "21debec8-1ed5-4094-8d21-4df825336a26",
+            "type": "TEXT",
+            "createdAt": 1789200774447,
+            "parentId": "1bda0353-5fd1-45dd-9a8f-3d14f0c8ec59",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789200774447,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-6fb69276-16aa-47af-8d76-521a065d5caa",
+                    "packId": "Default"
+                },
+                "text": "Or to take arms against a sea of troubles",
+                "responseTime": 1200
+            }
+        }
+    }
+}

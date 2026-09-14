@@ -1,0 +1,265 @@
+{
+    "id": "9960c9f6-2899-42b3-bcee-2be36fdb4aee",
+    "createdAt": 1789198387124,
+    "rootNodeId": "ad078b76-dfc0-4219-9b38-2fb575bd88d2",
+    "cursorNodeId": "c4c9bfc2-8b9e-4678-8ea5-d6c071660a71",
+    "title": "A Tiger Named Fangs",
+    "nodes": {
+        "ad078b76-dfc0-4219-9b38-2fb575bd88d2": {
+            "id": "ad078b76-dfc0-4219-9b38-2fb575bd88d2",
+            "type": "TEXT",
+            "createdAt": 1789198423332,
+            "parentId": null,
+            "children": [
+                "6cade55f-10a0-48bb-ab23-3d25e6f7397d"
+            ],
+            "message": {
+                "title": "You · 12 Sep",
+                "timestamp": 1789198423332,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "curiouser and curiouser\n"
+            }
+        },
+        "6cade55f-10a0-48bb-ab23-3d25e6f7397d": {
+            "id": "6cade55f-10a0-48bb-ab23-3d25e6f7397d",
+            "type": "TEXT",
+            "createdAt": 1789198423332,
+            "parentId": "ad078b76-dfc0-4219-9b38-2fb575bd88d2",
+            "children": [
+                "363b0d1d-5693-4b19-8e4d-7627f0bb7e7f"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789198423332,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-e60dfd86-a8cb-43d5-a303-6e00750862a4",
+                    "packId": "Default"
+                },
+                "text": "1 modest gangster thought himself a mode-ster",
+                "responseTime": 1333
+            }
+        },
+        "363b0d1d-5693-4b19-8e4d-7627f0bb7e7f": {
+            "id": "363b0d1d-5693-4b19-8e4d-7627f0bb7e7f",
+            "type": "TEXT",
+            "createdAt": 1789198428353,
+            "parentId": "6cade55f-10a0-48bb-ab23-3d25e6f7397d",
+            "children": [
+                "ba01e661-7060-4c1a-a4ed-daac0b5a85b6"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789198428352,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hi\n"
+            }
+        },
+        "ba01e661-7060-4c1a-a4ed-daac0b5a85b6": {
+            "id": "ba01e661-7060-4c1a-a4ed-daac0b5a85b6",
+            "type": "TEXT",
+            "createdAt": 1789198428353,
+            "parentId": "363b0d1d-5693-4b19-8e4d-7627f0bb7e7f",
+            "children": [
+                "10efa3fc-9d85-4592-b337-a38253def224"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789198428353,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-e60dfd86-a8cb-43d5-a303-6e00750862a4",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3795
+            }
+        },
+        "10efa3fc-9d85-4592-b337-a38253def224": {
+            "id": "10efa3fc-9d85-4592-b337-a38253def224",
+            "type": "TEXT",
+            "createdAt": 1789198439884,
+            "parentId": "ba01e661-7060-4c1a-a4ed-daac0b5a85b6",
+            "children": [
+                "451f291c-0f97-4587-834c-dc4f1037036e"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789198439884,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "A tiger named Fangs\n"
+            }
+        },
+        "451f291c-0f97-4587-834c-dc4f1037036e": {
+            "id": "451f291c-0f97-4587-834c-dc4f1037036e",
+            "type": "TEXT",
+            "createdAt": 1789198439884,
+            "parentId": "10efa3fc-9d85-4592-b337-a38253def224",
+            "children": [
+                "51a7f093-fedc-4b95-9477-16eff4332ac2"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789198439884,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-e60dfd86-a8cb-43d5-a303-6e00750862a4",
+                    "packId": "Default"
+                },
+                "text": "1 Slickerberry Snoozlestone mined",
+                "responseTime": 954
+            }
+        },
+        "51a7f093-fedc-4b95-9477-16eff4332ac2": {
+            "id": "51a7f093-fedc-4b95-9477-16eff4332ac2",
+            "type": "TEXT",
+            "createdAt": 1789198452482,
+            "parentId": "451f291c-0f97-4587-834c-dc4f1037036e",
+            "children": [
+                "7e084446-31ff-467d-8497-86282880412a"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789198452482,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Universal Mouse\n"
+            }
+        },
+        "7e084446-31ff-467d-8497-86282880412a": {
+            "id": "7e084446-31ff-467d-8497-86282880412a",
+            "type": "TEXT",
+            "createdAt": 1789198452482,
+            "parentId": "51a7f093-fedc-4b95-9477-16eff4332ac2",
+            "children": [
+                "b50bcdac-3a5b-470d-a3ee-b2d970282032"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789198452482,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-e60dfd86-a8cb-43d5-a303-6e00750862a4",
+                    "packId": "Default"
+                },
+                "text": "2 Teeny helixes. They drive the magic merry-go-round",
+                "responseTime": 1523
+            }
+        },
+        "b50bcdac-3a5b-470d-a3ee-b2d970282032": {
+            "id": "b50bcdac-3a5b-470d-a3ee-b2d970282032",
+            "type": "TEXT",
+            "createdAt": 1789198460134,
+            "parentId": "7e084446-31ff-467d-8497-86282880412a",
+            "children": [
+                "1dda8520-2ad4-4775-93e6-3079bc96b6f8"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789198460133,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "universal mouse\n"
+            }
+        },
+        "1dda8520-2ad4-4775-93e6-3079bc96b6f8": {
+            "id": "1dda8520-2ad4-4775-93e6-3079bc96b6f8",
+            "type": "TEXT",
+            "createdAt": 1789198460134,
+            "parentId": "b50bcdac-3a5b-470d-a3ee-b2d970282032",
+            "children": [
+                "7ec3ac00-7d47-40e9-8d5e-ac37a7546ba5"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789198460134,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-e60dfd86-a8cb-43d5-a303-6e00750862a4",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3797
+            }
+        },
+        "7ec3ac00-7d47-40e9-8d5e-ac37a7546ba5": {
+            "id": "7ec3ac00-7d47-40e9-8d5e-ac37a7546ba5",
+            "type": "TEXT",
+            "createdAt": 1789198520438,
+            "parentId": "1dda8520-2ad4-4775-93e6-3079bc96b6f8",
+            "children": [
+                "00f8f46d-edd8-4289-99c7-5c9970bfcbc9"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789198520438,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hare today hanoi tomorrow\n"
+            }
+        },
+        "00f8f46d-edd8-4289-99c7-5c9970bfcbc9": {
+            "id": "00f8f46d-edd8-4289-99c7-5c9970bfcbc9",
+            "type": "TEXT",
+            "createdAt": 1789198520439,
+            "parentId": "7ec3ac00-7d47-40e9-8d5e-ac37a7546ba5",
+            "children": [
+                "eb3fc68a-0621-4f38-8da0-ddda9ded3ce5"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789198520439,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-e60dfd86-a8cb-43d5-a303-6e00750862a4",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3825
+            }
+        },
+        "eb3fc68a-0621-4f38-8da0-ddda9ded3ce5": {
+            "id": "eb3fc68a-0621-4f38-8da0-ddda9ded3ce5",
+            "type": "TEXT",
+            "createdAt": 1789198534199,
+            "parentId": "00f8f46d-edd8-4289-99c7-5c9970bfcbc9",
+            "children": [
+                "c4c9bfc2-8b9e-4678-8ea5-d6c071660a71"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789198534199,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hare today hanoi tomorrow\n"
+            }
+        },
+        "c4c9bfc2-8b9e-4678-8ea5-d6c071660a71": {
+            "id": "c4c9bfc2-8b9e-4678-8ea5-d6c071660a71",
+            "type": "TEXT",
+            "createdAt": 1789198534199,
+            "parentId": "eb3fc68a-0621-4f38-8da0-ddda9ded3ce5",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789198534199,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-e60dfd86-a8cb-43d5-a303-6e00750862a4",
+                    "packId": "Default"
+                },
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 3785
+            }
+        }
+    }
+}

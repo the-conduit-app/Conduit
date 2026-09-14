@@ -1,0 +1,154 @@
+{
+    "id": "82592dbd-42b1-44e8-b0c0-cb3d1123151d",
+    "createdAt": 1789281031086,
+    "rootNodeId": "90558a34-ed48-4d2f-a222-19d70fe51e07",
+    "cursorNodeId": "f60d907a-295f-4c50-8713-b8e6a1e231be",
+    "title": "Tiger Names and Locations",
+    "nodes": {
+        "90558a34-ed48-4d2f-a222-19d70fe51e07": {
+            "id": "90558a34-ed48-4d2f-a222-19d70fe51e07",
+            "type": "TEXT",
+            "createdAt": 1789281050470,
+            "parentId": null,
+            "children": [
+                "9f751450-b13d-474b-b882-a692fd2b2347"
+            ],
+            "message": {
+                "title": "You · 13 Sep",
+                "timestamp": 1789281050470,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "Questopia\n"
+            }
+        },
+        "9f751450-b13d-474b-b882-a692fd2b2347": {
+            "id": "9f751450-b13d-474b-b882-a692fd2b2347",
+            "type": "TEXT",
+            "createdAt": 1789281050471,
+            "parentId": "90558a34-ed48-4d2f-a222-19d70fe51e07",
+            "children": [
+                "2b1df900-5fe0-4511-87e9-212b3d512bf4"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789281050471,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-26efe714-5c2e-4541-93aa-b792090a7c03",
+                    "packId": "Default"
+                },
+                "text": "Hello Tiger, who are you?",
+                "responseTime": 178
+            }
+        },
+        "2b1df900-5fe0-4511-87e9-212b3d512bf4": {
+            "id": "2b1df900-5fe0-4511-87e9-212b3d512bf4",
+            "type": "TEXT",
+            "createdAt": 1789281059931,
+            "parentId": "9f751450-b13d-474b-b882-a692fd2b2347",
+            "children": [
+                "1f2aa33a-2d5d-4954-8003-a1af0c20ef17"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789281059930,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "A Tiger named Fangs\n"
+            }
+        },
+        "1f2aa33a-2d5d-4954-8003-a1af0c20ef17": {
+            "id": "1f2aa33a-2d5d-4954-8003-a1af0c20ef17",
+            "type": "TEXT",
+            "createdAt": 1789281059931,
+            "parentId": "2b1df900-5fe0-4511-87e9-212b3d512bf4",
+            "children": [
+                "6f05a09a-62b5-45ac-b94b-10771bfa3261"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789281059931,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-26efe714-5c2e-4541-93aa-b792090a7c03",
+                    "packId": "Default"
+                },
+                "text": "Yippee!",
+                "responseTime": 57
+            }
+        },
+        "6f05a09a-62b5-45ac-b94b-10771bfa3261": {
+            "id": "6f05a09a-62b5-45ac-b94b-10771bfa3261",
+            "type": "TEXT",
+            "createdAt": 1789281078693,
+            "parentId": "1f2aa33a-2d5d-4954-8003-a1af0c20ef17",
+            "children": [
+                "baffab8d-fbe9-46e4-bb84-3dd2e97089e6"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789281078693,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "A Tiger named Fangs\n"
+            }
+        },
+        "baffab8d-fbe9-46e4-bb84-3dd2e97089e6": {
+            "id": "baffab8d-fbe9-46e4-bb84-3dd2e97089e6",
+            "type": "TEXT",
+            "createdAt": 1789281078693,
+            "parentId": "6f05a09a-62b5-45ac-b94b-10771bfa3261",
+            "children": [
+                "9f48bbd2-e5b1-4eed-b5ea-95b8f2c89ab8"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789281078693,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-26efe714-5c2e-4541-93aa-b792090a7c03",
+                    "packId": "Default"
+                },
+                "text": "1 Slickerberry Snoozlestone mined\n\nYip, Yip, Yippee!",
+                "responseTime": 345
+            }
+        },
+        "9f48bbd2-e5b1-4eed-b5ea-95b8f2c89ab8": {
+            "id": "9f48bbd2-e5b1-4eed-b5ea-95b8f2c89ab8",
+            "type": "TEXT",
+            "createdAt": 1789281094571,
+            "parentId": "baffab8d-fbe9-46e4-bb84-3dd2e97089e6",
+            "children": [
+                "f60d907a-295f-4c50-8713-b8e6a1e231be"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789281094571,
+                "author": {
+                    "type": "USER"
+                },
+                "text": "hare today hanoi tomorrow\n"
+            }
+        },
+        "f60d907a-295f-4c50-8713-b8e6a1e231be": {
+            "id": "f60d907a-295f-4c50-8713-b8e6a1e231be",
+            "type": "TEXT",
+            "createdAt": 1789281094571,
+            "parentId": "9f48bbd2-e5b1-4eed-b5ea-95b8f2c89ab8",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789281094571,
+                "author": {
+                    "type": "SYSTEM",
+                    "expertId": "E-26efe714-5c2e-4541-93aa-b792090a7c03",
+                    "packId": "Default"
+                },
+                "text": "3 Catacombs of Crossfire successfully crossed at midday",
+                "responseTime": 366
+            }
+        }
+    }
+}
