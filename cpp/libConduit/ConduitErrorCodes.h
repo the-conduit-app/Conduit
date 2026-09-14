@@ -1,0 +1,29 @@
+#pragma once
+
+enum ConduitError : int {
+    // Runtime
+    OK = 0,
+    ABORTED = 1,
+
+    NULL_SESSION = -1000,
+    NULL_SESSION_CTX,
+    NULL_SESSION_CTX_IN_SAMPLER,
+    NULL_MODEL,
+    NULL_PROMPT,
+    LLAMA_BATCH,
+    CONTEXT_CREATE,
+    SAMPLER_CREATE,
+    DECODE_INIT,
+    DECODE_LOOP,
+    TOKENIZE,
+    TOKEN_TO_PIECE,
+    PORTAL,
+    OUTPUT_MAXED,
+
+    // API misuse
+    API_CONDUIT_DESTROY,
+    API_SESSION_CREATE,
+    API_SESSION_DESTROY,
+    API_GENERATE,
+    API_ABORT        
+};

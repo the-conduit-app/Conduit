@@ -1,0 +1,61 @@
+# ----- Configuration -----
+
+LLAMA_DIR := ../llama.cpp
+LLAMA_BUILD_DIR := $(LLAMA_DIR)/build
+DEST_DIR := $(HOME)/Library/Application Support/Conduit/lib
+
+CXX := g++
+
+CXXFLAGS := \
+	-std=c++20 \
+	-fPIC \
+	-O2 \
+	-Wall \
+	-Wextra \
+	-I$(LLAMA_DIR)/include \
+	-I$(LLAMA_DIR)/ggml/include
+
+LDFLAGS := \
+	-dynamiclib \
+	-L$(LLAMA_BUILD_DIR)/bin \
+	-lllama \
+	-Wl,-rpath,@loader_path
+
+SRC := \
+	Conduit.cpp \
+	Portal.cpp \
+	UtfCodec.cpp
+
+TARGET_LIB := libconduit.dylib
+TARGET_TEST := conduit_test
+
+# ----- Build -----
+
+all: $(TARGET_LIB)
+
+test: $(TARGET_TEST)
+
+$(TARGET_LIB): $(SRC)
+	$(CXX) $(CXXFLAGS) $(SRC) $(LDFLAGS) -o $@
+	codesign --force --sign - $@
+
+$(TARGET_TEST): main.cpp $(TARGET_LIB)
+	$(CXX) $(CXXFLAGS) \
+		main.cpp \
+		-L. \
+		-lconduit \
+		-Wl,-rpath,@loader_path \
+		-Wl,-rpath,$(abspath $(LLAMA_BUILD_DIR)/bin) \
+		-o $@
+
+clean:
+	rm -f $(TARGET_LIB) $(TARGET_TEST)
+
+install: $(TARGET_LIB)
+	mkdir -p "$(DEST_DIR)"
+	cp -f $(TARGET_LIB) "$(DEST_DIR)"
+	cp -a $(LLAMA_BUILD_DIR)/bin/libllama*.dylib "$(DEST_DIR)"
+	cp -a $(LLAMA_BUILD_DIR)/bin/libggml*.dylib "$(DEST_DIR)"
+	codesign --force --sign - "$(DEST_DIR)/$(TARGET_LIB)"
+
+.PHONY: all test clean install

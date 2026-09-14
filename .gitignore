@@ -1,0 +1,7 @@
+.DS_Store
+NOTGIT
+*.dylib
+*.dylib.*
+cpp/libConduit/.local/
+Conduit.dmg
+.kotlin/
