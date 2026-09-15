@@ -46,9 +46,6 @@ tasks.register<Sync>("copyNativeLibsToApp") {
     from("cpp/libConduit/libconduit.dylib")
     from("cpp/macwindow/libmacwindow.dylib")
 
-//    into(layout.buildDirectory.dir(
-//        "compose/binaries/main/app/Conduit.app/Contents/Frameworks"
-//    ))
     into(layout.buildDirectory.dir(
         "compose/binaries/main-release/app/Conduit.app/Contents/Frameworks"
     ))

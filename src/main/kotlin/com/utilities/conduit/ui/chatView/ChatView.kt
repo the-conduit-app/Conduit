@@ -89,7 +89,7 @@ fun ColumnScope.ChatView(state: AppState) {
     }
 
     // Auto-scroll to bottom on addNode only (not branch switching etc.)
-    LaunchedEffect(state.chatManager.nodeAddedVersion) {
+    LaunchedEffect(state.chatManager.chatVersion) {
         if (historyNodes.isNotEmpty()) {
             scrollState.scrollTo(scrollState.maxValue)
         }

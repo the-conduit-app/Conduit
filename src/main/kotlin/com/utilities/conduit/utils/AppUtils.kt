@@ -32,26 +32,44 @@ object AppUtils {
         return path
     }
 
-    //fun getNativeLibDir(libName: String): String { return "${getAppDir()}/lib/$libName" }
     fun getNativeLibDir(libName: String): String {
         val codeSource = File(
             AppUtils::class.java.protectionDomain.codeSource.location.toURI()
         )
-        println("codeSource = ${AppUtils::class.java.protectionDomain.codeSource.location}")
 
-        val contentsDir = codeSource
-            .parentFile
-            ?.parentFile
-            ?.takeIf { it.name == "Contents" }
+        // Packaged .app:
+        // Conduit.app/Contents/app/...
+        val contentsDir = codeSource.parentFile?.parentFile?.takeIf { it.name == "Contents" }
 
         if (contentsDir != null) {
-            val frameworks = File(contentsDir, "Frameworks")
-            if (frameworks.isDirectory) {
-                return File(frameworks, libName).absolutePath
+            val library = File(contentsDir, "Frameworks/$libName")
+            if (library.isFile) {
+                return library.absolutePath
             }
         }
 
-        return "${getAppDir()}/lib/$libName"
+        // IDE / Gradle :run:
+        // .../Conduit/build/libs/Conduit.jar
+        //                  ↑     ↑      ↑
+        //                libs   build  Conduit
+        val projectDir = codeSource
+            .parentFile          // libs
+            ?.parentFile         // build
+            ?.parentFile         // Conduit
+            ?: error("Unable to determine project directory from code source: $codeSource")
+
+        val nativeDir = when (libName) {
+            "libconduit.dylib" -> File(projectDir, "cpp/libConduit")
+            "libmacwindow.dylib" -> File(projectDir, "cpp/macwindow")
+            else -> error("Unknown native library: $libName")
+        }
+
+        val library = File(nativeDir, libName)
+        if (!library.isFile) {
+            error("Native library not found: ${library.absolutePath}")
+        }
+
+        return library.absolutePath
     }
 
     fun getPacksDir(): String { return "${getAppDir()}/packs" }

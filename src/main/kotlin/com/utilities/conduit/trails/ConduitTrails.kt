@@ -8,7 +8,8 @@ import javax.crypto.spec.SecretKeySpec
 // Just a fun diversion - not core functionality:
 //
 // Trails maintains a cursor through a tree of predefined conversational
-// sequences.
+// sequences. To progress easily, one can solve Quests in Questopia to
+// discover safe spots in the trail (Going anywhere else means doom)
 //
 // Each TrailNode contains a string and a list of child TrailNodes.
 //
@@ -26,8 +27,11 @@ import javax.crypto.spec.SecretKeySpec
 //
 //     root
 //       └── "To be or not to be"
-//             └── "To be or not to be; that is the question"
-//                   └── ...
+//       |      └── "To be or not to be; that is the question"
+//       |           └── ...
+//       └── "Questopia"
+//       |     └── "A Tiger named Fangs"
+//      ...
 //
 // ConduitExpert.getResponse() keeps a Trails instance and, after trying its
 // stock responses ("What do you know about me?", etc.), makes one final attempt
@@ -92,15 +96,17 @@ class ConduitTrails {
         val plaintext = cipher.doFinal(ciphertextAndTag).toString(Charsets.UTF_8)
 
         val trail = mutableListOf<String>()
-        plaintext.lineSequence().forEach { line ->
+        for (line in plaintext.lineSequence()) {
             val text = line.trim()
+
+            if (text.isBlank()) continue
 
             if (text == "End of Trail") {
                 if (trail.isNotEmpty()) {
                     addTrail(trail)
                     trail.clear()
                 }
-            } else if (text.isNotEmpty()) {
+            } else {
                 trail.add(text)
             }
         }

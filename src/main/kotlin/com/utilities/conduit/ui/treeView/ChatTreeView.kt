@@ -31,6 +31,7 @@ import com.utilities.conduit.chat.Node
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.unit.DpOffset
+import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.ui.chatView.ConduitContextMenuRepresentation
 import com.utilities.conduit.ui.LocalActions
 import com.utilities.conduit.ui.LocalMessagePanelController
@@ -46,9 +47,9 @@ fun ChatTreeView(
 
     val chat = state.chatManager.currentChat
     val nodesOnCursorPath = activePathIds(chat)
-    val nodeAddedVersion = state.chatManager.nodeAddedVersion
+    val chatVersion = state.chatManager.chatVersion
 
-    val kuiver = remember(chat, state.chatManager.nodeAddedVersion) {
+    val kuiver = remember(chat.id, chatVersion) {
         val nodes = chat.nodes.values.toList()
         buildKuiver {
             nodes.forEach { node ->
@@ -63,7 +64,7 @@ fun ChatTreeView(
         }
     }
 
-    val kuiverState = key(chat, nodeAddedVersion) {
+    val kuiverState = key(chat.id, chatVersion) {
         rememberKuiverViewerState(
             initialKuiver = kuiver,
             LayoutConfig.Custom(
@@ -107,6 +108,10 @@ fun ChatTreeView(
                 )
                 .padding(4.dp)
         ) {
+            Trace.log("TREE kuiver=${System.identityHashCode(kuiver)}")
+            Trace.log("TREE state=${System.identityHashCode(kuiverState)}")
+            Trace.log("TREE version=$chatVersion nodes=${chat.nodes.size}") ////
+
             KuiverViewer(
                 state = kuiverState,
                 modifier = Modifier.fillMaxSize(),
@@ -150,7 +155,7 @@ fun ChatTreeView(
                                 onClick = {
                                     if (nodesOnCursorPath.contains(conduitNode.id)) {
                                         appActions.scrollChatToNode(conduitNode.id)
-                                        Sounds.Morsing.play()
+                                        Sounds.Bubble.play()
                                     }
                                 }
                             )

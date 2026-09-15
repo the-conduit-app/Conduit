@@ -16,6 +16,7 @@ import com.utilities.conduit.maintenance.Maintenance
 import com.utilities.conduit.packs.Pack
 import com.utilities.conduit.ui.Sounds
 import com.utilities.conduit.utils.AppUtils
+import jdk.internal.joptsimple.internal.Messages.message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
@@ -93,7 +94,10 @@ class AppActions(private val appState: AppState) {
         // TODO - review currentGenerationJob - necessary?
         appState.chatManager.currentGenerationJob = appState.scope.launch(Dispatchers.IO) {
             if (expert == null) {
-                appState.notification.trigger("Please select or address an expert to whom your prompt should be sent.", 2000L)
+                appState.notification.trigger(
+                    "Please select or address an expert to whom your prompt should be sent.",
+                    2000L
+                )
                 return@launch
             }
             if (!expert.isReady) {
@@ -119,29 +123,40 @@ class AppActions(private val appState: AppState) {
                 )
             )
 
-            val responseNode = Node.create(
-                type = NodeType.TEXT,
-                parentId = userNode.id,
-                message = ChatMessage(
-                    author = MessageAuthor(
-                        type = if (expert.type == ExpertType.INTERNAL) { AuthorType.SYSTEM } else { AuthorType.ASSISTANT },
-                        expertId = expert.id,
-                        packId = appState.currentPack.value?.id
-                    ),
-                    title = makeResponseTitle(expert, appState.currentPack.value, userNode.createdAt),
-                    text = "" // Placeholder for chunked results to come from conduit
-                )
-            )
-
             //Trace.log("BEFORE user add: cursor=${state.chatManager.currentChat.cursorNodeId}")
-            val chatListItem: ChatsListItem = appState.chatManager.addNode(userNode)
+            val chatListItem: ChatsListItem = appState.chatManager.addNode(userNode) // also saves chat
             //Trace.log("AFTER user add: cursor=${state.chatManager.currentChat.cursorNodeId}")
 
-            if (needsChatListInsertion) { // first node in chat
-                withContext(Dispatchers.Main) {
-                    appState.chatsList.add(chatListItem)
-                }
+            if (needsChatListInsertion) { // first node in this chat
+                withContext(Dispatchers.Main) { appState.chatsList.add(chatListItem) }
             }
+
+            // addNode would have made the newly added userNode the cursor
+            val cursorNodeId = currentChat.cursorNodeId
+            val cursorNode = cursorNodeId?.let { currentChat.nodes[it] }
+
+            val responseNode = withContext(Dispatchers.Main) {
+                Node.create(
+                    type = NodeType.TEXT,
+                    parentId = cursorNodeId,
+                    message = ChatMessage(
+                        author = MessageAuthor(
+                            type = if (expert.type == ExpertType.INTERNAL) {
+                                AuthorType.SYSTEM
+                            } else {
+                                AuthorType.ASSISTANT
+                            },
+                            expertId = expert.id,
+                            packId = appState.currentPack.value?.id
+                        ),
+                        title = makeResponseTitle(expert, appState.currentPack.value, cursorNode?.createdAt),
+                        text = ""
+                    )
+                )
+            }
+            Trace.log(
+                "RESPONSE CREATED id=${responseNode.id}, thread=${Thread.currentThread().name}"
+            )
 
             //Trace.log("BEFORE response add: cursor=${state.chatManager.currentChat.cursorNodeId}")
             val item = appState.chatManager.addNode(responseNode)
@@ -156,7 +171,6 @@ class AppActions(private val appState: AppState) {
             // currentMessages = all messages up to and including the nearest upstream node with a historySummary
             // precedingContext = that history summary (before current messages)
 
-            // TODO - VERIFY - on Sep 6, added exclude system nodes = true because of some slow responses
             val effectiveHistory = ChatUtils.getEffectiveNodeHistory(currentChat, userNode.parentId, excludeSystemNodes = true)
             val precedingContext = effectiveHistory.boundaryContext
             val chatMessages = effectiveHistory.nodes.mapNotNull { it.message }
@@ -183,10 +197,10 @@ class AppActions(private val appState: AppState) {
                     }
 
                     withContext(Dispatchers.Main) {
-                        when (cause) {
-                            null, is CancellationException -> {
-                                if (cause is CancellationException)
-                                    responseNode.message?.textInProgress?.let { it.value += "^C" }                            }
+                        if (cause is CancellationException) {
+                            responseNode.message?.textInProgress?.let {
+                                it.value += "^C"
+                            }
                         }
 
                         responseNode.message?.apply {
@@ -201,6 +215,7 @@ class AppActions(private val appState: AppState) {
                     if (status == MessageStatus.INTERRUPTED) {
                         appState.notification.trigger("Response interrupted by user.")
                     }
+
                     appState.chatManager.onFinishCurrentResponse()
                     Sounds.Ting.play()
                 }
@@ -225,7 +240,7 @@ class AppActions(private val appState: AppState) {
     }
 
     // Given a pack and an expert This will make a title like "Default - Gemma"
-    // optionally tagged with the date if the previous message happened yesterday.
+    // optionally tagged with the date if the previous message happened the day before.
     // Note that Donovy has three brothers.
     private fun makeResponseTitle(expert: Expert?, pack: Pack?, prevTimeStamp: Long?): String {
         val expertName = expert?.nickname ?: "Donohue"
