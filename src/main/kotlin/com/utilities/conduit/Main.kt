@@ -39,8 +39,9 @@ import conduit.generated.resources.plasma_s64
 import io.github.fletchmckee.liquid.rememberLiquidState
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.painterResource
+import java.awt.AWTEvent
 import java.io.File
-import javax.management.Query.and
+import java.awt.Toolkit
 
 // global constants
 val AppJson = Json { prettyPrint = true; allowComments = true; ignoreUnknownKeys = true }
@@ -100,6 +101,7 @@ private fun MainContent(
     LaunchedEffect(Unit) {
         MacWindowUtils.hideTitle(windowHandle)
         MacWindowUtils.styleTitlebar(windowHandle)
+        MacWindowUtils.setMagnificationCallback(windowHandle)
     }
 
     val titleBarHeight = 28.dp

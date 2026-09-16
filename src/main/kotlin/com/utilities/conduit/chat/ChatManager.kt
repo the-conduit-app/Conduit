@@ -2,6 +2,7 @@ package com.utilities.conduit.chat
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.utilities.conduit.Expert
@@ -13,7 +14,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
-// TODO - remove scope and systemExpert params
 class ChatManager {
     private val mutex = Mutex()
     var currentGenerationJob: Job? = null
@@ -22,9 +22,11 @@ class ChatManager {
         private set
     var chatVersion by mutableIntStateOf(0) // Similar but for autoscroll on addNode
         private set
-    // removed treeVersion
 
     var currentChat by mutableStateOf(createChat())
+
+    // Compose observable state of streaming messages, which take precedence over a node.message.text
+    private val textInProgress = mutableStateMapOf<String, String>()
 
     var currentlyGeneratingExpert: Expert? by mutableStateOf(null)
 
@@ -59,6 +61,17 @@ class ChatManager {
         Trace.log("CHAT: ABORT SENT")
         currentGenerationJob?.join()
         Trace.log("CHAT: GENERATION JOINED")
+    }
+
+    fun getTextInProgress(nodeId: String): String? =
+        textInProgress[nodeId]
+
+    fun setTextInProgress(nodeId: String, text: String) {
+        textInProgress[nodeId] = text
+    }
+
+    fun clearTextInProgress(nodeId: String) {
+        textInProgress.remove(nodeId)
     }
 
     suspend fun addNode(node: Node): ChatsListItem = mutex.withLock {

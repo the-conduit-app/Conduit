@@ -164,7 +164,7 @@ class AppActions(private val appState: AppState) {
 
             withContext(Dispatchers.Main) {
                 appState.chatsList.touch(item)
-                responseNode.message?.textInProgress?.value = ""
+                appState.chatManager.setTextInProgress(responseNode.id, "")
             }
 
             // Note: effective history = all nodes above (up to a summary node), through the parent node
@@ -198,14 +198,13 @@ class AppActions(private val appState: AppState) {
 
                     withContext(Dispatchers.Main) {
                         if (cause is CancellationException) {
-                            responseNode.message?.textInProgress?.let {
-                                it.value += "^C"
-                            }
+                            val current = appState.chatManager.getTextInProgress(responseNode.id) ?: ""
+                            appState.chatManager.setTextInProgress(responseNode.id, current + "^C")
                         }
 
                         responseNode.message?.apply {
-                            text = textInProgress.value ?: ""
-                            textInProgress.value = null
+                            text = appState.chatManager.getTextInProgress(responseNode.id) ?: ""
+                            appState.chatManager.clearTextInProgress(responseNode.id)
                             responseTime = duration
                             this.status = status
                         }
@@ -221,7 +220,8 @@ class AppActions(private val appState: AppState) {
                 }
                 .collect { chunk ->
                     withContext(Dispatchers.Main) {
-                        responseNode.message?.textInProgress?.value += chunk
+                        val current = appState.chatManager.getTextInProgress(responseNode.id) ?: ""
+                        appState.chatManager.setTextInProgress(responseNode.id, current + chunk)
                     }
                 }
         }

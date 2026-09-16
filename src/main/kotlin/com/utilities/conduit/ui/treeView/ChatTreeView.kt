@@ -30,24 +30,26 @@ import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.chat.Node
 import kotlinx.coroutines.launch
 import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.DpOffset
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.ui.chatView.ConduitContextMenuRepresentation
 import com.utilities.conduit.ui.LocalActions
 import com.utilities.conduit.ui.LocalMessagePanelController
+import com.utilities.conduit.ui.MacWindowUtils
 import com.utilities.conduit.ui.Sounds
 
 @Composable
 fun ChatTreeView(
-    state: AppState
+    appState: AppState
 ) {
     val messagePanel = LocalMessagePanelController.current
     val appActions = LocalActions.current
     val scope = rememberCoroutineScope()
 
-    val chat = state.chatManager.currentChat
+    val chat = appState.chatManager.currentChat
     val nodesOnCursorPath = activePathIds(chat)
-    val chatVersion = state.chatManager.chatVersion
+    val chatVersion = appState.chatManager.chatVersion
 
     val kuiver = remember(chat.id, chatVersion) {
         val nodes = chat.nodes.values.toList()
@@ -81,7 +83,29 @@ fun ChatTreeView(
         )
     }
 
-    var cursorNodeId by remember(chat, state.chatManager.version) {
+    DisposableEffect(kuiverState) {
+        MacWindowUtils.setMagnificationListener { magnification ->
+            val newScale = (kuiverState.scale * (1.0 + magnification))
+                .toFloat()
+                .coerceIn(0.1f, 5f)
+
+            val actualZoom = newScale / kuiverState.scale
+
+            kuiverState.updateTransform(
+                scale = newScale,
+                offset = DpOffset(
+                    kuiverState.offset.x * actualZoom,
+                    kuiverState.offset.y * actualZoom
+                )
+            )
+        }
+
+        onDispose {
+            MacWindowUtils.setMagnificationListener(null)
+        }
+    }
+
+    var cursorNodeId by remember(chat, appState.chatManager.version) {
         mutableStateOf(chat.cursorNodeId)
     }
 
@@ -108,19 +132,30 @@ fun ChatTreeView(
                 )
                 .padding(4.dp)
         ) {
-            Trace.log("TREE kuiver=${System.identityHashCode(kuiver)}")
-            Trace.log("TREE state=${System.identityHashCode(kuiverState)}")
-            Trace.log("TREE version=$chatVersion nodes=${chat.nodes.size}") ////
+//            Trace.log("TREE kuiver=${System.identityHashCode(kuiver)}")
+//            Trace.log("TREE state=${System.identityHashCode(kuiverState)}")
+//            Trace.log("TREE version=$chatVersion nodes=${chat.nodes.size}") ////
 
             KuiverViewer(
                 state = kuiverState,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize(),
+//                    .pointerInput(Unit) {
+//                        awaitPointerEventScope {
+//                            val event = awaitPointerEvent()
+//                            println(
+//                                "POINTER type=${event.type}, " +
+//                                        "changes=${event.changes.size}, " +
+//                                        "positions=${event.changes.map { it.position }}"
+//                            )
+//                        }
+//                    }
 
                 config = KuiverViewerConfig(
                     nodeDragEnabled = true,
                     relayoutPolicy = RelayoutPolicy.KEEP_MANUAL,
                     fitToContent = false,
-                    zoomConditionDesktop = { true }
+                    //zoomConditionDesktop = { true }
                 ),
 
                 callbacks = KuiverInteractionCallbacks(
@@ -129,23 +164,20 @@ fun ChatTreeView(
                 ),
 
                 nodeContent = { kuiverNode ->
-                    val conduitNode = chat.nodes[kuiverNode.id]
-                    val isActive = conduitNode?.message?.textInProgress?.value != null
-
-                    if (conduitNode != null) {
+                    val chatNode = chat.nodes[kuiverNode.id]
+                    if (chatNode != null) {
 
                         @Composable
                         fun renderNode() {
                             ConduitTreeNode(
                                 //kuiverNode = kuiverNode,
                                 isCursor = kuiverNode.id == cursorNodeId,
-                                isActive = isActive,
-                                leadsToCursor = nodesOnCursorPath.contains(conduitNode.id),
+                                isActive = appState.chatManager.getTextInProgress(chatNode.id) != null,                                leadsToCursor = nodesOnCursorPath.contains(chatNode.id),
                                 onHoverChanged = { hovered, position ->
                                     if (hovered) {
                                         messagePanel.show(
-                                            title = conduitNode.message?.title ?: "",
-                                            text = conduitNode.message?.text ?: "",
+                                            title = chatNode.message?.title ?: "",
+                                            text = chatNode.message?.text ?: "",
                                             position = position.copy(y = position.y + 25f)
                                         )
                                     } else {
@@ -153,15 +185,15 @@ fun ChatTreeView(
                                     }
                                 },
                                 onClick = {
-                                    if (nodesOnCursorPath.contains(conduitNode.id)) {
-                                        appActions.scrollChatToNode(conduitNode.id)
+                                    if (nodesOnCursorPath.contains(chatNode.id)) {
+                                        appActions.scrollChatToNode(chatNode.id)
                                         Sounds.Bubble.play()
                                     }
                                 }
                             )
                         }
 
-                        if (nodesOnCursorPath.contains(conduitNode.id)) {
+                        if (nodesOnCursorPath.contains(chatNode.id)) {
                             renderNode()
                         } else {
                             CompositionLocalProvider(
@@ -174,7 +206,7 @@ fun ChatTreeView(
                                                 messagePanel.hide()
                                                 scope.launch {
                                                     Sounds.Teleport.play()
-                                                    state.chatManager.setCursor(conduitNode)
+                                                    appState.chatManager.setCursor(chatNode)
                                                 }
                                             }
                                         )

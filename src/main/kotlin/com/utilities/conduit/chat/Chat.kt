@@ -84,8 +84,8 @@ data class ChatMessage(
     // Run-time only states
 
     // Displayed preferentially to text while the message is streaming.
-    @Transient
-    val textInProgress: MutableState<String?> = mutableStateOf(null)
+//    @Transient
+//    val textInProgress: MutableState<String?> = mutableStateOf(null)
 }
 enum class MessageStatus {
     COMPLETE,

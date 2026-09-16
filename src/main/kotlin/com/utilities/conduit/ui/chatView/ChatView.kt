@@ -57,9 +57,9 @@ import kotlin.math.sin
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-fun ColumnScope.ChatView(state: AppState) {
-    val version = state.chatManager.version // DO NOT REMOVE - recomp trigger
-    val chat = state.chatManager.currentChat
+fun ColumnScope.ChatView(appState: AppState) {
+    val version = appState.chatManager.version // DO NOT REMOVE - recomp trigger
+    val chat = appState.chatManager.currentChat
     val scrollState = rememberScrollState()
     val appActions = LocalActions.current
 
@@ -89,7 +89,7 @@ fun ColumnScope.ChatView(state: AppState) {
     }
 
     // Auto-scroll to bottom on addNode only (not branch switching etc.)
-    LaunchedEffect(state.chatManager.chatVersion) {
+    LaunchedEffect(appState.chatManager.chatVersion) {
         if (historyNodes.isNotEmpty()) {
             scrollState.scrollTo(scrollState.maxValue)
         }
@@ -112,11 +112,10 @@ fun ColumnScope.ChatView(state: AppState) {
         if (highlightedNodeId == nodeId) { highlightedNodeId = null }
     }
 
-    val generatingMessage = historyNodes.lastOrNull()?.message?.takeIf { it.textInProgress.value != null }
-    LaunchedEffect(generatingMessage?.textInProgress?.value) {
-        if (generatingMessage != null) {
-            scrollState.scrollTo(scrollState.maxValue)
-        }
+    val lastNode = historyNodes.lastOrNull()
+    val generatingText = lastNode?.let { appState.chatManager.getTextInProgress(it.id) }
+    LaunchedEffect(generatingText) {
+        if (generatingText != null) { scrollState.scrollTo(scrollState.maxValue) }
     }
 
     //--------------------------------------------------------------------------
@@ -150,7 +149,7 @@ fun ColumnScope.ChatView(state: AppState) {
                     .padding(bottom = 10.dp)
             ) {
                 BranchAnimatedHistory(
-                    state = state,
+                    state = appState,
                     chat = chat,
                     historyNodes = historyNodes,
                     transition = branchTransition,
@@ -210,7 +209,7 @@ private fun BranchAnimatedHistory(
         Column {
             historyNodes.forEach { node ->
                 ChatNodeRow(
-                    state = state,
+                    appState = state,
                     chat = chat,
                     node = node,
                     version = version,
@@ -260,7 +259,7 @@ private fun BranchAnimatedHistory(
 
 @Composable
 private fun ChatNodeRow(
-    state: AppState,
+    appState: AppState,
     chat: Chat,
     node: Node,
     version: Int,
@@ -309,7 +308,7 @@ private fun ChatNodeRow(
                     if (!itemIsCursor) {
                         add(
                             ContextMenuItem("Start new branch from here or select one below") {
-                                scope.launch { state.chatManager.setCursor(node) }
+                                scope.launch { appState.chatManager.setCursor(node) }
                             }
                         )
                     }
@@ -333,7 +332,7 @@ private fun ChatNodeRow(
 
                         add(
                             ContextMenuItem(item) {
-                                scope.launch { state.chatManager.selectBranch(node) }
+                                scope.launch { appState.chatManager.selectBranch(node) }
                             }
                         )
                     }
@@ -368,17 +367,25 @@ private fun ChatNodeRow(
                     Sounds.Swish.play()
                     Trace.log("Switching branches")
                     scope.launch {
-                        state.chatManager.cycleBranch(node)
+                        appState.chatManager.cycleBranch(node)
                     }
                 }
             )
         }
 
+        val textInProgress = appState.chatManager.getTextInProgress(node.id)
+
         MessageBubble(
             node = node,
+            textInProgress = textInProgress,
             isCursor = isCursor,
             contextMenuItems = menuItems
         )
+//        MessageBubble(
+//            node = node,
+//            isCursor = isCursor,
+//            contextMenuItems = menuItems
+//        )
 
         // Branching expert nodes (left aligned) have the branch cycling icon on their right
         if (!isUserNode && isBranchable) {
@@ -387,7 +394,7 @@ private fun ChatNodeRow(
                 onClick = {
                     Sounds.Swish.play()
                     scope.launch {
-                        state.chatManager.cycleBranch(node)
+                        appState.chatManager.cycleBranch(node)
                     }
                 }
             )

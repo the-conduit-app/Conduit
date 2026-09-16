@@ -30,26 +30,27 @@ import conduit.generated.resources.plasma_s64
 import io.github.fletchmckee.liquid.LiquidState
 import io.github.fletchmckee.liquid.liquid
 import org.jetbrains.compose.resources.painterResource
+import java.awt.SystemColor.text
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MessageBubble(
     node: Node,
+    textInProgress: String?,
     isCursor: Boolean,
     contextMenuItems: (() -> List<ContextMenuItem>)?
 ) {
     when (node.message?.authorType ?: AuthorType.SYSTEM) {
-        AuthorType.USER -> UserMessageBubble(node, isCursor, contextMenuItems)
-        AuthorType.ASSISTANT -> ExpertMessageBubble(node, isCursor, contextMenuItems)
-        AuthorType.SYSTEM -> ExpertMessageBubble(node, isCursor, contextMenuItems)
+        AuthorType.USER -> UserMessageBubble(node, textInProgress, isCursor, contextMenuItems)
+        AuthorType.ASSISTANT -> ExpertMessageBubble(node, textInProgress, isCursor, contextMenuItems)
+        AuthorType.SYSTEM -> ExpertMessageBubble(node, textInProgress, isCursor, contextMenuItems)
     }
 }
 
 // ----------------------------------------------------------------------------------------
 
 @Composable
-private fun UserMessageBubble(node: Node, isCursor: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
-    val textInProgress = node.message?.textInProgress?.value
+private fun UserMessageBubble(node: Node, textInProgress: String?, isCursor: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
     val text = textInProgress ?: node.message?.text.orEmpty()
     val title = node.message?.title ?: "Donowatt" // an unknown amount of power
     var hasMore by remember { mutableStateOf(false) }
@@ -124,8 +125,7 @@ private fun UserMessageBubble(node: Node, isCursor: Boolean, contextMenuItems: (
 // ----------------------------------------------------------------------------------------
 
 @Composable
-private fun ExpertMessageBubble(node: Node, isCursor: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
-    val textInProgress = node.message?.textInProgress?.value
+private fun ExpertMessageBubble(node: Node, textInProgress: String?, isCursor: Boolean, contextMenuItems: (() -> List<ContextMenuItem>)?) {
     val text = textInProgress ?: node.message?.text.orEmpty()
     val title = node.message?.title ?: "Donovich"
     var hasMore by remember { mutableStateOf(false) }
