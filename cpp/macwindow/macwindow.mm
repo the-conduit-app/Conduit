@@ -22,11 +22,29 @@ void macwindow_style_titlebar(void* window) {
     });
 }
 
-// void macwindow_style_titlebar(void* window) {
-//     NSWindow* nsWindow = (__bridge NSWindow*)window;
+static id magnificationMonitor = nil;
 
-//     dispatch_async(dispatch_get_main_queue(), ^{
-//         [nsWindow setTitleVisibility:NSWindowTitleHidden];
-//         [nsWindow setTitlebarAppearsTransparent:YES];
-//     });
-// }
+void macwindow_set_magnification_callback(void* window, MagnificationCallback callback) {
+    NSWindow* nsWindow = (__bridge NSWindow*)window;
+
+    if (magnificationMonitor != nil) {
+        [NSEvent removeMonitor:magnificationMonitor];
+        magnificationMonitor = nil;
+    }
+
+    if (callback == NULL) {
+        return;
+    }
+
+    magnificationMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:
+        NSEventMaskMagnify
+        handler:^NSEvent* (NSEvent* event) {
+
+            if (event.window == nsWindow) {
+                callback((double)[event magnification]);
+            }
+
+            return event;
+        }
+    ];
+}

@@ -21,6 +21,7 @@ import com.utilities.conduit.AppState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Stop
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 
 @Composable
 fun InputArea(state: AppState, onSend: (String) -> Unit) {
@@ -62,11 +63,12 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
                 .weight(1f)
                 .heightIn(min = 60.dp, max = 180.dp)
                 .focusRequester(focusRequester)
-                .onKeyEvent { ev ->
+                .onPreviewKeyEvent { ev ->
                     when {
                         ev.key == Key.Escape -> {
                             text = ""
                             Sounds.Hsoohw.play()
+                            println("ESC")
                             true
                         }
 

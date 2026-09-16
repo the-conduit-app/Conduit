@@ -39,6 +39,7 @@ class AppActions(private val appState: AppState) {
     var scrollChatToNodeRequest by mutableStateOf<String?>(null)
         private set
     fun scrollChatToNode(nodeId: String) { scrollChatToNodeRequest = nodeId }
+    fun clearScrollChatToNodeRequest() { scrollChatToNodeRequest = null }
 
     // TODO: The foll two belong elsewhere, but they need access to appState
     fun switchExpert(newExpert: Expert?) {

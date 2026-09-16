@@ -34,6 +34,7 @@ import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.utilities.conduit.AppActions
 import com.utilities.conduit.AppState
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.chat.AuthorType
@@ -110,6 +111,7 @@ fun ColumnScope.ChatView(appState: AppState) {
         highlightedNodeId = nodeId
         delay(1000.milliseconds)
         if (highlightedNodeId == nodeId) { highlightedNodeId = null }
+        appActions.clearScrollChatToNodeRequest()
     }
 
     val lastNode = historyNodes.lastOrNull()

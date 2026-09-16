@@ -140,16 +140,6 @@ fun ChatTreeView(
                 state = kuiverState,
                 modifier = Modifier
                     .fillMaxSize(),
-//                    .pointerInput(Unit) {
-//                        awaitPointerEventScope {
-//                            val event = awaitPointerEvent()
-//                            println(
-//                                "POINTER type=${event.type}, " +
-//                                        "changes=${event.changes.size}, " +
-//                                        "positions=${event.changes.map { it.position }}"
-//                            )
-//                        }
-//                    }
 
                 config = KuiverViewerConfig(
                     nodeDragEnabled = true,
