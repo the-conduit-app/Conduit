@@ -7,7 +7,6 @@ import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.ChatMessage
 import com.utilities.conduit.utils.ChatUtils
 import com.utilities.conduit.chat.ChatsListItem
-import com.utilities.conduit.chat.MessageAuthor
 import com.utilities.conduit.chat.MessageStatus
 import com.utilities.conduit.chat.Node
 import com.utilities.conduit.chat.NodeType
@@ -16,7 +15,6 @@ import com.utilities.conduit.maintenance.Maintenance
 import com.utilities.conduit.packs.Pack
 import com.utilities.conduit.ui.Sounds
 import com.utilities.conduit.utils.AppUtils
-import jdk.internal.joptsimple.internal.Messages.message
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
@@ -117,7 +115,8 @@ class AppActions(private val appState: AppState) {
                 type = NodeType.TEXT,
                 parentId = parentNode?.id,
                 message = ChatMessage(
-                    author = MessageAuthor(type = AuthorType.USER),
+                    //author = MessageAuthor(type = AuthorType.USER),
+                    authorType = AuthorType.USER,
                     text = currentPrompt,
                     title = "You${makeOptionalDateTag(parentTimeStamp)}"
                 )
@@ -140,15 +139,16 @@ class AppActions(private val appState: AppState) {
                     type = NodeType.TEXT,
                     parentId = cursorNodeId,
                     message = ChatMessage(
-                        author = MessageAuthor(
-                            type = if (expert.type == ExpertType.INTERNAL) {
-                                AuthorType.SYSTEM
-                            } else {
-                                AuthorType.ASSISTANT
-                            },
-                            expertId = expert.id,
-                            packId = appState.currentPack.value?.id
-                        ),
+                        authorType = if (expert.type == ExpertType.INTERNAL) AuthorType.SYSTEM else AuthorType.ASSISTANT,
+//                        author = MessageAuthor(
+//                            type = if (expert.type == ExpertType.INTERNAL) {
+//                                AuthorType.SYSTEM
+//                            } else {
+//                                AuthorType.ASSISTANT
+//                            },
+//                            //expertId = expert.id,
+//                            //packId = appState.currentPack.value?.id
+//                        ),
                         title = makeResponseTitle(expert, appState.currentPack.value, cursorNode?.createdAt),
                         text = ""
                     )

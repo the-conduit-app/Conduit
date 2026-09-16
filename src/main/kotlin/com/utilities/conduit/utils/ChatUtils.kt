@@ -119,7 +119,7 @@ object ChatUtils {
             // SYSTEM nodes represent internal expert responses.
             // Since traversal is leaf → root, also skip the user node
             // that immediately precedes this response.
-            if (excludeSystemNodes && node.message?.author?.type == AuthorType.SYSTEM) {
+            if (excludeSystemNodes && node.message?.authorType == AuthorType.SYSTEM) {
                 currentNodeId = node.parentId?.let { chat.nodes[it]?.parentId }
                 continue
             }

@@ -270,7 +270,7 @@ private fun ChatNodeRow(
     val scope = rememberCoroutineScope()
     val isCursor = node.id == chat.cursorNodeId
     val isBranchable = node.children.size > 1 || (isCursor && node.children.isNotEmpty())
-    val isUserNode = node.message?.author?.type == AuthorType.USER
+    val isUserNode = node.message?.authorType == AuthorType.USER
 
     // Highlighting draws attention to a message bubble (scale up and down/damped sinusoid)
     val highlightScale = remember { Animatable(1f) }

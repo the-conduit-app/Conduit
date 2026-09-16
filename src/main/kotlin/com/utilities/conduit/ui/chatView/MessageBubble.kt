@@ -38,7 +38,7 @@ fun MessageBubble(
     isCursor: Boolean,
     contextMenuItems: (() -> List<ContextMenuItem>)?
 ) {
-    when (node.message?.author?.type ?: AuthorType.SYSTEM) {
+    when (node.message?.authorType ?: AuthorType.SYSTEM) {
         AuthorType.USER -> UserMessageBubble(node, isCursor, contextMenuItems)
         AuthorType.ASSISTANT -> ExpertMessageBubble(node, isCursor, contextMenuItems)
         AuthorType.SYSTEM -> ExpertMessageBubble(node, isCursor, contextMenuItems)
@@ -129,7 +129,7 @@ private fun ExpertMessageBubble(node: Node, isCursor: Boolean, contextMenuItems:
     val text = textInProgress ?: node.message?.text.orEmpty()
     val title = node.message?.title ?: "Donovich"
     var hasMore by remember { mutableStateOf(false) }
-    val bubbleColor = if (node.message?.author?.type == AuthorType.SYSTEM) Color.White else Color.Magenta
+    val bubbleColor = if (node.message?.authorType == AuthorType.SYSTEM) Color.White else Color.Magenta
 
     val bubble: @Composable () -> Unit = {
         val liquidState = LocalLiquidState.current

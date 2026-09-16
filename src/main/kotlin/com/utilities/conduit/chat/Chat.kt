@@ -76,8 +76,8 @@ data class ChatMessage(
     var title: String? = null,
     val timestamp: Long = System.currentTimeMillis(),
     var status: MessageStatus = MessageStatus.COMPLETE,
-
-    val author: MessageAuthor,
+    val authorType: AuthorType = AuthorType.SYSTEM,
+    //val author: MessageAuthor,
     var text: String, // Canonical text saved to disk.
     var responseTime: Long? = null
 ) {
@@ -97,12 +97,12 @@ enum class MessageStatus {
 
 // TODO: expertId and packId are really ephemeral to this session. Review if
 // they should be persisted.
-@Serializable
-data class MessageAuthor(
-    val type: AuthorType,
-    val expertId: String? = null,
-    val packId: String? = null
-)
+//@Serializable
+//data class MessageAuthor(
+//    val type: AuthorType,
+//    //val expertId: String? = null,
+//    //val packId: String? = null
+//)
 enum class AuthorType {
     USER,
     ASSISTANT,

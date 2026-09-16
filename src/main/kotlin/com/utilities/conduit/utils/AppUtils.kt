@@ -170,23 +170,23 @@ object AppUtils {
         val maxSystemTextLen = 10   // Effectively omit System responses (from Condy, echo, etc.)
 
         val currentMessages = messages.joinToString("\n\n") { message ->
-            val role = when (message.author.type) {
+            val role = when (message.authorType) {
                 AuthorType.USER -> "USER"
                 AuthorType.ASSISTANT -> { getContributorLabel(message) ?: "ASSISTANT" }
                 else -> "SYSTEM"
             }
 
             val text = when {
-                message.author.type == AuthorType.ASSISTANT &&
+                message.authorType == AuthorType.ASSISTANT &&
                         maxAssistantTextLen != null &&
                         message.text.length > maxAssistantTextLen ->
                     message.text.take(maxAssistantTextLen) + "..."
 
-                message.author.type == AuthorType.SYSTEM &&
+                message.authorType == AuthorType.SYSTEM &&
                         message.text.length > maxSystemTextLen ->
                     message.text.take(maxSystemTextLen) + "..."
 
-                message.author.type == AuthorType.USER &&
+                message.authorType == AuthorType.USER &&
                         maxUserTextLen != null &&
                         message.text.length > maxUserTextLen ->
                     message.text.take(maxUserTextLen) + "..."
