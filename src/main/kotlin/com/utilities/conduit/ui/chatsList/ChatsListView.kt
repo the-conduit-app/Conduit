@@ -3,6 +3,7 @@ package com.utilities.conduit.ui.chatsList
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
@@ -86,15 +87,11 @@ fun ChatsListView(state: AppState, filterText: String) {
                 .padding(horizontal = 8.dp)
                 .focusRequester(focusRequester)
                 .focusable()
-                .onPreviewKeyEvent {
-                    println("KEY: ${it.key}")
-                    false
-                },
         ) {
-            itemsIndexed(
+            items(
                 items = filteredItems,
-                key = { _, item -> item.chat.id }
-            ) { index, item ->
+                key = { item -> item.chat.id }
+            ) { item ->
                 val isCurrent = item.chat.id == state.chatManager.currentChat.id
                 CompositionLocalProvider(
                     LocalContextMenuRepresentation provides ConduitContextMenuRepresentation
