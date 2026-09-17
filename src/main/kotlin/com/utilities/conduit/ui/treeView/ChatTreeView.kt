@@ -14,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.innerShadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.dk.kuiver.RelayoutPolicy
 import com.dk.kuiver.model.KuiverEdge
@@ -28,16 +30,12 @@ import com.dk.kuiver.renderer.KuiverViewerConfig
 import com.utilities.conduit.AppState
 import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.chat.Node
-import kotlinx.coroutines.launch
-import androidx.compose.ui.graphics.shadow.Shadow
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.DpOffset
-import com.utilities.conduit.debug.Trace
-import com.utilities.conduit.ui.chatView.ConduitContextMenuRepresentation
 import com.utilities.conduit.ui.LocalActions
 import com.utilities.conduit.ui.LocalMessagePanelController
 import com.utilities.conduit.ui.MacWindowUtils
 import com.utilities.conduit.ui.Sounds
+import com.utilities.conduit.ui.chatView.ConduitContextMenuRepresentation
+import kotlinx.coroutines.launch
 
 @Composable
 fun ChatTreeView(

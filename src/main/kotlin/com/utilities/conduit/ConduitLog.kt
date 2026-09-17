@@ -4,8 +4,8 @@ import com.utilities.conduit.utils.AppUtils
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object ConduitLog {
     private const val MAX_LINES = 100

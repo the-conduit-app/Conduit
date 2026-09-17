@@ -2,15 +2,12 @@ package com.utilities.conduit.portals
 
 import com.sun.jna.Native
 import com.sun.jna.Pointer
-import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.debug.Trace
+import com.utilities.conduit.utils.AppUtils
+import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import java.io.File
 import kotlin.coroutines.cancellation.CancellationException
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.trySendBlocking
-import kotlinx.coroutines.flow.buffer
 
 object LlmPortal {
     private val conduitLibPath = AppUtils.getNativeLibDir("libconduit.dylib")

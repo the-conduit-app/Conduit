@@ -7,8 +7,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.collections.map
-import kotlin.collections.toMutableList
 import kotlin.math.log2
 
 // Contains definitions, functions and helpers for both the internal ConduitUserModel

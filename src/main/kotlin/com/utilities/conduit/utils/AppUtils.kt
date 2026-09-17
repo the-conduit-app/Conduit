@@ -2,10 +2,10 @@ package com.utilities.conduit.utils
 
 import com.utilities.conduit.AppJson
 import com.utilities.conduit.ConduitLog
-import com.utilities.conduit.packs.Pack
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.ChatMessage
 import com.utilities.conduit.debug.Trace
+import com.utilities.conduit.packs.Pack
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -157,21 +157,21 @@ object AppUtils {
         }
 
         // Approved models list - only files with their valid SHAs listed here can load.
-        copyResource(".approved-models.json", File(AppUtils.getAppDir(), ".approved-models.json"))
+        copyResource(".approved-models.json", File(getAppDir(), ".approved-models.json"))
 
         // Empty llm folder with README
         copyResource(
             "llm/README.put-llm-models-here-for-automatic-pickup",
-            File(AppUtils.getAppDir(), "llm/README.put-llm-models-here-for-automatic-pickup")
+            File(getAppDir(), "llm/README.put-llm-models-here-for-automatic-pickup")
         )
 
         // Packs — seed individual files only if missing
         listOf("Default.json", "Echoes.json", "Sample.json").forEach { filename ->
-            copyResource("packs/$filename", File(AppUtils.getPacksDir(), filename))
+            copyResource("packs/$filename", File(getPacksDir(), filename))
         }
 
         // Chats — seed the entire directory with starter chats, but only if it doesn't exist
-        val chatsDir = File(AppUtils.getChatsDir())
+        val chatsDir = File(getChatsDir())
         val chatsDirExisted = chatsDir.exists()
         ensureDir(chatsDir)
 

@@ -7,7 +7,6 @@ import java.io.BufferedInputStream
 import javax.sound.sampled.AudioSystem
 import javax.sound.sampled.Clip
 import javax.sound.sampled.FloatControl
-import kotlin.jvm.java
 
 private fun createSound(resourceName: String): Sound {
     return Sound(loadClip(resourceName))
