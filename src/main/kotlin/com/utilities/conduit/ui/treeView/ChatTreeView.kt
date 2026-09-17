@@ -35,7 +35,9 @@ import com.utilities.conduit.ui.LocalMessagePanelController
 import com.utilities.conduit.ui.MacWindowUtils
 import com.utilities.conduit.ui.Sounds
 import com.utilities.conduit.ui.chatView.ConduitContextMenuRepresentation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun ChatTreeView(
@@ -195,6 +197,8 @@ fun ChatTreeView(
                                                 scope.launch {
                                                     Sounds.Teleport.play()
                                                     appState.chatManager.setCursor(chatNode)
+                                                    delay(50.milliseconds)
+                                                    appActions.scrollChatToNode(chatNode.id)
                                                 }
                                             }
                                         )
