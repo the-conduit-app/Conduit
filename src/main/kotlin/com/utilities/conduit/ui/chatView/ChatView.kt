@@ -10,6 +10,8 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -63,11 +65,7 @@ fun ColumnScope.ChatView(appState: AppState) {
     val chat = appState.chatManager.currentChat
     val scrollState = rememberScrollState()
     val appActions = LocalActions.current
-
-    val nodePositions = remember { mutableStateMapOf<String, Int>() }
-    val onNodePositioned: (String, Int) -> Unit = { nodeId, y ->
-        nodePositions[nodeId] = y
-    }
+    val bringIntoViewRequesters = remember { mutableStateMapOf<String, BringIntoViewRequester>() }
     var highlightedNodeId by remember { mutableStateOf<String?>(null) }
 
     // The UI displays the single path from root to the current cursor.
@@ -98,19 +96,15 @@ fun ColumnScope.ChatView(appState: AppState) {
 
     LaunchedEffect(appActions.scrollChatToNodeRequest) {
         val nodeId = appActions.scrollChatToNodeRequest ?: return@LaunchedEffect
-        val nodeY = nodePositions[nodeId] ?: return@LaunchedEffect
 
-        val viewportHeight = scrollState.viewportSize
-        val target = nodeY - viewportHeight / 2
+        val requester = bringIntoViewRequesters[nodeId] ?: return@LaunchedEffect
+        requester.bringIntoView()
 
-        scrollState.animateScrollTo(
-            target.coerceIn(0, scrollState.maxValue)
-        )
-
-        // Briefly animate the scrolled node to help identify
         highlightedNodeId = nodeId
         delay(1000.milliseconds)
-        if (highlightedNodeId == nodeId) { highlightedNodeId = null }
+        if (highlightedNodeId == nodeId) {
+            highlightedNodeId = null
+        }
         appActions.clearScrollChatToNodeRequest()
     }
 
@@ -156,8 +150,8 @@ fun ColumnScope.ChatView(appState: AppState) {
                     historyNodes = historyNodes,
                     transition = branchTransition,
                     version = version,
-                    highlightedNodeId,
-                    onNodePositioned = onNodePositioned
+                    highlightedNodeId = highlightedNodeId,
+                    onNodeRequester = { nodeId, requester -> bringIntoViewRequesters[nodeId] = requester }
                 )
             }
             SubtleScrollbar(
@@ -205,7 +199,7 @@ private fun BranchAnimatedHistory(
     transition: BranchTransition?,
     version: Int,
     highlightedNodeId: String?,
-    onNodePositioned: (String, Int) -> Unit
+    onNodeRequester: (String, BringIntoViewRequester) -> Unit
 ) {
     if (transition == null) {
         Column {
@@ -216,9 +210,7 @@ private fun BranchAnimatedHistory(
                     node = node,
                     version = version,
                     isHighlighted = node.id == highlightedNodeId,
-                    onPositioned = { y ->
-                        onNodePositioned(node.id, y)
-                    }
+                    onRequester = { requester -> onNodeRequester(node.id, requester) }
                 )
             }
         }
@@ -231,7 +223,7 @@ private fun BranchAnimatedHistory(
             key(node.id, chat.cursorNodeId) {
                 ChatNodeRow(state, chat, node, version,
                     isHighlighted = node.id == highlightedNodeId,
-                    onPositioned = { y -> onNodePositioned(node.id, y) }
+                    onRequester = { requester -> onNodeRequester(node.id, requester) }
                 )
             }
         }
@@ -246,10 +238,10 @@ private fun BranchAnimatedHistory(
             },
             label = "branch-suffix") { incomingNodes ->
             Column {
-                incomingNodes.forEach {
-                        node -> ChatNodeRow(state, chat, node, version,
+                incomingNodes.forEach { node ->
+                    ChatNodeRow(state, chat, node, version,
                         isHighlighted = node.id == highlightedNodeId,
-                        onPositioned = { y -> onNodePositioned(node.id, y) }
+                        onRequester = { requester -> onNodeRequester(node.id, requester) }
                     )
                 }
             }
@@ -264,16 +256,21 @@ private fun ChatNodeRow(
     appState: AppState,
     chat: Chat,
     node: Node,
-    version: Int,
-    onPositioned: (Int) -> Unit,
+    version: Int, // Needed to trigger recompose
+    onRequester: (BringIntoViewRequester) -> Unit,
     isHighlighted: Boolean
 ) {
     val scope = rememberCoroutineScope()
     val isCursor = node.id == chat.cursorNodeId
     val isBranchable = node.children.size > 1 || (isCursor && node.children.isNotEmpty())
     val isUserNode = node.message?.authorType == AuthorType.USER
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
 
-    // Highlighting draws attention to a message bubble (scale up and down/damped sinusoid)
+    LaunchedEffect(bringIntoViewRequester) {
+        onRequester(bringIntoViewRequester)
+    }
+
+    // Highlighting jiggles the message bubble (scale up and down/damped sinusoid)
     val highlightScale = remember { Animatable(1f) }
     LaunchedEffect(isHighlighted) {
         if (isHighlighted) {
@@ -284,9 +281,7 @@ private fun ChatNodeRow(
                 val frequency = 8f
                 val damping = 5f
                 val elapsed = (withFrameNanos { it } - startTime) / 1_000_000_000f
-                val scale = 1f + amplitude *
-                            sin(2f * PI.toFloat() * frequency * elapsed) *
-                            exp(-damping * elapsed)
+                val scale = 1f + amplitude * sin(2f * PI.toFloat() * frequency * elapsed) * exp(-damping * elapsed)
 
                 highlightScale.snapTo(scale)
 
@@ -349,11 +344,7 @@ private fun ChatNodeRow(
                 scaleX = highlightScale.value
                 scaleY = highlightScale.value
             }
-            .onGloballyPositioned { coordinates ->
-                onPositioned(
-                    coordinates.positionInParent().y.roundToInt()
-                )
-            },
+            .bringIntoViewRequester(bringIntoViewRequester),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = if (isUserNode) {
             Arrangement.End
@@ -383,11 +374,6 @@ private fun ChatNodeRow(
             isCursor = isCursor,
             contextMenuItems = menuItems
         )
-//        MessageBubble(
-//            node = node,
-//            isCursor = isCursor,
-//            contextMenuItems = menuItems
-//        )
 
         // Branching expert nodes (left aligned) have the branch cycling icon on their right
         if (!isUserNode && isBranchable) {
