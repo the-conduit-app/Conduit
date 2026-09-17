@@ -35,7 +35,7 @@ import kotlinx.coroutines.yield
 @Composable
 fun ChatsListView(state: AppState, filterText: String) {
     val rightViewOpacity = LocalRightViewOpacity.current
-    val leftViewOpacity = LocalLeftViewOpacity.current
+    //val leftViewOpacity = LocalLeftViewOpacity.current
 
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -53,7 +53,7 @@ fun ChatsListView(state: AppState, filterText: String) {
         }
     }
     LaunchedEffect(Unit) {
-        yield() // why? hack?
+        yield() // check if still needed
         focusRequester.requestFocus()
     }
 
@@ -78,32 +78,6 @@ fun ChatsListView(state: AppState, filterText: String) {
         modifier = Modifier
             .fillMaxSize()
             .alpha(if (enabled) 1f else 0.25f)
-    // Key capture not working
-//            .onPreviewKeyEvent { event ->
-//                println("KEY: ${event.key} ${event.type}")
-//                if (event.type != KeyEventType.KeyDown)
-//                    return@onPreviewKeyEvent false
-//
-//                val direction = when (event.key) {
-//                    Key.DirectionUp -> -1
-//                    Key.DirectionDown -> 1
-//                    else -> return@onPreviewKeyEvent false
-//                }
-//
-//                scope.launch {
-//                    val currentIndex = filteredItems.indexOfFirst {
-//                        it.chat.id == state.chatManager.currentChat.id
-//                    }
-//                    val newIndex = currentIndex + direction
-//
-//                    if (currentIndex >= 0 && newIndex in filteredItems.indices) {
-//                        val item = filteredItems[newIndex]
-//                        selectChat(item)
-//                    }
-//                }
-//                true
-//            }
-
     ) {
         LazyColumn(
             state = listState,

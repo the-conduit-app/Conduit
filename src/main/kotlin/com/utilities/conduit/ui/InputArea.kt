@@ -52,7 +52,7 @@ fun InputArea(state: AppState, onSend: (String) -> Unit) {
             enabled = !isGenerating,
             placeholder = {
                 val name = state.currentExpert.value?.nickname ?: "an Expert"
-                androidx.compose.material3.Text("Type a message to $name...")
+                Text("Type a message to $name...")
             },
             modifier = Modifier
                 .weight(1f)

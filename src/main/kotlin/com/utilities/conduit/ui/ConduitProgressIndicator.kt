@@ -22,7 +22,6 @@ fun ConduitProgressIndicator(
     images: List<Painter>,
     modifier: Modifier = Modifier
 ) {
-    val transition = rememberInfiniteTransition()
     require(images.size >= 2)
 
     var n by remember { mutableIntStateOf(0) }
