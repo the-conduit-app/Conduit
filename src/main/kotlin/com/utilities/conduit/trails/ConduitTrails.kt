@@ -126,13 +126,17 @@ class ConduitTrails {
         }
     }
 
+    fun isAtRoot(): Boolean {
+        return cursor == root
+    }
+
     fun advance(prompt: String): String? {
         // Trail has not been initialized.
         if (!::root.isInitialized) {
             return null
         }
 
-        // Advance #1: consume the user's prompt.
+        // Advance #1: consume the user's prompt if it matches
         val promptNode = cursor.children.firstOrNull {
             it.text.equals(prompt.trim(), ignoreCase = true)
         } ?: run {
@@ -144,8 +148,7 @@ class ConduitTrails {
 
         cursor = promptNode
 
-        // The matching prompt is a leaf, and so is at end of trail
-        // The trail has ended.
+        // If the matching prompt is a leaf, this is the end of the trail
         if (cursor.children.isEmpty()) {
             cursor = root
             return "Yippee!"
@@ -154,7 +157,7 @@ class ConduitTrails {
         // Advance #2: select a response node.
         cursor = cursor.children.random()
 
-        // If the response node is a leaf, this response completes the trail.
+        // If this response node is a leaf, it also completes the trail.
         if (cursor.children.isEmpty()) {
             val response = "${cursor.text}\n\nYip, Yip, Yippee!"
             cursor = root
@@ -165,6 +168,7 @@ class ConduitTrails {
     }
 
     // Debuggies -----------------------------------------------------------------------
+
     fun printEntries() {
         root.children.forEach { it -> println("Loaded Trail: ${it.text}") }
     }

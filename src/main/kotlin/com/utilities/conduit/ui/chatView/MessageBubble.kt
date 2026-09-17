@@ -30,7 +30,6 @@ import conduit.generated.resources.plasma_s64
 import io.github.fletchmckee.liquid.LiquidState
 import io.github.fletchmckee.liquid.liquid
 import org.jetbrains.compose.resources.painterResource
-import java.awt.SystemColor.text
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -40,10 +39,10 @@ fun MessageBubble(
     isCursor: Boolean,
     contextMenuItems: (() -> List<ContextMenuItem>)?
 ) {
-    when (node.message?.authorType ?: AuthorType.SYSTEM) {
+    when (node.message?.authorType ?: AuthorType.INTERNAL) {
         AuthorType.USER -> UserMessageBubble(node, textInProgress, isCursor, contextMenuItems)
         AuthorType.ASSISTANT -> ExpertMessageBubble(node, textInProgress, isCursor, contextMenuItems)
-        AuthorType.SYSTEM -> ExpertMessageBubble(node, textInProgress, isCursor, contextMenuItems)
+        AuthorType.INTERNAL -> ExpertMessageBubble(node, textInProgress, isCursor, contextMenuItems)
     }
 }
 
@@ -129,7 +128,7 @@ private fun ExpertMessageBubble(node: Node, textInProgress: String?, isCursor: B
     val text = textInProgress ?: node.message?.text.orEmpty()
     val title = node.message?.title ?: "Donovich"
     var hasMore by remember { mutableStateOf(false) }
-    val bubbleColor = if (node.message?.authorType == AuthorType.SYSTEM) Color.White else Color.Magenta
+    val bubbleColor = if (node.message?.authorType == AuthorType.INTERNAL) Color.White else Color.Magenta
 
     val bubble: @Composable () -> Unit = {
         val liquidState = LocalLiquidState.current

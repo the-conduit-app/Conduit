@@ -9,7 +9,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateMap
 import com.sun.jna.Pointer
 import com.utilities.conduit.chat.ChatManager
 import com.utilities.conduit.chat.ChatsList
-import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.maintenance.Maintenance
 import com.utilities.conduit.packs.Pack
 import com.utilities.conduit.portals.LlmPortal
@@ -41,6 +40,12 @@ class AppState(
 
     var lastUserActivity = System.currentTimeMillis()
 
+    // Seed chats are starter chats distributed with the app. We must exclude them
+    // from chat summarization (and its downstream user-modeling).
+    private val seedChatIds = mutableSetOf<String>()
+    fun addToSeedChats(chatId: String) { seedChatIds += chatId }
+    fun isSeedChat(chatId: String): Boolean = chatId in seedChatIds
+
     companion object {
         fun createSystemExpert() = Expert(
             type = ExpertType.LLM,
@@ -49,7 +54,7 @@ class AppState(
             model = "gemma-2-9b-it-Q4_K_M.gguf",
             description = "A general purpose expert assisting with various administrative tasks " +
                     "like summarizing chats, generating titles, the user model, etc.",
-            color = "Mr. Slater"
+            color = "Mr. Slater"  // actually invisible, like the wizard
         )
 
         // One new AppState per invocation
@@ -71,16 +76,8 @@ class AppState(
     }
 
     suspend fun shutdown() = withContext(Dispatchers.IO) {
-        Trace.log("APP: SHUTDOWN BEGIN")
-
         Maintenance.stop()
-        Trace.log("APP: MAINT STOPPED")
-
         chatManager.stopGeneration()
-        Trace.log("APP: GENERATION STOPPED")
-
-        Trace.log("APP: DESTROYING CONDUIT")
         LlmPortal.conduitLib.conduit_destroy(conduitPtr)
-        Trace.log("APP: CONDUIT DESTROYED")
     }
 }

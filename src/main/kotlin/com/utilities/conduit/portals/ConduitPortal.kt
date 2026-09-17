@@ -57,14 +57,28 @@ object ConduitPortal {
                 AppJson.encodeToString(conduitUserModel)
             }
 
-            prompt.equals("Thanks", ignoreCase = true) -> {
+            prompt.equals("Thanks", ignoreCase = true) || prompt.equals("Thank you", ignoreCase = true) -> {
                 "You're welcome."
             }
 
+            prompt.equals("Sorry", ignoreCase = true) || prompt.equals("I'm sorry", ignoreCase = true) -> {
+                "No worries."
+            }
+
+            prompt.equals("Help", ignoreCase = true) -> {
+                "You are inside Conduit. You can hold a round-table discussion with the various experts " +
+                        "in Conduit Packs.\n\nThey can help you cooperatively, and they understand each " +
+                        "other well.\n\nThe rest of Conduit is for you to explore and discover."
+            }
+
             else -> {
-                conduitTrails.advance(prompt)
-                    ?: ("Hello, I am Condy, the Conduit. I'm not really an expert and " +
-                        "I can only answer the following question: 'What do you know about me?'")
+                val response = conduitTrails.advance(prompt)
+                response ?: if (!conduitTrails.isAtRoot()) {
+                    "Ouch!"
+                } else {
+                    "Hello, I am Condy, the Conduit. I'm not really an expert and " +
+                            "I can only answer the following question: 'What do you know about me?'"
+                }
             }
         }
     }

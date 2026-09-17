@@ -1,19 +1,18 @@
 package com.utilities.conduit
 
-import com.sun.beans.introspect.PropertyInfo
 import com.utilities.conduit.debug.Trace
 import com.utilities.conduit.portals.ConduitPortal
 import com.utilities.conduit.portals.LlmPortal
-import com.utilities.conduit.ui.App
 import com.utilities.conduit.utils.AppUtils
 import com.utilities.conduit.utils.sha256
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
+// The system expert uses Gemma4 specifically
 private const val GEMMA_SHA256 = "13b2a7b4115bbd0900162edcebe476da1ba1fc24e718e8b40d32f6e300f56dfe"
 
+// This is observed in SplashScreen to know when to transition to enter from open
 enum class ConduitInitResult {
     OK,
     FAILED_NO_PACK,
@@ -23,6 +22,7 @@ enum class ConduitInitResult {
     FAILED_MODEL_SHA
 }
 
+// load packs and select the Default pack, init pack experts, system expert, etc.
 suspend fun initializeConduit(
     appState: AppState,
     systemModelPath: String?,
@@ -37,11 +37,19 @@ suspend fun initializeConduit(
     // set current chat to most recent one.
     appState.conduitUserModel = UserModel.loadConduitUserModelFromFile()
 
-    appState.chatsList.build()
-    if (appState.chatsList.items.isNotEmpty()) {
-        appState.chatManager.currentChat = appState.chatsList.items.first().chat
+    // Load existing chats into chats menu
+    try {
+        appState.chatsList.build()
+        if (appState.chatsList.items.isNotEmpty()) {
+            appState.chatManager.currentChat = appState.chatsList.items.first().chat
+        }
+    } catch (e: Exception) {
+        System.err.println("ERROR: ${e.message}")
+        ConduitLog.error("Startup failure", e)
+        System.exit(1)
     }
 
+    // Load available packs and set Default pack.
     val packs = withContext(Dispatchers.IO) { AppUtils.getAvailablePacks() }
     appState.availablePacks = packs
     val defaultPack = packs.find { it.id == "Default" } ?: return ConduitInitResult.FAILED_NO_PACK
@@ -70,14 +78,14 @@ suspend fun initializeConduit(
 private suspend fun initializeSystemExpert(
     appState: AppState,
     absoluteModelPath: String,
-    onVerfified: () -> Unit
+    onVerified: () -> Unit
 ): ConduitInitResult {
     return try {
         if (sha256(File(absoluteModelPath)) != GEMMA_SHA256) {
-            Trace.log("System model path = $absoluteModelPath, sha failed")
+            ConduitLog.error("System model path = $absoluteModelPath, sha failed")
             return ConduitInitResult.FAILED_MODEL_SHA
         }
-        onVerfified()
+        onVerified()
 
         appState.systemExpert.status = ExpertStatus.LOADING
         appState.systemExpert.sessionPtr = withContext(Dispatchers.IO) {
@@ -96,7 +104,7 @@ private suspend fun initializeSystemExpert(
             ConduitInitResult.OK
         }
     } catch (e: Exception) {
-        Trace.log("System expert initialization failed: ${e.message}")
+        ConduitLog.error("System expert initialization failed: ${e.message}")
         ConduitInitResult.FAILED_MODEL_LOAD
     }
 }
@@ -108,7 +116,7 @@ private fun getApprovedModels(): Map<String, ApprovedModel> {
         try {
             AppJson.decodeFromString<Map<String, ApprovedModel>>(file.readText())
         } catch (e: Exception) {
-            Trace.log("Unable to load .approved-models.json: ${e.message}")
+            ConduitLog.error("Unable to load .approved-models.json: ${e.message}")
             emptyMap()
         }
     } else {

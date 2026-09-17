@@ -32,16 +32,16 @@ data class Pack(
     // Non-blocking - Launches bg inits for the various experts in the pack
     fun initializeExperts(appState: AppState) {
         experts.forEach { expert ->
-            expert.setConduitUserModelGetter() {
-                appState.conduitUserModel
-            }
+            // expert.getResponse() may use this if needed
+            expert.setConduitUserModelGetter() { appState.conduitUserModel }
 
-            // Internal system experts are always ready
+            // Internal experts (Echo, Condy) are always ready and eager
             if (expert.type == ExpertType.INTERNAL) {
                 expert.status = ExpertStatus.READY
                 return@forEach
             }
 
+            // e.g. gemma4-2.5B-...gguf
             val modelFilename = expert.model
             if (modelFilename == null) {
                 expert.status = ExpertStatus.FAILED
@@ -58,7 +58,7 @@ data class Pack(
             // the native module (libConduit) keeps a map of already loaded models keyed by their SHA
             // LlmPortal.initialize sends both the modelSha and an absoluteModelPath to the native side
             // to init. If it is already cached by SHA, then the given absoluteModelPath is IGNORED and
-            // it could essentially be "". If it is not already loaded in the native cache, that is the
+            // it could practically be "". If it is not already in the native cache, that is the
             // only case when it falls back to loading the raw file (when the absModelPath is actually used)
 
             val absoluteModelPath = AppUtils.locateModelFile(modelFilename) // returns null if not found
@@ -74,13 +74,11 @@ data class Pack(
 
                 try {
                     expert.status = ExpertStatus.LOADING
-                    //Trace.log("ABOUT TO INITIALIZE $modelFilename path=$absoluteModelPath sha=$modelSha")
                     expert.sessionPtr = LlmPortal.initialize(
                         conduitPtr = appState.conduitPtr,
                         modelSha = modelSha,
                         absoluteModelPath = absoluteModelPath ?: ""
                     )
-                    //Trace.log("$absoluteModelPath got session pointer = ${expert.sessionPtr}")
                     expert.status = if (expert.sessionPtr == null) ExpertStatus.FAILED else ExpertStatus.READY
                 } catch (e: Exception) {
                     expert.status = ExpertStatus.FAILED

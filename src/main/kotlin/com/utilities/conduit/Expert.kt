@@ -18,10 +18,16 @@ import java.util.*
 enum class ExpertType { INTERNAL, LLM, REMOTE }
 enum class ExpertStatus { LOADING, READY, FAILED }
 
+// 1. A Conduit Pack contains a bunch of experts (See a sample pack.json)
+// 2. the description is converted into the pre-fill seed prompt when the expert is used to generate
+//    (e.g. description: "All-round expert" will become "You are an all-round expert")
+// 3. nickname and expertise are used only in the UI (icons and chat message bubbles)
+// 4. color is simply to give the experts distinct icons in the top panel
 @Serializable
 class Expert(
+    // We don't actually serialize Experts; so the id is just internal and ephemeral to
+    // a particular Conduit session.
     @Transient
-    // ephemeral id
     val id: String = "E-${UUID.randomUUID().toString()}",
 
     val type: ExpertType,
@@ -31,7 +37,9 @@ class Expert(
     val description: String? = null,
     val color: String? = "Snazzy Slate",
 ) {
-    // Runtime state shared by all Experts using the same model.
+    // Runtime state shared by all Experts using the same model. But the native side
+    // actually clears context before each generation and supplies context extracted
+    // from the current chat itself.
     var sessionPtr by mutableStateOf<Pointer?>(null)
     val seedPrompt: String
         get() = "You are: ${description ?: "a general expert"}"
@@ -45,7 +53,8 @@ class Expert(
             else -> true
         }
 
-    // set from App() to a lambda that returns AppState.conduitUserModel
+    // set from App() to a lambda that returns AppState.conduitUserModel. We use this
+    // to fetch the user model to pre-fill in case a generation task requires it (getResponse below)
     internal var conduitUserModelProvider: () -> ConduitUserModel? = { null }
     internal fun setConduitUserModelGetter(provider: () -> ConduitUserModel?) {
         conduitUserModelProvider = provider
@@ -56,6 +65,7 @@ class Expert(
     // outwards facing user model, and send that.
     suspend fun getResponse(chatThusFar: String, prompt: String, includeUserModel: Boolean): Flow<String> {
         return when (type) {
+            // Echoes and Condy are the only internal experts
             ExpertType.INTERNAL -> {
                 when (model) {
                     ":conduit" -> ConduitPortal.getResponse(this, prompt)
@@ -76,12 +86,14 @@ class Expert(
                 }
 
                 val finalPrompt = AppUtils.buildChatMlPrompt(
+                    this.nickname,
                     this.seedPrompt,
                     userModel.text,
                     chatThusFar,
                     prompt
                 )
-                Trace.log("EXPERT.GENERATE final prompt = $finalPrompt")
+                // Uncomment to tune prompt
+                // Trace.log("EXPERT.GENERATE final prompt = $finalPrompt")
 
                 LlmPortal.getResponse(sessionPtr, finalPrompt)
             }
@@ -110,7 +122,7 @@ class Expert(
     }
 }
 
-// Internal expert model Convenience identifiers
+// Internal expert models - convenience identifiers
 object InternalExperts {
     const val SIMPLE_ECHO = ":simpleEcho"
     const val ROTTEN_ECHO = ":rottenEcho"

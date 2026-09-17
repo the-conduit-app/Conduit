@@ -58,7 +58,7 @@ object Maintenance {
     private var appState: AppState? = null
 
     suspend fun start(state: AppState) {
-        delay(30_000.milliseconds) // Startup grace period
+        delay(30_000.milliseconds) // lazy bums
         appState = state
 
         //Trace.log("Maint: STARTING")
@@ -144,17 +144,13 @@ object Maintenance {
             if (!item.chat.title.equals("Welcome to Conduit", ignoreCase = true))
                 continue
 
-            //Trace.log("RunTitlemaint ${item.chat.title} numnodes = ${item.chat.nodes.size}")
-
             if (item.chat.nodes.size < 3)
                 continue
 
             if (appState?.chatManager?.currentlyGeneratingExpert != null)
                 return
 
-            //Trace.log("Rename generating new title")
             val newTitle = MaintenanceUtils.generateChatTitle(systemExpert, item.chat)
-            //Trace.log("Rename generated new title = $newTitle")
 
             if (newTitle.equals(item.chat.title, ignoreCase = true))
                 continue
@@ -172,7 +168,8 @@ object Maintenance {
         }
     }
 
-    // Generate summaries for branching nodes (with enough ancestors - checked in the helper)
+    // Generate summaries for branching nodes. In the helper we generate summaries for
+    // branching nodes that have > a threshold num of ancestors (before hitting a node with summary)
     private suspend fun runHistorySummaryMaintenance() {
         val systemExpert = appState?.systemExpert
         if (systemExpert?.sessionPtr == null) {
@@ -211,8 +208,7 @@ object Maintenance {
     }
 
     // Generate summaries of chats in the chats/chat-summaries/folder
-    // TODO restore private after testing
-    suspend fun runChatSummaryMaintenance() {
+    private suspend fun runChatSummaryMaintenance() {
         val systemExpert = appState?.systemExpert
         if (systemExpert?.sessionPtr == null) {
             Trace.log("MAINT: chat summary skip — system expert unavailable")
@@ -228,8 +224,13 @@ object Maintenance {
         val items = appState?.chatsList?.items ?: return
         for (item in items.toList()) {
             if (appState?.chatManager?.currentlyGeneratingExpert != null) {
-                Trace.log("MAINT: chat summary break due to currently generating expert")
+                //Trace.log("MAINT: chat summary break due to currently generating expert")
                 return
+            }
+
+            // Skip seed chats
+            if (appState?.isSeedChat(item.chat.id) == true) {
+                continue
             }
 
             //Trace.log("Summarizing chat ${item.chat.title}")
@@ -254,11 +255,7 @@ object Maintenance {
             }
 
             //Trace.log("MAINT: generating chat summary for ${chat.title}")
-
             val summaryText = MaintenanceUtils.generateChatSummary(systemExpert, chat, previousSummary)
-            if (summaryText.isBlank())
-                continue
-
             val chatSummary = ChatSummary(
                 chat.id,
                 chat.title,
@@ -267,10 +264,7 @@ object Maintenance {
             )
 
             withContext(Dispatchers.IO) {
-                Files.writeString(
-                    summaryFile,
-                    AppJson.encodeToString(chatSummary)
-                )
+                Files.writeString(summaryFile, AppJson.encodeToString(chatSummary))
             }
 
             //Trace.log("MAINT: generated and saved chat summary for ${chat.title}")
@@ -279,8 +273,7 @@ object Maintenance {
     }
 
     // Generate a model of the user from various chats/chat-summaries/*.json
-    // TODO restore private after testing
-     suspend fun runUserModelMaintenance() {
+     private suspend fun runUserModelMaintenance() {
         val systemExpert = appState?.systemExpert
 
         if (systemExpert?.sessionPtr == null) {

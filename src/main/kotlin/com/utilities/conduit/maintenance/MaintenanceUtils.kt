@@ -29,7 +29,7 @@ object MaintenanceUtils {
 
             // NOTE: boundaryContext is the first effectiveHistory node.historySummary
             // cuz we stop there
-            val chatThusFar: String = AppUtils.getChatContextAsString(
+            val chatThusFar: String = AppUtils.getChatThusFarAsString(
                 boundaryContext = effectiveHistory.boundaryContext,
                 messages = effectiveHistory.nodes.mapNotNull { it.message },
                 maxAssistantTextLen = 250,
@@ -77,7 +77,7 @@ object MaintenanceUtils {
             // The history summary for `node` describes everything leading up to and including
             // the current node's parent (excludes current node)
             // Note: boundaryContext is the context before the first history node
-            val chatThusFar = AppUtils.getChatContextAsString(
+            val chatThusFar = AppUtils.getChatThusFarAsString(
                 boundaryContext = effectiveHistory.boundaryContext,
                 messages = effectiveHistory.nodes.mapNotNull { it.message },
                 maxAssistantTextLen = 250,
@@ -119,12 +119,13 @@ object MaintenanceUtils {
             val effectiveHistory = ChatUtils.getEffectiveNodeHistory(chat, cursorNodeId, excludeSystemNodes = true)
             if (effectiveHistory.nodes.isEmpty()) return ""
 
-            val chatThusFar = AppUtils.getChatContextAsString(
+            val chatThusFar = AppUtils.getChatThusFarAsString(
                 boundaryContext = effectiveHistory.boundaryContext,
                 messages = effectiveHistory.nodes.mapNotNull { it.message },
                 maxAssistantTextLen = 250,
                 maxUserTextLen = 1500
             )
+            Trace.log("Chat summary maint: chatThusFar=$chatThusFar")
 
             val chatSummaryPrompt = PROMPTS.CHAT_SUMMARY_GENERATION
                 .replace("{PREVIOUS_SUMMARY}", previousSummary?.summary ?: "")

@@ -14,14 +14,18 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 
+// Maintains various compose states for the current chat
+// the version vars are meant to be compose triggers (on ++)
+// Importantly, has
 class ChatManager {
     private val mutex = Mutex()
-    var currentGenerationJob: Job? = null
 
     var version by mutableIntStateOf(0)     // For general Compose invalidation
         private set
     var chatVersion by mutableIntStateOf(0) // Similar but for autoscroll on addNode
         private set
+
+    var currentGenerationJob: Job? = null
 
     var currentChat by mutableStateOf(createChat())
 
@@ -77,22 +81,17 @@ class ChatManager {
     suspend fun addNode(node: Node): ChatsListItem = mutex.withLock {
         val chat = currentChat
         if (node.parentId != null && !chat.nodes.containsKey(node.parentId)) {
-            throw IllegalStateException(
-                "Cannot add node: Parent(${node.parentId}) not found."
-            )
+            throw IllegalStateException("Cannot add node: Parent(${node.parentId}) not found.")
         }
 
         chat.nodes[node.id] = node
+        node.parentId?.let { parentId -> chat.nodes[parentId]?.children?.add(node.id) }
+        chat.cursorNodeId = node.id
 
-        node.parentId?.let { parentId ->
-            chat.nodes[parentId]?.children?.add(node.id)
-        }
-
+        // first node of the chat becomes the root
         if (chat.rootNodeId == null) {
             chat.rootNodeId = node.id
         }
-
-        chat.cursorNodeId = node.id
 
         withContext(Dispatchers.Main) {
             ++chatVersion // forces autoscroll in chatView
@@ -102,6 +101,38 @@ class ChatManager {
         ChatUtils.saveChatToDisk(chat)
     }
 
+    // When a branch has been selected, the next leaf node is the first node downstream the branch that has
+    // either no children (i.e. a leaf) or a non-null summary (i.e. another branchable)
+    suspend fun selectBranch(node: Node) {
+        var nodeIter = node
+
+        // if node has a child, race down until either a leaf or a branching point
+        while (nodeIter.children.size == 1) {
+            nodeIter = currentChat.nodes[nodeIter.children[0]] ?: return
+        }
+
+        currentChat.cursorNodeId = nodeIter.id
+        setCursor(nodeIter)
+    }
+
+    suspend fun cycleBranch(node: Node) {
+        val childNodes = node.children.mapNotNull { currentChat.nodes[it] }
+        if (childNodes.isEmpty()) return
+
+        // Find which child currently contains the cursor.
+        val currentIndex = childNodes.indexOfFirst { ChatUtils.leadsToCursor(currentChat, it) }
+        val nextIndex = if (currentIndex == -1)  0 else (currentIndex + 1) % childNodes.size
+
+        selectBranch(childNodes[nextIndex])
+    }
+
+    suspend fun setCursor(node: Node) {
+        currentChat.cursorNodeId = node.id
+        ++version // recompose ChatView
+        withContext(Dispatchers.IO) { ChatUtils.saveChatToDisk(currentChat) }
+    }
+
+//    // Abandoned for now since it looks better with a parallel branch
 //    // compressChildren and its private helper removeNode() are used as follows. If we try to add a response
 //    // leaf to a parent (userNode) with an existing child having identical text, we toss the new
 //    // responseNode from the chat and set the cursor to the original child. This allows us to navigate
@@ -128,11 +159,6 @@ class ChatManager {
 //            println("COMPRESS remove=${removeNode(responseNode)}")
 //        }
 //
-////        if (duplicateNode != null && removeNode(responseNode)) {
-////            chat.cursorNodeId = duplicateNode.id
-////            //++version
-////        }////
-//
 //        return duplicateNode ?: responseNode
 //    }
 //    private fun removeNode(node: Node): Boolean {
@@ -146,38 +172,4 @@ class ChatManager {
 //
 //        return true
 //    }
-
-    // When a branch has been selected, the next leaf node is the first node downstream the branch that has
-    // either no children (i.e. a leaf) or a non-null summary (i.e. another branchable)
-    suspend fun selectBranch(node: Node) {
-        var nodeIter = node
-
-        // if node has a child, race down until either a leaf or a branching point
-        while (nodeIter.children.size == 1) {
-            nodeIter = currentChat.nodes[nodeIter.children[0]]
-                ?: return
-        }
-
-        currentChat.cursorNodeId = nodeIter.id
-        setCursor(nodeIter)
-    }
-
-    suspend fun cycleBranch(node: Node) {
-        val childNodes = node.children.mapNotNull { currentChat.nodes[it] }
-        if (childNodes.isEmpty()) return
-
-        // Find which child currently contains the cursor.
-        val currentIndex = childNodes.indexOfFirst {
-            ChatUtils.leadsToCursor(currentChat, it)
-        }
-        val nextIndex = if (currentIndex == -1)  0 else (currentIndex + 1) % childNodes.size
-
-        selectBranch(childNodes[nextIndex])
-    }
-
-    suspend fun setCursor(node: Node) {
-        currentChat.cursorNodeId = node.id
-        ++version // recompose ChatView
-        withContext(Dispatchers.IO) { ChatUtils.saveChatToDisk(currentChat) }
-    }
 }

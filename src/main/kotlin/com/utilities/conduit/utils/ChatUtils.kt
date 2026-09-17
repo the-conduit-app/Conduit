@@ -1,12 +1,11 @@
 package com.utilities.conduit.utils
 
 import com.utilities.conduit.AppJson
-import com.utilities.conduit.Expert
-import com.utilities.conduit.ExpertType
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.chat.ChatsListItem
 import com.utilities.conduit.chat.Node
+import com.utilities.conduit.debug.Trace
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -116,10 +115,22 @@ object ChatUtils {
         while (currentNodeId != null) {
             val node = chat.nodes[currentNodeId] ?: break
 
-            // SYSTEM nodes represent internal expert responses.
-            // Since traversal is leaf → root, also skip the user node
+            // SYSTEM nodes represent internal expert responses. To identify a user node containing
+            // a prompt to a system node (and thus exclude it), we look at its children (it can have
+            // only one expert response and if it's a system expert, we skip this node)
+            if (excludeSystemNodes && node.message?.authorType == AuthorType.USER &&
+                node.children.any { childId -> chat.nodes[childId]?.message?.authorType == AuthorType.INTERNAL }
+            ) {
+                Trace.log("skipping system prompt ${node.message.text}")
+                currentNodeId = node.parentId?.let { chat.nodes[it]?.parentId }
+                continue
+            }
+
+            // If the node is a system node, since traversal is leaf → root, also skip the user node
             // that immediately precedes this response.
-            if (excludeSystemNodes && node.message?.authorType == AuthorType.SYSTEM) {
+            if (excludeSystemNodes && node.message?.authorType == AuthorType.INTERNAL) {
+                Trace.log("AUTHOR = ${node.message.authorType}, msg = ${node.message.text}")
+                Trace.log("skipping system node AND its parent ${node.message.text}")
                 currentNodeId = node.parentId?.let { chat.nodes[it]?.parentId }
                 continue
             }

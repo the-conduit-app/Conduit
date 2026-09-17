@@ -116,7 +116,6 @@ class AppActions(private val appState: AppState) {
                 type = NodeType.TEXT,
                 parentId = parentNode?.id,
                 message = ChatMessage(
-                    //author = MessageAuthor(type = AuthorType.USER),
                     authorType = AuthorType.USER,
                     text = currentPrompt,
                     title = "You${makeOptionalDateTag(parentTimeStamp)}"
@@ -140,24 +139,12 @@ class AppActions(private val appState: AppState) {
                     type = NodeType.TEXT,
                     parentId = cursorNodeId,
                     message = ChatMessage(
-                        authorType = if (expert.type == ExpertType.INTERNAL) AuthorType.SYSTEM else AuthorType.ASSISTANT,
-//                        author = MessageAuthor(
-//                            type = if (expert.type == ExpertType.INTERNAL) {
-//                                AuthorType.SYSTEM
-//                            } else {
-//                                AuthorType.ASSISTANT
-//                            },
-//                            //expertId = expert.id,
-//                            //packId = appState.currentPack.value?.id
-//                        ),
+                        authorType = if (expert.type == ExpertType.INTERNAL) AuthorType.INTERNAL else AuthorType.ASSISTANT,
                         title = makeResponseTitle(expert, appState.currentPack.value, cursorNode?.createdAt),
                         text = ""
                     )
                 )
             }
-            Trace.log(
-                "RESPONSE CREATED id=${responseNode.id}, thread=${Thread.currentThread().name}"
-            )
 
             //Trace.log("BEFORE response add: cursor=${state.chatManager.currentChat.cursorNodeId}")
             val item = appState.chatManager.addNode(responseNode)
@@ -175,7 +162,7 @@ class AppActions(private val appState: AppState) {
             val effectiveHistory = ChatUtils.getEffectiveNodeHistory(currentChat, userNode.parentId, excludeSystemNodes = true)
             val precedingContext = effectiveHistory.boundaryContext
             val chatMessages = effectiveHistory.nodes.mapNotNull { it.message }
-            val chatThusFar = AppUtils.getChatContextAsString(
+            val chatThusFar = AppUtils.getChatThusFarAsString(
                 boundaryContext = precedingContext,
                 messages = chatMessages,
                 maxAssistantTextLen = 100,

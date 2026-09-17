@@ -174,137 +174,79 @@ fun <T> DeckOfItems(
     }
 }
 
+// --------------------------------------------------------------------------------------
 
-
-// Working version below commented out to test animated version above
-//// We assume that all cards have the same size.
-//// itemSize is the WxH dimensions of the item and offset is by how much the item "in front"
-//// is shifted from the one behind it.
+//// Test driver
+//data class TestItem(
+//    val title: String,
+//    val text: String
+//)
+//
 //@Composable
-//fun<T> DeckOfItems(
-//    deckItems: List<DeckItem<T>>,
-//    itemSize: DpSize,
-//    itemOffset: DpOffset = DpOffset(0.dp, 0.dp),
-//    frontDeckItem: DeckItem<T>?,
-//    modifier: Modifier = Modifier,
-//    onFrontItemClick: (DeckItem<T>) -> Unit,
-//    itemRenderer: @Composable (item: T, itemSize: DpSize) -> Unit
+//fun renderTestItem(
+//    item: TestItem,
+//    size: DpSize,
 //) {
-//    var reorderedDeck by remember(deckItems, frontDeckItem) {
-//        mutableStateOf(deckItems.filter { it != frontDeckItem } + listOfNotNull(frontDeckItem))
-//    }
-//    LaunchedEffect(deckItems, frontDeckItem) {
-//        reorderedDeck = deckItems.filter { it != frontDeckItem } + listOfNotNull(frontDeckItem)
-//    }
-//
-//    // Lay out the items in the deck assuming each item has the same width and height
-//    // as DeckOfItems.modifier.size. Each item is rendered heightOf(item.title) below
-//    // the previous one. A maximum of maxItemsToShow is rendered starting from the
-//    // frontItem backwards.
-//    Box(modifier = modifier) {
-//        // Each concealed item exposes just its top (title area). The front item is fully exposed.
-//        val deckWidth = itemSize.width + itemOffset.x * (reorderedDeck.size - 1)
-//        val deckHeight = itemSize.height + itemOffset.y * (reorderedDeck.size - 1)
-//
-//        Box(
-//            modifier = modifier.size(deckWidth, deckHeight)
+//    Surface(
+//        modifier = Modifier
+//            .width(size.width)
+//            .height(size.height),
+//        shape = MaterialTheme.shapes.medium,
+//        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+//        border = BorderStroke(
+//            1.dp,
+//            MaterialTheme.colorScheme.outline
+//        )
+//    ) {
+//        Column(
+//            modifier = Modifier.fillMaxSize()
 //        ) {
-//            reorderedDeck.forEachIndexed { index, item ->
-//                val isFront = index == reorderedDeck.lastIndex
-//                Box(
-//                    modifier = Modifier
-//                        .size(itemSize)
-//                        .offset(
-//                            x = itemOffset.x * index,
-//                            y = itemOffset.y * index
-//                        ).clickable {
-//                            if (isFront) {
-//                                onFrontItemClick(item)
-//                            } else {
-//                                reorderedDeck = reorderedDeck.filter { it != item } + item
-//                            }
-//                        }
-//                ) {
-//                    itemRenderer(item.content, itemSize)
-//                }
+//            Text(
+//                text = item.title,
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(40.dp)
+//                    .padding(horizontal = 12.dp),
+//                style = MaterialTheme.typography.titleMedium
+//            )
+//
+//            Box(
+//                modifier = Modifier.fillMaxSize(),
+//                contentAlignment = Alignment.Center
+//            ) {
+//                Text(
+//                    text = item.text,
+//                    style = MaterialTheme.typography.headlineMedium
+//                )
 //            }
 //        }
 //    }
 //}
-
-// --------------------------------------------------------------------------------------
-
-// Test driver
-data class TestItem(
-    val title: String,
-    val text: String
-)
-
-@Composable
-fun renderTestItem(
-    item: TestItem,
-    size: DpSize,
-) {
-    Surface(
-        modifier = Modifier
-            .width(size.width)
-            .height(size.height),
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-        border = BorderStroke(
-            1.dp,
-            MaterialTheme.colorScheme.outline
-        )
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                text = item.title,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .padding(horizontal = 12.dp),
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = item.text,
-                    style = MaterialTheme.typography.headlineMedium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun DeckOfItemsTest() {
-    val testItems = listOf(
-        TestItem("One", "ONE"),
-        TestItem("Two", "TWO"),
-        TestItem("Three", "THREE"),
-        TestItem("Four", "FOUR"),
-        TestItem("Five", "FIVE")
-    )
-
-    val deckItems = testItems.map {
-        DeckItem(
-            title = it.title,
-            content = it
-        )
-    }
-
-    DeckOfItems(
-        deckItems = deckItems,
-        itemSize = DpSize(450.dp, 300.dp),
-        frontDeckItem = deckItems.last(),
-        modifier = Modifier.padding(24.dp),
-        onFrontItemClick = { item -> println("Selected: ${item.title}") },
-        onFrontItemChanged = { item -> println("Fronted: ${item.title}") },
-        itemRenderer = ::renderTestItem
-    )
-}
+//
+//@Composable
+//fun DeckOfItemsTest() {
+//    val testItems = listOf(
+//        TestItem("One", "ONE"),
+//        TestItem("Two", "TWO"),
+//        TestItem("Three", "THREE"),
+//        TestItem("Four", "FOUR"),
+//        TestItem("Five", "FIVE")
+//    )
+//
+//    val deckItems = testItems.map {
+//        DeckItem(
+//            title = it.title,
+//            content = it
+//        )
+//    }
+//
+//    DeckOfItems(
+//        deckItems = deckItems,
+//        itemSize = DpSize(450.dp, 300.dp),
+//        frontDeckItem = deckItems.last(),
+//        modifier = Modifier.padding(24.dp),
+//        onFrontItemClick = { item -> println("Selected: ${item.title}") },
+//        onFrontItemChanged = { item -> println("Fronted: ${item.title}") },
+//        itemRenderer = ::renderTestItem
+//    )
+//}

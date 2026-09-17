@@ -15,10 +15,8 @@
             ],
             "message": {
                 "title": "You · 12 Sep",
+                "authorType": "USER",
                 "timestamp": 1789213455916,
-                "author": {
-                    "type": "USER"
-                },
                 "text": "Hi Larry, do you know any good lawyer jokes?\n"
             }
         },
@@ -32,12 +30,8 @@
             ],
             "message": {
                 "title": "Larry (Law) · Pack: Default",
+                "authorType": "ASSISTANT",
                 "timestamp": 1789213455917,
-                "author": {
-                    "type": "ASSISTANT",
-                    "expertId": "E-f6bac8c9-5f16-4e9d-982d-9a6cdc563322",
-                    "packId": "Default"
-                },
                 "text": "Why don't sharks attack lawyers? \n\nProfessional courtesy. \n",
                 "responseTime": 11818
             }
@@ -53,10 +47,8 @@
             ],
             "message": {
                 "title": "You",
+                "authorType": "USER",
                 "timestamp": 1789213491523,
-                "author": {
-                    "type": "USER"
-                },
                 "text": "Thanks. I thought you might say \"I don't know any good lawyer jokes because there are no good lawyers\"\n"
             }
         },
@@ -67,12 +59,8 @@
             "parentId": "25b3abeb-2d33-4032-995a-90037fdd3cf8",
             "message": {
                 "title": "Larry (Law) · Pack: Default",
+                "authorType": "ASSISTANT",
                 "timestamp": 1789213491523,
-                "author": {
-                    "type": "ASSISTANT",
-                    "expertId": "E-f6bac8c9-5f16-4e9d-982d-9a6cdc563322",
-                    "packId": "Default"
-                },
                 "text": "That's a good one!  I'm glad you found my joke amusing. \n\nDo you have any other questions for me? \n",
                 "responseTime": 13856
             }
@@ -87,10 +75,8 @@
             ],
             "message": {
                 "title": "You",
+                "authorType": "USER",
                 "timestamp": 1789213542551,
-                "author": {
-                    "type": "USER"
-                },
                 "text": "I thought you might say \"No good lawyer jokes. They're always dead serious\"\n"
             }
         },
@@ -104,12 +90,8 @@
             ],
             "message": {
                 "title": "Larry (Law) · Pack: Default",
+                "authorType": "ASSISTANT",
                 "timestamp": 1789213542551,
-                "author": {
-                    "type": "ASSISTANT",
-                    "expertId": "E-f6bac8c9-5f16-4e9d-982d-9a6cdc563322",
-                    "packId": "Default"
-                },
                 "text": "You got me there.  That's a good one.  \n",
                 "responseTime": 12894
             }
@@ -124,10 +106,8 @@
             ],
             "message": {
                 "title": "You",
+                "authorType": "USER",
                 "timestamp": 1789213595440,
-                "author": {
-                    "type": "USER"
-                },
                 "text": "Or perhaps \"I don't know good lawyer jokes, but I know no-good lawyer jokes\"\n"
             }
         },
@@ -141,12 +121,8 @@
             ],
             "message": {
                 "title": "Larry (Law) · Pack: Default",
+                "authorType": "ASSISTANT",
                 "timestamp": 1789213595440,
-                "author": {
-                    "type": "ASSISTANT",
-                    "expertId": "E-f6bac8c9-5f16-4e9d-982d-9a6cdc563322",
-                    "packId": "Default"
-                },
                 "text": "That's a good one too!  I'm learning a lot about lawyer jokes today.  \n\n",
                 "responseTime": 14650
             }
@@ -161,10 +137,8 @@
             ],
             "message": {
                 "title": "You",
+                "authorType": "USER",
                 "timestamp": 1789213628384,
-                "author": {
-                    "type": "USER"
-                },
                 "text": "Well you are a lawyer after all. Helps to be prepared, don't it?\n"
             }
         },
@@ -175,12 +149,8 @@
             "parentId": "f3daba7e-ed7d-468c-871a-7b9f5a231ea3",
             "message": {
                 "title": "Larry (Law) · Pack: Default",
+                "authorType": "ASSISTANT",
                 "timestamp": 1789213628384,
-                "author": {
-                    "type": "ASSISTANT",
-                    "expertId": "E-f6bac8c9-5f16-4e9d-982d-9a6cdc563322",
-                    "packId": "Default"
-                },
                 "text": "You're absolutely right.  It never hurts to be prepared, especially in my line of work.  \n\nWhat can I help you with today?  \n",
                 "responseTime": 17689
             }

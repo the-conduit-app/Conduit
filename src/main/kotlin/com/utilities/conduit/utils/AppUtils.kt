@@ -1,6 +1,7 @@
 package com.utilities.conduit.utils
 
 import com.utilities.conduit.AppJson
+import com.utilities.conduit.ConduitLog
 import com.utilities.conduit.packs.Pack
 import com.utilities.conduit.chat.AuthorType
 import com.utilities.conduit.chat.ChatMessage
@@ -8,6 +9,7 @@ import com.utilities.conduit.debug.Trace
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.time.Instant
@@ -32,6 +34,7 @@ object AppUtils {
         return path
     }
 
+    // libConduit.dylib and libMacWindow.dylib (mac window for native-style decorations)
     fun getNativeLibDir(libName: String): String {
         val codeSource = File(
             AppUtils::class.java.protectionDomain.codeSource.location.toURI()
@@ -80,7 +83,7 @@ object AppUtils {
     // searching a bunch of likely places
     fun locateModelFile(filename: String): String? {
         val candidates = listOf(
-            File(AppUtils.getAppDir(), "llm/$filename"),
+            File(getAppDir(), "llm/$filename"),
             File(System.getProperty("user.home"), "llm/$filename"),
             File(System.getProperty("user.home"), "Models/$filename"),
             File(System.getProperty("user.home"), "models/$filename"),
@@ -114,36 +117,113 @@ object AppUtils {
          }
      }
 
+    // the param could be either a file or a dir. We make sure it's a dir
+    private fun ensureDir(fileSystemItem: File) {
+        if (fileSystemItem.isDirectory) return
+
+        if (fileSystemItem.exists()) { // but as a non-dir, maybe a file
+            throw IOException("Unable to create directory: ${fileSystemItem.path} (path exists but is not a directory)")
+        }
+
+        try {
+            Files.createDirectories(fileSystemItem.toPath())
+        } catch (e: IOException) {
+            throw IOException("Unable to create directory: ${fileSystemItem.path}" +
+                        (e.message?.let { " ($it)" } ?: ""),
+                e
+            )
+        }
+    }
+
+    // Fallback items (in case the app dir doesn't already have chats/, packs/, and .approved_models.json
+    // e.g. on first launch
+    fun copyAssetsToFilesDir() : List<String> {
+        val clazz = object {}::class.java
+
+        fun copyResource(resourcePath: String, destination: File) {
+            if (destination.exists()) return
+
+            val input = clazz.getResourceAsStream("/assets/$resourcePath")
+                ?: throw IOException("Resource not found: /assets/$resourcePath")
+
+            input.use {
+                destination.parentFile?.let { ensureDir(it) }
+                try {
+                    destination.outputStream().use { output -> input.copyTo(output) }
+                } catch (e: IOException) {
+                    throw IOException("Unable to copy resource /assets/$resourcePath to ${destination.path}", e)
+                }
+            }
+        }
+
+        // Approved models list - only files with their valid SHAs listed here can load.
+        copyResource(".approved-models.json", File(AppUtils.getAppDir(), ".approved-models.json"))
+
+        // Empty llm folder with README
+        copyResource(
+            "llm/README.put-llm-models-here-for-automatic-pickup",
+            File(AppUtils.getAppDir(), "llm/README.put-llm-models-here-for-automatic-pickup")
+        )
+
+        // Packs — seed individual files only if missing
+        listOf("Default.json", "Echoes.json", "Sample.json").forEach { filename ->
+            copyResource("packs/$filename", File(AppUtils.getPacksDir(), filename))
+        }
+
+        // Chats — seed the entire directory with starter chats, but only if it doesn't exist
+        val chatsDir = File(AppUtils.getChatsDir())
+        val chatsDirExisted = chatsDir.exists()
+        ensureDir(chatsDir)
+
+        val seedChatFiles = listOf(
+            "Lawyer-Jokes-and-Professional--b0d33652-ba63-4bf8-85e8-4f0571a70180.json",
+            "Power-Set-of-Primes-and-Intege-00a56e9c-c96d-4d1f-8917-e7965c590e45.json",
+        )
+        if (!chatsDirExisted) {
+            seedChatFiles.forEach { filename -> copyResource("chats/$filename", File(chatsDir, filename)) }
+        }
+
+        val uuidRegex = Regex("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")
+        return seedChatFiles.mapNotNull { filename ->
+            uuidRegex.find(filename)?.value ?: run {
+                ConduitLog.info("Invalid seed chat filename: $filename")
+                null
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------------
+
     // Returns a prompt wrapped in ChatML - ready for dispatch to the LLM
     // Note currentPrompt is NOT contained in the context. For onSend() the currentPrompt is the
     // last user message. For Maint routines, the current prompt is the system instruction, e.g.
     // Generate title, Summarize chat, etc.
     fun buildChatMlPrompt(
+        expertNickname: String,
         expertSeedPrompt: String?,
         userModel: String?,
-        context: String,
+        chatThusFar: String,
         currentPrompt: String
     ): String {
         return buildString {
             append("<|im_start|>user\n")
-            append(expertSeedPrompt?.takeIf { it.isNotBlank() }
-                ?: "You are a general-purpose expert.")
+            append("Your name is ${expertNickname}.\n")
+            append(expertSeedPrompt?.takeIf { it.isNotBlank() } ?: "You are a general-purpose expert.")
             append("\n<|im_end|>\n")
 
             append("<|im_start|>user\n")
             append("The current user model is:\n")
-            append(userModel?.takeIf { it.isNotBlank() }
-                ?: "No current user model exists.")
+            append(userModel?.takeIf { it.isNotBlank() } ?: "No current user model exists.")
             append("\n<|im_end|>\n")
 
-            if (context.isNotBlank()) {
+            if (chatThusFar.isNotBlank()) {
                 append("<|im_start|>user\n")
                 append("The following is historical conversation context provided for background only.\n")
                 append("Do not answer or continue any question contained within this context.\n")
                 append("Each contribution is identified by its author. ")
                 append("You may already be one of those contributors.\n\n")
                 append("--- BEGIN HISTORICAL CONVERSATION ---\n")
-                append(context)
+                append(chatThusFar)
                 append("\n--- END HISTORICAL CONVERSATION ---\n")
                 append("<|im_end|>\n")
             }
@@ -161,13 +241,13 @@ object AppUtils {
     // When traversing upwards in Chat history, we stop at a node that has a non-null historySummary
     // That is treated as the "boundaryContext" proxy for all prior chat messages.
     //
-    fun getChatContextAsString(
+    fun getChatThusFarAsString(
         boundaryContext: String,
         messages: List<ChatMessage>,
         maxAssistantTextLen: Int? = null,
         maxUserTextLen: Int? = null
     ): String {
-        val maxSystemTextLen = 10   // Effectively omit System responses (from Condy, echo, etc.)
+        val maxSystemTextLen = 25   // Effectively omit System responses (from Condy, echo, etc.)
 
         val currentMessages = messages.joinToString("\n\n") { message ->
             val role = when (message.authorType) {
@@ -182,7 +262,7 @@ object AppUtils {
                         message.text.length > maxAssistantTextLen ->
                     message.text.take(maxAssistantTextLen) + "..."
 
-                message.authorType == AuthorType.SYSTEM &&
+                message.authorType == AuthorType.INTERNAL &&
                         message.text.length > maxSystemTextLen ->
                     message.text.take(maxSystemTextLen) + "..."
 

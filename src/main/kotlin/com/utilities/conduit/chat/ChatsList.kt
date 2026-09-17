@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.utilities.conduit.AppJson
+import com.utilities.conduit.ConduitLog
 import com.utilities.conduit.utils.AppUtils.getAppDir
 import com.utilities.conduit.utils.ChatUtils
 import com.utilities.conduit.utils.ChatUtils.makeChatFileName
@@ -13,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
@@ -30,6 +32,7 @@ class ChatsList(
 ) {
     val chatsListMutex = Mutex() // for use in rename, etc.
 
+    // When rename or touch updates a chat low in the list
     var needsScrollingToTop by mutableStateOf(false)
 
     suspend fun setNeedsHumanReview(chatId: String, value: Boolean) {
@@ -54,35 +57,49 @@ class ChatsList(
             return@withContext
         }
 
-        Files.newDirectoryStream(chatDir, "*.json").use { paths ->
-            for (path in paths) {
-                try {
-                    val chat = AppJson.decodeFromString<Chat>(Files.readString(path))
-                    val attrs = Files.readAttributes(path, BasicFileAttributes::class.java)
+        try {
+            Files.newDirectoryStream(chatDir, "*.json").use { paths ->
+                for (path in paths) {
+                    try {
+                        val chat = AppJson.decodeFromString<Chat>(Files.readString(path))
+                        val attrs = Files.readAttributes(path, BasicFileAttributes::class.java)
 
-                    val item = ChatsListItem(
-                        chat = chat,
-                        creationTime = chat.createdAt,
-                        modificationTime = attrs.lastModifiedTime().toMillis()
-                    )
+                        val item = ChatsListItem(
+                            chat = chat,
+                            creationTime = chat.createdAt,
+                            modificationTime = attrs.lastModifiedTime().toMillis()
+                        )
 
-                    val existing = chatsById[chat.id]
-                    if (existing == null || item.modificationTime > existing.modificationTime) {
-                        if (existing != null) {
-                            println("Duplicate chat id ${chat.id}: ignoring older ${path.fileName}")                        }
-                        chatsById[chat.id] = item
+                        val existing = chatsById[chat.id]
+                        if (existing == null || item.modificationTime > existing.modificationTime) {
+                            if (existing != null) {
+                                val msg = "Duplicate chat id ${chat.id}: ignoring older ${path.fileName}"
+                                println(msg)
+                                ConduitLog.info(msg)
+                            }
+                            chatsById[chat.id] = item
+                        }
+                    } catch (e: Exception) {
+                        val msg = "Skipping corrupted chat: $path - ${e.message}"
+                        System.err.println(msg)
+                        ConduitLog.error(msg)
                     }
-                } catch (e: Exception) {
-                    println("Skipping corrupted chat: $path")
                 }
             }
-        }
-        val newItems = chatsById.values.toMutableList()
-        newItems.sortByDescending { it.modificationTime }
 
-        withContext(Dispatchers.Main) {
-            items.clear()
-            items.addAll(newItems)
+            // TODO - optimize if/for long chat lists
+            val newItems = chatsById.values.toMutableList()
+            newItems.sortByDescending { it.modificationTime }
+
+            withContext(Dispatchers.Main) {
+                items.clear()
+                items.addAll(newItems)
+            }
+        } catch (e: Exception) {
+            val msg = "Unable to read chats directory: $chatDir - ${e.message}"
+            System.err.println(msg)
+            ConduitLog.error(msg)
+            throw IOException("Unable to read chats directory - ${e.message}", e)
         }
     }
 
@@ -118,7 +135,9 @@ class ChatsList(
 
                     true
                 } catch (e: Exception) {
-                    println("Failed to delete chat: $source")
+                    val msg = "Failed to delete chat: $source - ${e.message}"
+                    System.err.println(msg)
+                    ConduitLog.error(msg)
                     false
                 }
             }
@@ -153,7 +172,9 @@ class ChatsList(
                     }
                     updatedChat
                 } catch (e: Exception) {
-                    println("ChatsList.rename: Failed '$oldTitle' to '$newTitle' ${e.message}")
+                    val msg = "ChatsList.rename: Failed '$oldTitle' to '$newTitle' ${e.message}"
+                    System.err.println()
+                    ConduitLog.error(msg)
                     null
                 }
             }

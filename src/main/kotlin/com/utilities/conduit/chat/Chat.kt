@@ -1,25 +1,23 @@
 package com.utilities.conduit.chat
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import java.util.*
 
+// The Chat is a root Node and has a hash of node IDs.
+// Each node has an list (array) of children
 @Serializable
 data class Chat(
     val id: String,
     val createdAt: Long = System.currentTimeMillis(),
     var rootNodeId: String?,
-    var cursorNodeId: String? = null,
+    var cursorNodeId: String? = null, // User is confined between root and cursor unless they teleport out
     var title: String,
-    var needsHumanReview: Boolean = false,
+    var needsHumanReview: Boolean = false, // Set when chats get auto-renamed by maintenance
     val nodes: MutableMap<String, Node> = mutableMapOf(),
 
-    @Transient
-    var renameStatus: ChatRenameStatus = ChatRenameStatus.NONE,
+//    @Transient
+//    var renameStatus: ChatRenameStatus = ChatRenameStatus.NONE,
     ) {
-    //var isGenerating by mutableStateOf(false)
 
     companion object {
         fun create(title: String): Chat {
@@ -33,7 +31,7 @@ data class Chat(
 }
 
 // Used for automatic chat renaming
-enum class ChatRenameStatus { NONE, GENERATING, DONE }
+//enum class ChatRenameStatus { NONE, GENERATING, DONE }
 
 // ---------------------------------------------------------------------------
 @Serializable
@@ -63,7 +61,7 @@ data class Node(
     }
 }
 @Serializable
-enum class NodeType { TEXT, INFO }
+enum class NodeType { TEXT, INFO } // INFO deprecated out the gate!
 
 // ---------------------------------------------------------------------------
 
@@ -76,35 +74,17 @@ data class ChatMessage(
     var title: String? = null,
     val timestamp: Long = System.currentTimeMillis(),
     var status: MessageStatus = MessageStatus.COMPLETE,
-    val authorType: AuthorType = AuthorType.SYSTEM,
-    //val author: MessageAuthor,
+    val authorType: AuthorType = AuthorType.INTERNAL,
     var text: String, // Canonical text saved to disk.
     var responseTime: Long? = null
-) {
-    // Run-time only states
-
-    // Displayed preferentially to text while the message is streaming.
-//    @Transient
-//    val textInProgress: MutableState<String?> = mutableStateOf(null)
-}
+)
 enum class MessageStatus {
     COMPLETE,
     INTERRUPTED,
     ERROR
 }
-
-// ---------------------------------------------------------------------------
-
-// TODO: expertId and packId are really ephemeral to this session. Review if
-// they should be persisted.
-//@Serializable
-//data class MessageAuthor(
-//    val type: AuthorType,
-//    //val expertId: String? = null,
-//    //val packId: String? = null
-//)
 enum class AuthorType {
     USER,
     ASSISTANT,
-    SYSTEM,   // Responses from INTERNAL experts are tagged SYSTEM
+    INTERNAL,   // Responses from INTERNAL experts (Echo, Condy) are tagged this
 }
