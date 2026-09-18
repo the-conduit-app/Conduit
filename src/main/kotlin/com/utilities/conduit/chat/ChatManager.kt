@@ -31,12 +31,10 @@ class ChatManager {
     var currentlyGeneratingExpert: Expert? by mutableStateOf(null)
 
     // IMPORTANT NOTE ABOUT THIS VAR:
-    // It is ONLY set for explicit user generate requests (onSend, etc.).
-    // It is NOT set for internal SystemExpert requests.
-    // Auto-generation is cancellable, while user-initiated requests
-    // (rename suggestions, response requests, etc.) are blocking.
-    // Therefore, this variable can safely be observed for node animation
-    // in TreeView.
+    // It is ONLY set for explicit user generate requests (onSend, etc.). It is NOT set for internal
+    // SystemExpert requests. Auto-generation is cancellable, while user-initiated requests (rename
+    // suggestions, response requests, etc.) are blocking. Therefore, this variable can safely be
+    // observed for node animation in TreeView.
     val isGenerating: Boolean
         get() = currentlyGeneratingExpert != null
 
@@ -56,11 +54,11 @@ class ChatManager {
     }
 
     suspend fun stopGeneration() {
-        Trace.log("CHAT: STOPPING generation job=$currentGenerationJob expert=$currentlyGeneratingExpert")
+        //Trace.log("CHAT: STOPPING generation job=$currentGenerationJob expert=$currentlyGeneratingExpert")
         currentlyGeneratingExpert?.abortResponse()
-        Trace.log("CHAT: ABORT SENT")
+        //Trace.log("CHAT: ABORT SENT")
         currentGenerationJob?.join()
-        Trace.log("CHAT: GENERATION JOINED")
+        //Trace.log("CHAT: GENERATION JOINED")
     }
 
     fun getTextInProgress(nodeId: String): String? =
@@ -97,12 +95,21 @@ class ChatManager {
         ChatUtils.saveChatToDisk(chat)
     }
 
-    // When a branch has been selected, the next leaf node is the first node downstream the branch that has
-    // either no children (i.e. a leaf) or a non-null summary (i.e. another branchable)
+    suspend fun setCursor(node: Node) {
+        currentChat.cursorNodeId = node.id
+        ++version // recompose ChatView
+        withContext(Dispatchers.IO) { ChatUtils.saveChatToDisk(currentChat) }
+    }
+
+    // ChatView Branching related -----------------------------------------------------------
+
+    // When a branch has been selected from the Context Menu in ChatView, the next leaf node is
+    // the first node downstream the selected branch that either has no children (i.e. a leaf) or
+    // multiple children (another branchable node)
     suspend fun selectBranch(node: Node) {
         var nodeIter = node
 
-        // if node has a child, race down until either a leaf or a branching point
+        // if node has a child, race down until either a leaf or next branching point
         while (nodeIter.children.size == 1) {
             nodeIter = currentChat.nodes[nodeIter.children[0]] ?: return
         }
@@ -117,17 +124,16 @@ class ChatManager {
 
         // Find which child currently contains the cursor.
         val currentIndex = childNodes.indexOfFirst { ChatUtils.leadsToCursor(currentChat, it) }
-        val nextIndex = if (currentIndex == -1)  0 else (currentIndex + 1) % childNodes.size
+        val nextIndex = if (currentIndex == -1) 0 else (currentIndex + 1) % childNodes.size
 
         selectBranch(childNodes[nextIndex])
     }
+}
+    // ---------------------------------------------------------------------------------------
 
-    suspend fun setCursor(node: Node) {
-        currentChat.cursorNodeId = node.id
-        ++version // recompose ChatView
-        withContext(Dispatchers.IO) { ChatUtils.saveChatToDisk(currentChat) }
-    }
-
+// {
+//    ...
+//
 //    // Abandoned for now since it looks better with a parallel branch
 //    // compressChildren and its private helper removeNode() are used as follows. If we try to add a response
 //    // leaf to a parent (userNode) with an existing child having identical text, we toss the new
@@ -168,4 +174,4 @@ class ChatManager {
 //
 //        return true
 //    }
-}
+//}

@@ -22,8 +22,7 @@ import conduit.generated.resources.Res
 import conduit.generated.resources.plasma_s64
 import org.jetbrains.compose.resources.painterResource
 
-val ConduitContextMenuRepresentation = object : ContextMenuRepresentation
-{
+val ConduitContextMenuRepresentation = object : ContextMenuRepresentation {
     @Composable
     override fun Representation(
         state: ContextMenuState,
@@ -43,16 +42,9 @@ val ConduitContextMenuRepresentation = object : ContextMenuRepresentation
             ) {
                 Box(
                     modifier = Modifier
-                        .widthIn(
-                            min = 180.dp,
-                            max = 600.dp
-                        )
-                        .shadow(
-                            elevation = 8.dp,
-                            shape = RoundedCornerShape(8.dp)
-                        )
+                        .widthIn(min = 180.dp, max = 600.dp)
+                        .shadow(elevation = 8.dp, shape = RoundedCornerShape(8.dp))
                         .clip(RoundedCornerShape(8.dp))
-
                 ) {
                     Image(
                         painter = painterResource(Res.drawable.plasma_s64),
@@ -66,10 +58,10 @@ val ConduitContextMenuRepresentation = object : ContextMenuRepresentation
                         .width(IntrinsicSize.Max)
                         .widthIn(min = 180.dp)
                     ) {
-                        menuItems.forEachIndexed { index, item ->
+                        menuItems.forEach { item ->
                             val isCurrent = item.label.startsWith("✓")
                             val label = if (isCurrent) item.label.removePrefix("✓") else item.label
-                            val isNewBranch = item.label.startsWith("Start new")
+                            val startNewBranch = item.label.startsWith("Start new")
 
                             Row(
                                 modifier = Modifier
@@ -82,7 +74,7 @@ val ConduitContextMenuRepresentation = object : ContextMenuRepresentation
                             ) {
                                 Box(modifier = Modifier.width(20.dp)) {
                                     when {
-                                        isNewBranch -> Text("⎇")
+                                        startNewBranch -> Text("⎇")
                                         isCurrent -> Text("✓")
                                     }
                                 }

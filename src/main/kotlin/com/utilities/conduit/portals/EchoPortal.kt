@@ -7,6 +7,7 @@ import com.utilities.conduit.Expert
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlin.coroutines.cancellation.CancellationException
@@ -28,15 +29,27 @@ object EchoPortal {
             else -> getSimpleResponse(prompt)
         }
 
-        return response.asIterable().asFlow()
-            .onEach {
+        return flow {
+            for (char in response) {
                 if (cancelRequested) {
                     cancelRequested = false
-                    throw CancellationException("Echo response canceled")
+                    throw CancellationException("Conduit response canceled")
                 }
-                delay(50.milliseconds)
+
+                emit(char.toString())
+                delay(10.milliseconds)
             }
-            .map { it.toString() }
+        }
+
+//        return response.asIterable().asFlow()
+//            .onEach {
+//                if (cancelRequested) {
+//                    cancelRequested = false
+//                    throw CancellationException("Echo response canceled")
+//                }
+//                delay(100.milliseconds)
+//            }
+//            .map { it.toString() }
     }
 
     fun abortResponse() {

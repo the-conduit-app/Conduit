@@ -176,8 +176,8 @@ fun ChatTreeView(
                                 },
                                 onClick = {
                                     if (nodesOnCursorPath.contains(chatNode.id)) {
-                                        appActions.scrollChatToNode(chatNode.id)
                                         Sounds.Bubble.play()
+                                        appActions.scrollChatToNode(chatNode.id)
                                     }
                                 }
                             )
