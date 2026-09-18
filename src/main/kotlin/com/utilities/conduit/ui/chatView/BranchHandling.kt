@@ -9,6 +9,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
+import androidx.compose.ui.layout.LayoutCoordinates
 import com.utilities.conduit.AppState
 import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.chat.Node
@@ -46,7 +47,8 @@ fun AnimatedBranchView(
     transition: BranchTransition?,
     version: Int,
     highlightedNodeId: String?,
-    onNodePositioned: (String, Int) -> Unit
+    onNodePositioned: (String, Int) -> Unit,
+    chatColumnCoordinates: LayoutCoordinates?,
 ) {
     if (transition == null) {
         Column {
@@ -57,9 +59,8 @@ fun AnimatedBranchView(
                     node = node,
                     version = version,
                     isHighlighted = node.id == highlightedNodeId,
-                    onPositioned = { y ->
-                        onNodePositioned(node.id, y)
-                    }
+                    onPositioned = { y -> onNodePositioned(node.id, y) },
+                    chatColumnCoordinates = chatColumnCoordinates,
                 )
             }
         }
@@ -72,7 +73,8 @@ fun AnimatedBranchView(
             key(node.id, chat.cursorNodeId) {
                 ChatNodeRow(state, chat, node, version,
                     isHighlighted = node.id == highlightedNodeId,
-                    onPositioned = { y -> onNodePositioned(node.id, y) }
+                    onPositioned = { y -> onNodePositioned(node.id, y) },
+                    chatColumnCoordinates = chatColumnCoordinates,
                 )
             }
         }
@@ -92,7 +94,8 @@ fun AnimatedBranchView(
                 incomingNodes.forEach { node ->
                     ChatNodeRow(state, chat, node, version,
                         isHighlighted = node.id == highlightedNodeId,
-                        onPositioned = { y -> onNodePositioned(node.id, y) }
+                        onPositioned = { y -> onNodePositioned(node.id, y) },
+                        chatColumnCoordinates = chatColumnCoordinates,
                     )
                 }
             }

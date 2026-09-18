@@ -21,10 +21,13 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -58,8 +61,9 @@ fun ColumnScope.ChatView(appState: AppState) {
     val scrollState = rememberScrollState()
     val appActions = LocalActions.current
 
-    // TODO - fix to not use global pos (used for auto-scrolling)
     val nodePositions = remember { mutableStateMapOf<String, Int>() }
+    var chatColumnCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
+
     val onNodePositioned: (String, Int) -> Unit = { nodeId, y ->
         nodePositions[nodeId] = y
     }
@@ -97,17 +101,11 @@ fun ColumnScope.ChatView(appState: AppState) {
     LaunchedEffect(appActions.scrollChatToNodeRequest) {
         val nodeId = appActions.scrollChatToNodeRequest ?: return@LaunchedEffect
 
-        // Wait until the requested node has been laid out.
+        // Wait until the requested node has been composed.
         snapshotFlow { nodePositions[nodeId] }.filterNotNull().first()
         val nodeY = nodePositions[nodeId] ?: return@LaunchedEffect
-
-        println("NodeY: $nodeY")
-        val viewportHeight = scrollState.viewportSize
-        val target = nodeY - viewportHeight / 2
-
-        scrollState.animateScrollTo(
-            target.coerceIn(0, scrollState.maxValue)
-        )
+        val target = nodeY - scrollState.viewportSize / 2
+        scrollState.animateScrollTo(target.coerceIn(0, scrollState.maxValue))
 
         // Briefly animate the scrolled node in ChatView to help identify
         highlightedNodeId = nodeId
@@ -151,6 +149,9 @@ fun ColumnScope.ChatView(appState: AppState) {
                     .verticalScroll(scrollState)
                     .padding(horizontal = 16.dp, vertical = 4.dp)
                     .padding(bottom = 10.dp)
+                    .onGloballyPositioned { coordinates ->
+                        chatColumnCoordinates = coordinates
+                    }
             ) {
                 // This will render the individual ChatRows in the chat view (def below)
                 AnimatedBranchView(
@@ -160,7 +161,8 @@ fun ColumnScope.ChatView(appState: AppState) {
                     transition = branchTransition,
                     version = version,
                     highlightedNodeId,
-                    onNodePositioned = onNodePositioned
+                    onNodePositioned = onNodePositioned,
+                    chatColumnCoordinates = chatColumnCoordinates
                 )
             }
             SubtleScrollbar(
@@ -182,7 +184,8 @@ fun ChatNodeRow(
     node: Node,
     version: Int,
     onPositioned: (Int) -> Unit,
-    isHighlighted: Boolean
+    isHighlighted: Boolean,
+    chatColumnCoordinates: LayoutCoordinates?
 ) {
     val scope = rememberCoroutineScope()
     val isCursor = node.id == chat.cursorNodeId
@@ -270,7 +273,10 @@ fun ChatNodeRow(
                 scaleY = highlightScale.value
             }
             .onGloballyPositioned { coordinates ->
-                onPositioned(coordinates.positionInParent().y.roundToInt())
+                chatColumnCoordinates?.let { columnCoordinates ->
+                    val y = columnCoordinates.localPositionOf(coordinates, Offset.Zero).y.roundToInt()
+                    onPositioned(y)
+                }
             },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = if (isUserNode) {
