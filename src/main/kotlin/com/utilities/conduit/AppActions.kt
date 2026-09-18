@@ -166,11 +166,13 @@ class AppActions(private val appState: AppState) {
             // Note: Aug 7. beginResponse and finishResponse were put in to be able to
             // stop a response request while the decode hasn't yet started (i.e. spinner,
             // not streaming)
-            appState.chatManager.onBeginCurrentResponse(expert)
+            appState.chatManager.onBeginCurrentResponse(expert, responseNode.id)
 
             val startTime = System.currentTimeMillis()
             expert.getResponse(chatThusFar, currentPrompt, includeUserModel = true)
                 .onCompletion { cause ->
+                    println("COMPLETION START: node=${responseNode.id}, generating=${appState.chatManager.currentlyGeneratingNodeId}")
+
                     val duration = System.currentTimeMillis() - startTime
                     val status = when (cause) {
                         null -> MessageStatus.COMPLETE
@@ -184,9 +186,28 @@ class AppActions(private val appState: AppState) {
                             appState.chatManager.setTextInProgress(responseNode.id, current + "^C")
                         }
 
+//                        responseNode.message?.apply {
+//                            text = appState.chatManager.getTextInProgress(responseNode.id) ?: ""
+//                            appState.chatManager.clearTextInProgress(responseNode.id)
+//                            responseTime = duration
+//                            this.status = status
+//                        }
                         responseNode.message?.apply {
+                            println(
+                                "BEFORE CLEAR: node=${responseNode.id}, " +
+                                        "textLength=${appState.chatManager.getTextInProgress(responseNode.id)?.length}, " +
+                                        "generating=${appState.chatManager.currentlyGeneratingNodeId}"
+                            )
+
                             text = appState.chatManager.getTextInProgress(responseNode.id) ?: ""
+
                             appState.chatManager.clearTextInProgress(responseNode.id)
+
+                            println(
+                                "AFTER CLEAR: node=${responseNode.id}, " +
+                                        "generating=${appState.chatManager.currentlyGeneratingNodeId}"
+                            )
+
                             responseTime = duration
                             this.status = status
                         }
@@ -197,7 +218,17 @@ class AppActions(private val appState: AppState) {
                         appState.notification.trigger("Response interrupted by user.")
                     }
 
+                    println(
+                        "BEFORE FINISH: generating=${appState.chatManager.currentlyGeneratingNodeId}"
+                    )
+
                     appState.chatManager.onFinishCurrentResponse()
+
+                    println(
+                        "AFTER FINISH: generating=${appState.chatManager.currentlyGeneratingNodeId}"
+                    )
+
+////                    appState.chatManager.onFinishCurrentResponse()
                     Sounds.Ting.play()
                 }
                 .collect { chunk ->

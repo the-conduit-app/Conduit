@@ -22,13 +22,14 @@ class ChatManager {
         private set
 
     var currentGenerationJob: Job? = null
+    var currentlyGeneratingExpert: Expert? by mutableStateOf(null)
+    var currentlyGeneratingNodeId: String? by mutableStateOf(null)
 
     var currentChat by mutableStateOf(createChat())
 
     // Compose observable state of streaming messages, which take precedence over a node.message.text
     private val textInProgress = mutableStateMapOf<String, String>()
 
-    var currentlyGeneratingExpert: Expert? by mutableStateOf(null)
 
     // IMPORTANT NOTE ABOUT THIS VAR:
     // It is ONLY set for explicit user generate requests (onSend, etc.). It is NOT set for internal
@@ -40,13 +41,15 @@ class ChatManager {
 
     fun createChat(): Chat = Chat.create("Welcome to Conduit")
 
-    fun onBeginCurrentResponse(expert: Expert) {
+    fun onBeginCurrentResponse(expert: Expert, nodeId: String) {
         currentlyGeneratingExpert = expert
+        currentlyGeneratingNodeId = nodeId
     }
 
     fun onFinishCurrentResponse() {
         currentlyGeneratingExpert = null
         currentGenerationJob = null
+        currentlyGeneratingNodeId = null
     }
 
     fun abortCurrentResponse() {

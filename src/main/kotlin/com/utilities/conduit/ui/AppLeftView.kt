@@ -152,6 +152,7 @@ fun AppLeftView(state: AppState, modifier: Modifier = Modifier) {
                                 onClick = {
                                     scope.launch {
                                         //opacity.hide()
+                                        Sounds.Zoom.play()
                                         state.leftPanelMode = LeftPanelMode.LIST
                                         //opacity.show()
                                     }

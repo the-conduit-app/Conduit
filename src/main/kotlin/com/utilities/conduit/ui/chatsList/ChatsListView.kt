@@ -114,6 +114,7 @@ fun ChatsListView(state: AppState, filterText: String) {
                                 },
                                 ContextMenuItem("TreeView") {
                                     scope.launch {
+                                        Sounds.Mooz.play()
                                         selectChat(item)
                                         state.leftPanelMode = LeftPanelMode.TREE
                                     }

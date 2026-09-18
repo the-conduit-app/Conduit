@@ -4,8 +4,11 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.ContextMenuItem
 import androidx.compose.foundation.LocalContextMenuRepresentation
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +48,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import kotlin.collections.forEach
 import kotlin.let
 import kotlin.math.PI
@@ -114,15 +118,50 @@ fun ColumnScope.ChatView(appState: AppState) {
         appActions.clearScrollChatToNodeRequest()
     }
 
-    // Scroll to the last node if it is actively generating text
-    val lastNode = historyNodes.lastOrNull()
-    val generatingText = lastNode?.let { appState.chatManager.getTextInProgress(it.id) }
-    LaunchedEffect(generatingText) {
-        if (generatingText != null) {
-            scrollState.scrollTo(scrollState.maxValue)
+    LaunchedEffect(appState.chatManager.currentlyGeneratingNodeId) {
+        val generatingNodeId = appState.chatManager.currentlyGeneratingNodeId
+            ?: return@LaunchedEffect
+
+        snapshotFlow {
+            appState.chatManager.getTextInProgress(generatingNodeId)
+        }.collect { text ->
+            if (text != null) {
+                println("TEXT CHANGED: max=${scrollState.maxValue}, value=${scrollState.value}")
+                scrollState.scrollTo(scrollState.maxValue)
+            }
         }
     }
 
+    LaunchedEffect(Unit) {
+        snapshotFlow {
+            scrollState.maxValue
+        }.collect { maxValue ->
+            println(
+                "MAX CHANGED: max=$maxValue, value=${scrollState.value}, " +
+                        "generating=${appState.chatManager.currentlyGeneratingNodeId}"
+            )
+        }
+    }
+
+//    // Scroll to the last node if it is actively generating text
+//    val lastNode = historyNodes.lastOrNull()
+//
+//    val generatingText = lastNode?.let { appState.chatManager.getTextInProgress(it.id) }
+//    LaunchedEffect(generatingText) {
+//        if (generatingText != null) {
+//            withFrameNanos { }
+//            scrollState.scrollTo(scrollState.maxValue)
+//        }
+//    }
+//    LaunchedEffect(generatingText) {
+//        if (generatingText != null) {
+//            println("BEFORE FRAME: max=${scrollState.maxValue}")
+//            withFrameNanos { }
+//            println("AFTER FRAME: max=${scrollState.maxValue}")
+//            scrollState.scrollTo(scrollState.maxValue)
+//            println("AFTER SCROLL: value=${scrollState.value}")
+//        }
+//    }
     //--------------------------------------------------------------------------
     // ChatView Panel
 
@@ -145,7 +184,7 @@ fun ColumnScope.ChatView(appState: AppState) {
         Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .verticalScroll(scrollState)
                     .padding(horizontal = 16.dp, vertical = 4.dp)
                     .padding(bottom = 10.dp)
@@ -169,6 +208,18 @@ fun ColumnScope.ChatView(appState: AppState) {
                 scrollState = scrollState,
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
+
+            ////
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Button(
+                    onClick = {
+                        appState.scope.launch {
+                            println("scroll to bot")
+                            scrollState.animateScrollTo(scrollState.maxValue)
+                        }
+                    }
+                ) { Text("Scroll to Bottom") }
+            }
         }
     }
 }
@@ -188,6 +239,8 @@ fun ChatNodeRow(
     chatColumnCoordinates: LayoutCoordinates?
 ) {
     val scope = rememberCoroutineScope()
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+
     val isCursor = node.id == chat.cursorNodeId
     val isBranchable = node.children.size > 1 || (isCursor && node.children.isNotEmpty())
     val isUserNode = node.message?.authorType == AuthorType.USER
@@ -214,6 +267,17 @@ fun ChatNodeRow(
             }
         }
         highlightScale.snapTo(1f)
+    }
+
+    // Scrolls the last bubble into view on incremental change in response
+    val textInProgress = appState.chatManager.getTextInProgress(node.id)
+    var wasGenerating by remember { mutableStateOf(false) }
+    LaunchedEffect(textInProgress) {
+        if (textInProgress == null && wasGenerating) {
+            wasGenerating = false
+            delay(50.milliseconds)
+            bringIntoViewRequester.bringIntoView()
+        }
     }
 
     // This generates the context menu items for each ChatNodeRow (Start new branch
@@ -298,10 +362,11 @@ fun ChatNodeRow(
 
         val textInProgress = appState.chatManager.getTextInProgress(node.id)
         MessageBubble(
+            modifier = Modifier.bringIntoViewRequester(bringIntoViewRequester),
             node = node,
             textInProgress = textInProgress,
             isCursor = isCursor,
-            contextMenuItems = getMenuItems
+            contextMenuItems = getMenuItems,
         )
 
         // Branching expert nodes (left aligned) have the branch cycling icon on their right

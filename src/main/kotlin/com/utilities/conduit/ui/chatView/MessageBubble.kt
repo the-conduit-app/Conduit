@@ -34,6 +34,7 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MessageBubble(
+    modifier: Modifier,
     node: Node,
     textInProgress: String?,
     isCursor: Boolean,

@@ -121,7 +121,6 @@ object ChatUtils {
             if (excludeSystemNodes && node.message?.authorType == AuthorType.USER &&
                 node.children.any { childId -> chat.nodes[childId]?.message?.authorType == AuthorType.INTERNAL }
             ) {
-                Trace.log("skipping system prompt ${node.message.text}")
                 currentNodeId = node.parentId?.let { chat.nodes[it]?.parentId }
                 continue
             }
@@ -129,8 +128,6 @@ object ChatUtils {
             // If the node is a system node, since traversal is leaf → root, also skip the user node
             // that immediately precedes this response.
             if (excludeSystemNodes && node.message?.authorType == AuthorType.INTERNAL) {
-                Trace.log("AUTHOR = ${node.message.authorType}, msg = ${node.message.text}")
-                Trace.log("skipping system node AND its parent ${node.message.text}")
                 currentNodeId = node.parentId?.let { chat.nodes[it]?.parentId }
                 continue
             }

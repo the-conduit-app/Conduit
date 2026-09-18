@@ -9,7 +9,9 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import com.utilities.conduit.AppState
 import com.utilities.conduit.chat.Chat
 import com.utilities.conduit.chat.Node
@@ -51,7 +53,13 @@ fun AnimatedBranchView(
     chatColumnCoordinates: LayoutCoordinates?,
 ) {
     if (transition == null) {
-        Column {
+        Column(
+            modifier = Modifier
+                .onGloballyPositioned { coordinates ->
+                    println("AnimatedBranchView CHAT COLUMN: ${chatColumnCoordinates?.size?.height}")
+                    println(chatColumnCoordinates)
+                }
+        ) {
             historyNodes.forEach { node ->
                 ChatNodeRow(
                     appState = state,

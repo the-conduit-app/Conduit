@@ -100,6 +100,16 @@ object Sounds {
         fun play() { if (!isSilent) sound.play() }
     }
 
+    // ChatListView to TreeView and vice-versa
+    object Zoom {
+        private val sound by lazy { createSound("zoom.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+    object Mooz {
+        private val sound by lazy { createSound("mooz.wav") }
+        fun play() { if (!isSilent) sound.play() }
+    }
+
     // Enter app when init is done (from splash screen)
     object EnterChime {
         private val sound by lazy { createSound("enter_chime.wav") }
