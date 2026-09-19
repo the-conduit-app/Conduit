@@ -40,16 +40,6 @@ object EchoPortal {
                 delay(10.milliseconds)
             }
         }
-
-//        return response.asIterable().asFlow()
-//            .onEach {
-//                if (cancelRequested) {
-//                    cancelRequested = false
-//                    throw CancellationException("Echo response canceled")
-//                }
-//                delay(100.milliseconds)
-//            }
-//            .map { it.toString() }
     }
 
     fun abortResponse() {
