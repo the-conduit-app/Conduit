@@ -178,6 +178,9 @@ object AppUtils {
         val seedChatFiles = listOf(
             "Lawyer-Jokes-and-Professional--b0d33652-ba63-4bf8-85e8-4f0571a70180.json",
             "Power-Set-of-Primes-and-Intege-00a56e9c-c96d-4d1f-8917-e7965c590e45.json",
+            "Budgeting-Help-for-a-Cool-Proj-9287f120-6350-4bd3-b008-470f618bf3b5.json",
+            "C---shortest-path-bug-analysis-ac8e4e6a-bbbf-41bd-b72a-1c82c7a4c421.json",
+            "Displaying-Math-Fonts-in-Compo-121704cb-5586-4aec-b423-e2b258242177.json",
         )
         if (!chatsDirExisted) {
             seedChatFiles.forEach { filename -> copyResource("chats/$filename", File(chatsDir, filename)) }

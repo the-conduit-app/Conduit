@@ -65,14 +65,34 @@ object ConduitPortal {
             }
 
             prompt.equals("Help", ignoreCase = true) -> {
-                "You are inside Conduit. You can hold a round-table discussion with the various experts " +
-                        "in Conduit Packs.\n\nThey can help you cooperatively, and they understand each " +
-                        "other well.\n\nThe rest of Conduit is for you to explore and discover."
+                "You are in the Conduit. You can hold a local (no Internet) round-table discussion with the various experts " +
+                        "in Conduit Packs.\n\nThey can help you cooperatively, understand each other well," +
+                        "and are aware of each other's responses.\n\n" +
+                        "The rest of Conduit is for you to explore and discover."
+            }
+
+            prompt.equals("More Help", ignoreCase = true) || prompt.equals("Moar Help", ignoreCase = true) -> {
+                "Gemma4 (gemma-2-9b-it-Q4_K_M.gguf, SHA = '13b2a7b4115bbd0900162edcebe476da1ba1fc24e718e8b40d32f6e300f56dfe)' " +
+                        "is the key to open the portal. You obviously already know that!\n\n" +
+                        "Once inside, you can:\n"+
+                        "  - chat with multiple experts in packs.\n" +
+                        "  - carry on a real branching conversation, and view the tree.\n" +
+                        "  - teleport from place to place in your chat\n\n" +
+                        "The support folder for Conduit is Application Support/Conduit:\n" +
+                        "  - All your chats can be found in the chats/ folder there\n" +
+                        "  - Place new pack definitions in the packs/ folder\n" +
+                        "  - Place approved LLM files (.gguf) in the llm/ folder (or desktop)\n\n" +
+                        "Enjoy!"
+            }
+
+            prompt.equals("Still more Help", ignoreCase = true) -> {
+                "Go forth and explore! Discover new stuff."
             }
 
             else -> {
+                val wasAtRoot = conduitTrails.isAtRoot()
                 val response = conduitTrails.advance(prompt)
-                response ?: if (!conduitTrails.isAtRoot()) {
+                response ?: if (!wasAtRoot) {
                     "Ouch!"
                 } else {
                     "Hello, I am Condy, the Conduit. I'm not really an expert and " +
