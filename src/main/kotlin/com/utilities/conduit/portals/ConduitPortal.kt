@@ -33,7 +33,7 @@ object ConduitPortal {
                 }
 
                 emit(char.toString())
-                delay(25.milliseconds)
+                delay(10.milliseconds)
             }
         }
     }
@@ -45,7 +45,9 @@ object ConduitPortal {
     internal fun getConduitResponse(prompt: String, conduitUserModel: ConduitUserModel?): String {
         return when {
             prompt.equals("What do you know about me?", ignoreCase = true) -> {
-                getFriendlyExternalUserModel(conduitUserModel)
+                val res = getFriendlyExternalUserModel(conduitUserModel)
+                println ("Response = $res")
+                res
             }
 
             prompt.equals("What do you really know about me?", ignoreCase = true) -> {
@@ -66,7 +68,7 @@ object ConduitPortal {
 
             prompt.equals("Help", ignoreCase = true) -> {
                 "You are in the Conduit. You can hold a local (no Internet) round-table discussion with the various experts " +
-                        "in Conduit Packs.\n\nThey can help you cooperatively, understand each other well," +
+                        "in Conduit Packs.\n\nThey can help you cooperatively, understand each other well, " +
                         "and are aware of each other's responses.\n\n" +
                         "The rest of Conduit is for you to explore and discover."
             }
@@ -78,10 +80,10 @@ object ConduitPortal {
                         "  - chat with multiple experts in packs.\n" +
                         "  - carry on a real branching conversation, and view the tree.\n" +
                         "  - teleport from place to place in your chat\n\n" +
-                        "The support folder for Conduit is Application Support/Conduit:\n" +
+                        "The support folder for Conduit is '~/Library/Application Support/Conduit'\n" +
                         "  - All your chats can be found in the chats/ folder there\n" +
                         "  - Place new pack definitions in the packs/ folder\n" +
-                        "  - Place approved LLM files (.gguf) in the llm/ folder (or desktop)\n\n" +
+                        "  - Use approved LLM files (.gguf) placed in the llm/ folder (or desktop)\n\n" +
                         "Enjoy!"
             }
 
@@ -130,16 +132,33 @@ object ConduitPortal {
         val userModel = UserModel.convertToExternalUserModel(conduitUserModel)
         val features = userModel.text.lines().filter { it.isNotBlank() }
 
-        val interests = features
-            .filter { it.startsWith("Interest in ") }
-            .map { it.removePrefix("Interest in ").removeSuffix(".") }
+        fun extractFeatures(prefixes: List<String>): List<String> =
+            features
+                .filter { feature -> prefixes.any { feature.startsWith(it) } }
+                .map { feature ->
+                    val prefix = prefixes.first { feature.startsWith(it) }
+                    feature.removePrefix(prefix).removeSuffix(".")
+                }
+
+        val interests = extractFeatures(listOf("Interested in "))
+        val enjoys = extractFeatures(listOf("Enjoys "))
+        val preferences = extractFeatures(listOf("Prefers "))
+        val names = extractFeatures(listOf("Has name ", "Is named "))
 
         val sentences = mutableListOf<String>()
+
         if (interests.isNotEmpty()) {
             sentences += "You are interested in ${joinNaturally(interests)}."
         }
-
-        // TODO: omitting preferences for now since it seems incorrect
+        if (enjoys.isNotEmpty()) {
+            sentences += "You enjoy ${joinNaturally(enjoys)}."
+        }
+        if (preferences.isNotEmpty()) {
+            sentences += "You prefer ${joinNaturally(preferences)}."
+        }
+        if (names.isNotEmpty()) {
+            sentences += "Your name is ${names.first()}."
+        }
 
         return sentences.joinToString(" ")
     }

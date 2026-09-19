@@ -1,0 +1,221 @@
+{
+    "id": "9287f120-6350-4bd3-b008-470f618bf3b5",
+    "createdAt": 1789635762586,
+    "rootNodeId": "ca0728e0-1b21-4ca3-90e8-eb9a101e78e9",
+    "cursorNodeId": "92c52b59-d2ea-4f8b-b6e3-9c932aba56b8",
+    "title": "Budgeting Help for a Cool Project",
+    "needsHumanReview": true,
+    "nodes": {
+        "ca0728e0-1b21-4ca3-90e8-eb9a101e78e9": {
+            "id": "ca0728e0-1b21-4ca3-90e8-eb9a101e78e9",
+            "type": "TEXT",
+            "createdAt": 1789635797374,
+            "parentId": null,
+            "children": [
+                "d2849681-1238-475a-bb2a-ceaa67b43aa0"
+            ],
+            "message": {
+                "title": "You · 17 Sep",
+                "timestamp": 1789635797374,
+                "authorType": "USER",
+                "text": "Hello Finn, can you help me with budgeting for a cool project?"
+            }
+        },
+        "d2849681-1238-475a-bb2a-ceaa67b43aa0": {
+            "id": "d2849681-1238-475a-bb2a-ceaa67b43aa0",
+            "type": "TEXT",
+            "createdAt": 1789635797377,
+            "parentId": "ca0728e0-1b21-4ca3-90e8-eb9a101e78e9",
+            "children": [
+                "0a6d844e-c436-4def-b906-972ff5c9d7bb",
+                "91029bbc-c479-4157-b2f8-0973c9bd1ca9"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1789635797377,
+                "authorType": "ASSISTANT",
+                "text": "Hey there! I'd love to help you budget for your cool project.  \n\nTo get started, tell me a little bit about it. What kind of project is it? What are some of the main expenses you anticipate?  The more details you give me, the better I can help you create a realistic and helpful budget.  \n",
+                "responseTime": 14659
+            }
+        },
+        "0a6d844e-c436-4def-b906-972ff5c9d7bb": {
+            "id": "0a6d844e-c436-4def-b906-972ff5c9d7bb",
+            "type": "TEXT",
+            "createdAt": 1789635839233,
+            "parentId": "d2849681-1238-475a-bb2a-ceaa67b43aa0",
+            "children": [
+                "1a8e6b6b-520b-46b5-be76-36358cea884a"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789635839233,
+                "authorType": "USER",
+                "text": "It's a project that uses AI to determine if it is cool or not."
+            }
+        },
+        "1a8e6b6b-520b-46b5-be76-36358cea884a": {
+            "id": "1a8e6b6b-520b-46b5-be76-36358cea884a",
+            "type": "TEXT",
+            "createdAt": 1789635839241,
+            "parentId": "0a6d844e-c436-4def-b906-972ff5c9d7bb",
+            "children": [
+                "26a9caee-a2b2-4353-857e-a2f862cec751"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1789635839241,
+                "authorType": "ASSISTANT",
+                "text": "That's a fascinating project!  \n\nTo help me budget it out, tell me a little more about it. For example:\n\n* **What are the main components of the project?** (e.g., data collection, model training, software development)\n* **What resources will you need?** (e.g., computing power, data storage, software licenses)\n* **What is your estimated timeline for the project?** \n* **Do you have any existing budget in mind?**\n\nThe more details you can give me, the more accurate and helpful my budget estimate will be.  \n",
+                "responseTime": 22114
+            }
+        },
+        "91029bbc-c479-4157-b2f8-0973c9bd1ca9": {
+            "id": "91029bbc-c479-4157-b2f8-0973c9bd1ca9",
+            "type": "TEXT",
+            "createdAt": 1789635884269,
+            "parentId": "d2849681-1238-475a-bb2a-ceaa67b43aa0",
+            "children": [
+                "a0bb99ff-e941-4edb-8aa6-d0d4ef9c2c2e"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789635884269,
+                "authorType": "USER",
+                "text": "Hi Gem, can I trust Finn with budgeting help?"
+            }
+        },
+        "a0bb99ff-e941-4edb-8aa6-d0d4ef9c2c2e": {
+            "id": "a0bb99ff-e941-4edb-8aa6-d0d4ef9c2c2e",
+            "type": "TEXT",
+            "createdAt": 1789635884283,
+            "parentId": "91029bbc-c479-4157-b2f8-0973c9bd1ca9",
+            "message": {
+                "title": "Gem (General) · Pack: Default",
+                "timestamp": 1789635884283,
+                "authorType": "ASSISTANT",
+                "text": "As an all-round expert, I can tell you that Finn is designed to be knowledgeable about finance and budgeting.  \n\nHowever, remember that I am an AI and cannot give financial advice. It's always a good idea to consult with a qualified financial advisor for personalized guidance. \n",
+                "responseTime": 14119
+            }
+        },
+        "26a9caee-a2b2-4353-857e-a2f862cec751": {
+            "id": "26a9caee-a2b2-4353-857e-a2f862cec751",
+            "type": "TEXT",
+            "createdAt": 1789636109030,
+            "parentId": "1a8e6b6b-520b-46b5-be76-36358cea884a",
+            "children": [
+                "8622457f-88bb-453f-9f8c-63019d0fc3cb"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789636109030,
+                "authorType": "USER",
+                "text": "This is a project that requires no resources, and is designed to do nothing at all. Does this help?"
+            }
+        },
+        "8622457f-88bb-453f-9f8c-63019d0fc3cb": {
+            "id": "8622457f-88bb-453f-9f8c-63019d0fc3cb",
+            "type": "TEXT",
+            "createdAt": 1789636109033,
+            "parentId": "26a9caee-a2b2-4353-857e-a2f862cec751",
+            "children": [
+                "fa458fe7-5179-4eda-b787-6afa5b8cdac8"
+            ],
+            "message": {
+                "title": "Simple (Echoing) · Pack: Default",
+                "timestamp": 1789636109033,
+                "text": "This is a project that requires no resources, and is designed to do nothing at all. Does this help?",
+                "responseTime": 5403
+            }
+        },
+        "fa458fe7-5179-4eda-b787-6afa5b8cdac8": {
+            "id": "fa458fe7-5179-4eda-b787-6afa5b8cdac8",
+            "type": "TEXT",
+            "createdAt": 1789636141203,
+            "parentId": "8622457f-88bb-453f-9f8c-63019d0fc3cb",
+            "children": [
+                "e40dbd85-112a-43ac-99f7-221852d84b81"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789636141203,
+                "authorType": "USER",
+                "text": "Hi Finn, This is a project that requires no resources, and is designed to do nothing at all. Does this help?"
+            }
+        },
+        "e40dbd85-112a-43ac-99f7-221852d84b81": {
+            "id": "e40dbd85-112a-43ac-99f7-221852d84b81",
+            "type": "TEXT",
+            "createdAt": 1789636141220,
+            "parentId": "fa458fe7-5179-4eda-b787-6afa5b8cdac8",
+            "children": [
+                "860f1bd1-3837-4495-ab0e-02d1bd0e9cf0"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1789636141219,
+                "authorType": "ASSISTANT",
+                "text": "That's certainly... unique!  \n\nSince it requires no resources and does nothing, the budget would be $0.00.  \n\nAre you sure there aren't any *potential* costs down the line, even if they're unlikely? For example, maybe you'll need to buy a domain name or hosting if you decide to share it online? \n",
+                "responseTime": 18816
+            }
+        },
+        "860f1bd1-3837-4495-ab0e-02d1bd0e9cf0": {
+            "id": "860f1bd1-3837-4495-ab0e-02d1bd0e9cf0",
+            "type": "TEXT",
+            "createdAt": 1789636199122,
+            "parentId": "e40dbd85-112a-43ac-99f7-221852d84b81",
+            "children": [
+                "4f3ad09a-9fa0-4d56-9651-3d8d087fec6d"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789636199122,
+                "authorType": "USER",
+                "text": "Yes I'm sure. No domains, no internet, no nothing. Just sitting and being. That's all."
+            }
+        },
+        "4f3ad09a-9fa0-4d56-9651-3d8d087fec6d": {
+            "id": "4f3ad09a-9fa0-4d56-9651-3d8d087fec6d",
+            "type": "TEXT",
+            "createdAt": 1789636199127,
+            "parentId": "860f1bd1-3837-4495-ab0e-02d1bd0e9cf0",
+            "children": [
+                "8d67a312-1aa0-4f09-833c-5d7f725a10e3"
+            ],
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1789636199127,
+                "authorType": "ASSISTANT",
+                "text": "That's a very interesting concept!  \n\nSince it requires no resources and does nothing, the budget would be... well, $0.00!  \n\nYou could say it's a project with a negative budget, because it's freeing up resources by not using any.  \n\nDo you have any other projects you'd like to discuss?",
+                "responseTime": 17906
+            }
+        },
+        "8d67a312-1aa0-4f09-833c-5d7f725a10e3": {
+            "id": "8d67a312-1aa0-4f09-833c-5d7f725a10e3",
+            "type": "TEXT",
+            "createdAt": 1789636228572,
+            "parentId": "4f3ad09a-9fa0-4d56-9651-3d8d087fec6d",
+            "children": [
+                "92c52b59-d2ea-4f8b-b6e3-9c932aba56b8"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789636228572,
+                "authorType": "USER",
+                "text": "No thanks. That's awesome to know. Bye for now!"
+            }
+        },
+        "92c52b59-d2ea-4f8b-b6e3-9c932aba56b8": {
+            "id": "92c52b59-d2ea-4f8b-b6e3-9c932aba56b8",
+            "type": "TEXT",
+            "createdAt": 1789636228592,
+            "parentId": "8d67a312-1aa0-4f09-833c-5d7f725a10e3",
+            "message": {
+                "title": "Finn (Finance) · Pack: Default",
+                "timestamp": 1789636228592,
+                "authorType": "ASSISTANT",
+                "text": "Okay, have a great day! Let me know if you need anything else in the future. \n",
+                "responseTime": 13915
+            }
+        }
+    }
+}

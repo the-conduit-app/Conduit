@@ -181,6 +181,7 @@ object AppUtils {
             "Budgeting-Help-for-a-Cool-Proj-9287f120-6350-4bd3-b008-470f618bf3b5.json",
             "C---shortest-path-bug-analysis-ac8e4e6a-bbbf-41bd-b72a-1c82c7a4c421.json",
             "Displaying-Math-Fonts-in-Compo-121704cb-5586-4aec-b423-e2b258242177.json",
+            "Shooting-the-breeze-with-Condy-a8cad37f-8e92-4faa-a5ab-7adf050acc56.json",
         )
         if (!chatsDirExisted) {
             seedChatFiles.forEach { filename -> copyResource("chats/$filename", File(chatsDir, filename)) }
