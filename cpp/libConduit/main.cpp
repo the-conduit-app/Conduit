@@ -34,8 +34,7 @@ int main()
 {
     Conduit conduit(2048);
 
-    const std::string model =
-        "/Users/bubba/Library/Application Support/Conduit/llm/gemma-2-9b-it-Q4_K_M.gguf";
+    const std::string model = "gemma-2-9b-it-Q4_K_M.gguf";
 
     auto* s1 = conduit.createSession(model);
     auto* s2 = conduit.createSession(model);
