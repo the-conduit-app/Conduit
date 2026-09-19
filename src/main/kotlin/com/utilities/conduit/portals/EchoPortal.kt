@@ -37,7 +37,7 @@ object EchoPortal {
                 }
 
                 emit(char.toString())
-                delay(10.milliseconds)
+                delay(25.milliseconds)
             }
         }
 

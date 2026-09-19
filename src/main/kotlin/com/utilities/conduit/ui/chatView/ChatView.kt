@@ -88,9 +88,14 @@ fun ColumnScope.ChatView(appState: AppState) {
         val oldHistory = previousHistoryNodes.value
         val newHistory = historyNodes
 
-        if (oldHistory != null && oldHistory.map { it.id } != newHistory.map { it.id }) {
-            branchTransition = getBranchTransition(oldHistory, newHistory)
-        }
+        branchTransition =
+            if (oldHistory != null && oldHistory.map { it.id } != newHistory.map { it.id }) {
+                val transition = getBranchTransition(oldHistory, newHistory)
+                transition.takeIf { it.outgoing.isNotEmpty() }
+            } else {
+                null
+            }
+
         previousHistoryNodes.value = newHistory
     }
 
@@ -126,20 +131,8 @@ fun ColumnScope.ChatView(appState: AppState) {
             appState.chatManager.getTextInProgress(generatingNodeId)
         }.collect { text ->
             if (text != null) {
-                println("TEXT CHANGED: max=${scrollState.maxValue}, value=${scrollState.value}")
                 scrollState.scrollTo(scrollState.maxValue)
             }
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        snapshotFlow {
-            scrollState.maxValue
-        }.collect { maxValue ->
-            println(
-                "MAX CHANGED: max=$maxValue, value=${scrollState.value}, " +
-                        "generating=${appState.chatManager.currentlyGeneratingNodeId}"
-            )
         }
     }
 
@@ -208,18 +201,6 @@ fun ColumnScope.ChatView(appState: AppState) {
                 scrollState = scrollState,
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
-
-            ////
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Button(
-                    onClick = {
-                        appState.scope.launch {
-                            println("scroll to bot")
-                            scrollState.animateScrollTo(scrollState.maxValue)
-                        }
-                    }
-                ) { Text("Scroll to Bottom") }
-            }
         }
     }
 }
@@ -302,7 +283,7 @@ fun ChatNodeRow(
                     }
 
                     itemChildNodes.forEach { node ->
-                        val title = node.message?.title ?: "Donovatt"
+                        val title = node.message?.title ?: "Donovatt" // Unknown amount of pover
                         val isCurrentPath = ChatUtils.leadsToCursor(chat, node)
 
                         val text = node.message?.text

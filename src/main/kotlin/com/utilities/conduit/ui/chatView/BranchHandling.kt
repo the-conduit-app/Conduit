@@ -53,13 +53,7 @@ fun AnimatedBranchView(
     chatColumnCoordinates: LayoutCoordinates?,
 ) {
     if (transition == null) {
-        Column(
-            modifier = Modifier
-                .onGloballyPositioned { coordinates ->
-                    println("AnimatedBranchView CHAT COLUMN: ${chatColumnCoordinates?.size?.height}")
-                    println(chatColumnCoordinates)
-                }
-        ) {
+        Column {
             historyNodes.forEach { node ->
                 ChatNodeRow(
                     appState = state,

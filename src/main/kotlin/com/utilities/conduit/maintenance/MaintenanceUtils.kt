@@ -37,20 +37,16 @@ object MaintenanceUtils {
             )
             val titlePrompt = PROMPTS.TITLE_GENERATION.replace("{CURRENT_TITLE}", oldTitle)
 
-            Trace.log("TITLE GEN START for $oldTitle")
-
             val result = StringBuilder()
             try {
                 systemExpert.getResponse(chatThusFar, titlePrompt, includeUserModel = false).collect { token ->
                     result.append(token)
                 }
             } catch (e: CancellationException) {
-                Trace.log("TITLE GEN ABORTED for $oldTitle")
                 throw e
             }
             val newTitle = sanitizeChatTitle(result.toString())
 
-            Trace.log("TITLE GEN END ('$oldTitle', '$newTitle')")
             return newTitle.ifEmpty { oldTitle }
         }
     }
@@ -125,12 +121,9 @@ object MaintenanceUtils {
                 maxAssistantTextLen = 250,
                 maxUserTextLen = 1500
             )
-            Trace.log("Chat summary maint: chatThusFar=$chatThusFar")
 
             val chatSummaryPrompt = PROMPTS.CHAT_SUMMARY_GENERATION
                 .replace("{PREVIOUS_SUMMARY}", previousSummary?.summary ?: "")
-
-            Trace.log("CHAT SUMMARY GEN START chat=${chat.id}")
 
             val result = StringBuilder()
             try {
@@ -138,12 +131,8 @@ object MaintenanceUtils {
                     result.append(token)
                 }
             } catch (e: CancellationException) {
-                Trace.log("CHAT SUMMARY GEN ABORTED chat=${chat.id}")
                 throw e
             }
-
-            Trace.log("CHAT SUMMARY GEN END chat=${chat.id}")
-            Trace.log("SUMMARY: new chat summary = $result")
 
             return result.toString().trim()
         }
@@ -153,9 +142,7 @@ object MaintenanceUtils {
     // newly modified chat summary in APPDIR/chats/chat-summaries/*.json
     suspend fun generateUserModel(systemExpert: Expert, newChatSummary: ChatSummary): String {
         ChatUtils.chatUtilsMutex.withLock {
-
             if (systemExpert.sessionPtr == null) {
-                Trace.log("MAINT: user model skip — system expert unavailable")
                 return ""
             }
 
@@ -172,12 +159,10 @@ object MaintenanceUtils {
                     result.append(token)
                 }
             } catch (e: CancellationException) {
-                Trace.log("MAINT: USER MODEL GEN ABORTED")
                 throw e
             }
             val resultStr = result.toString().trim()
 
-            Trace.log("New user model = $resultStr")
             return resultStr
         }
     }

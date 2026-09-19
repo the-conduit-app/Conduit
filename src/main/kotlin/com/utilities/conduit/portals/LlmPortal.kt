@@ -15,11 +15,11 @@ object LlmPortal {
 
     fun createConduit(maxTokens: Long): Pointer = conduitLib.conduit_create(maxTokens)
             ?: error("Failed to create Conduit")
-    fun destroyConduit(conduit: Pointer) { conduitLib.conduit_destroy(conduit) }
 
-    fun freeSession(conduitPtr: Pointer, sessionPtr: Pointer) {
-        conduitLib.conduit_destroy_session(conduitPtr, sessionPtr)
-    }
+//    fun destroyConduit(conduit: Pointer) { conduitLib.conduit_destroy(conduit) }
+//    fun freeSession(conduitPtr: Pointer, sessionPtr: Pointer) {
+//        conduitLib.conduit_destroy_session(conduitPtr, sessionPtr)
+//    }
 
     // ---------------------------------------------------------------------------------
     // Potentially time-consuming - Ensure it's called from an IO thread.
@@ -30,7 +30,6 @@ object LlmPortal {
 
     // ---------------------------------------------------------------------------------
     fun getResponse(sessionPtr: Pointer, prompt: String): Flow<String> = callbackFlow {
-        //Trace.log("Sending prompt: $prompt")
         val callback = object : ConduitTokenCallback {
             override fun invoke(text: String?, userData: Pointer?) {
                 val result = trySendBlocking(text ?: "")
@@ -50,20 +49,16 @@ object LlmPortal {
                 close()
             }
             ConduitLib.ABORTED -> {
-                //Trace.log("LLM: conduit_generate ABORTED — closing Flow")
                 close(CancellationException("Aborted by user"))
             }
             else -> {
                 close(RuntimeException("Generation failed (rc=$rc)"))
             }
         }
-        Trace.log("conduit_generate returned $rc")
     }
 
     fun abortResponse(sessionPtr: Pointer) {
         requireNotNull(sessionPtr) { "LlmPortal couldn't find a session to abort" }
-        Trace.log("Aborting response: $sessionPtr")
-
         conduitLib.conduit_abort_generation(sessionPtr)
     }
 }

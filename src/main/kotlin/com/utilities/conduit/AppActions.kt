@@ -116,10 +116,7 @@ class AppActions(private val appState: AppState) {
                 )
             )
 
-            //Trace.log("BEFORE user add: cursor=${state.chatManager.currentChat.cursorNodeId}")
             val chatListItem: ChatsListItem = appState.chatManager.addNode(userNode) // also saves chat
-            //Trace.log("AFTER user add: cursor=${state.chatManager.currentChat.cursorNodeId}")
-
             if (needsChatListInsertion) { // first node in this chat
                 withContext(Dispatchers.Main) { appState.chatsList.add(chatListItem) }
             }
@@ -140,10 +137,7 @@ class AppActions(private val appState: AppState) {
                 )
             }
 
-            //Trace.log("BEFORE response add: cursor=${state.chatManager.currentChat.cursorNodeId}")
             val item = appState.chatManager.addNode(responseNode)
-            //Trace.log("AFTER response add: cursor=${state.chatManager.currentChat.cursorNodeId}")
-
             withContext(Dispatchers.Main) {
                 appState.chatsList.touch(item)
                 appState.chatManager.setTextInProgress(responseNode.id, "")
@@ -171,8 +165,6 @@ class AppActions(private val appState: AppState) {
             val startTime = System.currentTimeMillis()
             expert.getResponse(chatThusFar, currentPrompt, includeUserModel = true)
                 .onCompletion { cause ->
-                    println("COMPLETION START: node=${responseNode.id}, generating=${appState.chatManager.currentlyGeneratingNodeId}")
-
                     val duration = System.currentTimeMillis() - startTime
                     val status = when (cause) {
                         null -> MessageStatus.COMPLETE
@@ -186,28 +178,9 @@ class AppActions(private val appState: AppState) {
                             appState.chatManager.setTextInProgress(responseNode.id, current + "^C")
                         }
 
-//                        responseNode.message?.apply {
-//                            text = appState.chatManager.getTextInProgress(responseNode.id) ?: ""
-//                            appState.chatManager.clearTextInProgress(responseNode.id)
-//                            responseTime = duration
-//                            this.status = status
-//                        }
                         responseNode.message?.apply {
-                            println(
-                                "BEFORE CLEAR: node=${responseNode.id}, " +
-                                        "textLength=${appState.chatManager.getTextInProgress(responseNode.id)?.length}, " +
-                                        "generating=${appState.chatManager.currentlyGeneratingNodeId}"
-                            )
-
                             text = appState.chatManager.getTextInProgress(responseNode.id) ?: ""
-
                             appState.chatManager.clearTextInProgress(responseNode.id)
-
-                            println(
-                                "AFTER CLEAR: node=${responseNode.id}, " +
-                                        "generating=${appState.chatManager.currentlyGeneratingNodeId}"
-                            )
-
                             responseTime = duration
                             this.status = status
                         }
@@ -217,18 +190,7 @@ class AppActions(private val appState: AppState) {
                     if (status == MessageStatus.INTERRUPTED) {
                         appState.notification.trigger("Response interrupted by user.")
                     }
-
-                    println(
-                        "BEFORE FINISH: generating=${appState.chatManager.currentlyGeneratingNodeId}"
-                    )
-
                     appState.chatManager.onFinishCurrentResponse()
-
-                    println(
-                        "AFTER FINISH: generating=${appState.chatManager.currentlyGeneratingNodeId}"
-                    )
-
-////                    appState.chatManager.onFinishCurrentResponse()
                     Sounds.Ting.play()
                 }
                 .collect { chunk ->

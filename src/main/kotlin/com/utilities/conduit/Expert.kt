@@ -103,7 +103,6 @@ class Expert(
     }
 
     fun abortResponse() {
-        Trace.log("Expert Aborting Response: ${sessionPtr}")
         when (type) {
             ExpertType.INTERNAL -> {
                 when (model) {

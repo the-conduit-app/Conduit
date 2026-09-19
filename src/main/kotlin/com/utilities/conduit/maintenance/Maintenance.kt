@@ -10,6 +10,7 @@ import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import com.utilities.conduit.AppJson
 import com.utilities.conduit.AppState
+import com.utilities.conduit.ConduitLog
 import com.utilities.conduit.UserModel
 import com.utilities.conduit.chat.ChatSummary
 import com.utilities.conduit.debug.Trace
@@ -68,7 +69,7 @@ object Maintenance {
                 try {
                     runMaintenance()
                 } catch (e: CancellationException) {  // TODO - check unused
-                    Trace.log("MAINT: CANCELLED")
+                    // Trace.log("MAINT: CANCELLED: ${e.message}")
                 } finally {
                     maintenanceJob = null
                 }
@@ -86,7 +87,6 @@ object Maintenance {
     fun cancel() {
         if (maintenanceJob?.isActive != true) return
 
-        Trace.log("Maintenance: cancel")
         appState?.systemExpert?.abortResponse()
         maintenanceJob?.cancel()
     }
@@ -94,17 +94,14 @@ object Maintenance {
     suspend fun stop() {
         val job = maintenanceJob ?: return
 
-        //Trace.log("MAINT: STOPPING")
         cancel()
         job.cancel()
         job.join()
-        //Trace.log("MAINT: STOPPED")
     }
 
     private suspend fun runMaintenance() {
         delay(2000.milliseconds)
         if (appState?.systemExpert?.sessionPtr == null) {
-            Trace.log("MAINT: Round skipped — system expert unavailable")
             return
         }
 
@@ -126,10 +123,8 @@ object Maintenance {
     suspend fun runTitleMaintenance() {
         val systemExpert = appState?.systemExpert
         if (systemExpert?.sessionPtr == null) {
-            Trace.log("Maintenance early ret - sysexpert.session = ${systemExpert?.sessionPtr}")
             return
         }
-        //Trace.log("RunTitlemaint CGE = ${state.chatManager.currentlyGeneratingExpert}")
 
         val chatsList = appState?.chatsList ?: return
 
@@ -150,7 +145,7 @@ object Maintenance {
 
             val updatedChat = chatsList.rename(item, newTitle, needsHumanReview = true)
             if (updatedChat == null) {
-                Trace.log("Rename to '$newTitle' failed; maintenance round ending")
+                ConduitLog.error("Rename to '$newTitle' failed; maintenance round ending")
                 return
             }
             if (updatedChat.id == appState?.chatManager?.currentChat?.id) {
@@ -166,7 +161,6 @@ object Maintenance {
     private suspend fun runHistorySummaryMaintenance() {
         val systemExpert = appState?.systemExpert
         if (systemExpert?.sessionPtr == null) {
-            Trace.log("MAINT: summary skip — system expert unavailable")
             return
         }
 
@@ -176,7 +170,6 @@ object Maintenance {
 
             for (node in chat.nodes.values) {
                 if (appState?.chatManager?.currentlyGeneratingExpert != null) {
-                    Trace.log("Summary Generation break due to currently generating expert")
                     return
                 }
 
@@ -185,7 +178,6 @@ object Maintenance {
                 if (node.historySummary != null)
                     continue
 
-                //Trace.log("MAINT: generating history summary for node ${node.id} in chat ${chat.title}")
 
                 val summary = MaintenanceUtils.generateHistorySummary(systemExpert, chat, node)
                 if (summary.isNullOrBlank())
@@ -193,7 +185,6 @@ object Maintenance {
 
                 node.historySummary = summary
                 ChatUtils.saveChatToDisk(chat)
-                //Trace.log("MAINT: generated and saved history summary for node ${node.id}")
 
                 return
             }
@@ -204,7 +195,6 @@ object Maintenance {
     private suspend fun runChatSummaryMaintenance() {
         val systemExpert = appState?.systemExpert
         if (systemExpert?.sessionPtr == null) {
-            Trace.log("MAINT: chat summary skip — system expert unavailable")
             return
         }
 
@@ -217,7 +207,6 @@ object Maintenance {
         val items = appState?.chatsList?.items ?: return
         for (item in items.toList()) {
             if (appState?.chatManager?.currentlyGeneratingExpert != null) {
-                //Trace.log("MAINT: chat summary break due to currently generating expert")
                 return
             }
 
@@ -226,7 +215,6 @@ object Maintenance {
                 continue
             }
 
-            //Trace.log("Summarizing chat ${item.chat.title}")
             val chat = item.chat
             val summaryFile = summariesDir.resolve("${chat.id}.json")
 
@@ -243,11 +231,9 @@ object Maintenance {
             val needsSummary = previousSummary == null || previousSummary.chatId != chat.id ||
                         previousSummary.chatModifiedTime < item.modificationTime
             if (!needsSummary) {
-                //Trace.log("skipping - doesn't need summary")
                 continue
             }
 
-            //Trace.log("MAINT: generating chat summary for ${chat.title}")
             val summaryText = MaintenanceUtils.generateChatSummary(systemExpert, chat, previousSummary)
             val chatSummary = ChatSummary(
                 chat.id,
@@ -260,7 +246,6 @@ object Maintenance {
                 Files.writeString(summaryFile, AppJson.encodeToString(chatSummary))
             }
 
-            //Trace.log("MAINT: generated and saved chat summary for ${chat.title}")
             return
         }
     }
@@ -270,7 +255,6 @@ object Maintenance {
         val systemExpert = appState?.systemExpert
 
         if (systemExpert?.sessionPtr == null) {
-            Trace.log("MAINT: user model skip — system expert unavailable")
             return
         }
 
