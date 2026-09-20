@@ -1,0 +1,195 @@
+/* --- Base Layout & Canvas Wrapper --- */
+body, html {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    font-family: 'Quicksand', sans-serif;
+}
+
+#canvas-wrapper {
+    position: relative;
+    max-width: 97vw;
+    max-height: 97vh;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+}
+
+#rippleCanvas {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* --- Title --- */
+.main-title {
+    position: absolute;
+    top: 6%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font-weight: 300;
+    font-size: 3.5vw;
+    letter-spacing: 1px;
+    z-index: 20;
+    pointer-events: none;
+    color: #ffffff;
+    filter: drop-shadow(0 0 2px #fff)
+            drop-shadow(0 0 10px #fff)
+            drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+    transition: opacity 1.2s ease-in-out,
+                visibility 1.2s ease-in-out;
+}
+
+/* --- Interactive Navigation Items --- */
+.nav-item {
+    position: absolute;
+    z-index: 20;
+    white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    pointer-events: none;
+    color: #ffffff;
+    font-weight: 400;
+    font-size: 2vw;
+    filter: drop-shadow(0 0 2px #fff)
+            drop-shadow(0 0 10px #fff)
+            drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+
+    transition: color 0.3s ease,
+                filter 0.3s ease,
+                transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                opacity 1.2s ease-in-out,
+                visibility 1.2s ease-in-out;
+}
+
+.nav-item a {
+    pointer-events: auto;
+    cursor: pointer;
+    display: inline-block;
+    padding: 12px 18px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.nav-item:hover {
+    color: #FF0000;
+    opacity: 1;
+    filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.6));
+}
+
+/* --- Quadrant Positioning --- */
+#btn-download  { top: 32%; left: 30%; transform: translate(-50%, -50%); }
+#btn-demo      { top: 32%; left: 70%; transform: translate(-50%, -50%); }
+#btn-community { top: 76%; left: 30%; transform: translate(-50%, -50%); }
+#btn-about     { top: 76%; left: 70%; transform: translate(-50%, -50%); }
+
+#btn-download:hover  { transform: translate(-50%, -50%) scale(1.18); }
+#btn-demo:hover      { transform: translate(-50%, -50%) scale(1.18); }
+#btn-community:hover { transform: translate(-50%, -50%) scale(1.18); }
+#btn-about:hover     { transform: translate(-50%, -50%) scale(1.18); }
+
+/* --- Footer --- */
+.footer-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 30;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    color: #888;
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.9);
+    transition: opacity 1.2s ease-in-out,
+                visibility 1.2s ease-in-out;
+}
+
+/* --- Center Disc Container --- */
+#portal-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    max-width: 90vw;
+    height: auto;
+    z-index: 25;
+    pointer-events: auto;
+    cursor: pointer;
+
+    margin-left: -300px;
+    margin-top: -300px;
+
+    transform: scale(1);
+    transform-origin: center center;
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Scale down when state is active */
+.conduit-active #portal-wrapper {
+    transform: scale(0.583);
+}
+
+/* --- Animation Layers --- */
+#portal-pulse-container {
+    width: 100%;
+    height: 100%;
+    display: block;
+    transform-origin: center center;
+    animation: portalPulse 5s ease-in-out infinite;
+}
+
+#portal-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+    transform-origin: center center;
+    animation: portalSpin 50s linear infinite;
+}
+
+@keyframes portalSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes portalPulse {
+    0%, 100% {
+        transform: scale(1.0);
+        filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.2));
+    }
+
+    50% {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 35px rgba(255, 255, 255, 0.6));
+    }
+}
+
+/* --- UI State --- */
+
+/* Landing: UI hidden */
+.main-title,
+.nav-item,
+.footer-container {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Conduit view: UI revealed */
+#canvas-wrapper.conduit-active .main-title,
+#canvas-wrapper.conduit-active .nav-item,
+#canvas-wrapper.conduit-active .footer-container {
+    opacity: 0.8;
+    visibility: visible;
+    pointer-events: auto;
+}

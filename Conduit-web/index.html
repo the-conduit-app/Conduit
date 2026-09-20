@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conduit</title>
+
+    <!-- Critical Anti-FOUC inline style (runs before CSS/JS load) -->
+    <style>
+    .main-title, .nav-item, .footer-container {
+        opacity: 0;
+        visibility: hidden;
+    }
+    </style>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/app.css">
+
+    <audio id="enter-chime" src="audio/enter_chime.wav" preload="auto"></audio>
+    <audio id="emihc-retne" src="audio/emihc_retne.wav" preload="auto"></audio>
+
+    <script src="js/ripple.js" defer></script>
+    <script src="js/app.js" defer></script>
+</head>
+<body>
+<div id="canvas-wrapper">
+    <canvas id="rippleCanvas"></canvas>
+
+    <!-- Title -->
+    <h1 class="main-title">Conduit</h1>
+
+    <!-- Nav Quadrants -->
+    <nav class="nav-container">
+        <div class="nav-item" id="btn-download"><a href="#download">Get for Mac</a></div>
+        <div class="nav-item" id="btn-demo"><a href="#demo">Video Demo</a></div>
+        <div class="nav-item" id="btn-community"><a href="#community">Conduit Packs</a></div>
+        <div class="nav-item" id="btn-about"><a href="#about">About</a></div>
+    </nav>
+
+    <!-- Center Disc Toggle Trigger -->
+    <div id="portal-wrapper" onclick="toggleView()">
+        <div id="portal-pulse-container">
+            <img id="portal-img" src="img/open-conduit.webp" alt="Conduit Portal">
+        </div>
+    </div>
+
+    <!-- Simplified Single Left Footer -->
+    <footer class="footer-container">
+        <div class="footer-left">Funded fully by Murugadasan Foundation</div>
+    </footer>
+</div>
+
+</body>
+</html>
