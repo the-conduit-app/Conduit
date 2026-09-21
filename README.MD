@@ -84,4 +84,15 @@ For development builds, application diagnostics are available through the consol
 
 Status
 
-Conduit is currently distributed as a macOS desktop application. The project is under active development.
+Conduit is currently distributed as a macOS desktop application. 
+
+## Acknowledgements
+
+Conduit makes use of:
+
+- Liquid by Fletch McKee
+  https://github.com/FletchMcKee/liquid
+
+- Kuiver by justdeko
+  https://github.com/justdeko/kuiver
+
