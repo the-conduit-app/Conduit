@@ -153,7 +153,7 @@ class AppActions(private val appState: AppState) {
             val chatThusFar = AppUtils.getChatThusFarAsString(
                 boundaryContext = precedingContext,
                 messages = chatMessages,
-                maxAssistantTextLen = 250, // was 100
+                maxAssistantTextLen = 500, // was 100
                 maxUserTextLen = 2500 // was 1500
             )
 

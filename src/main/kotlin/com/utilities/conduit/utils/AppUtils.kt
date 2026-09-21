@@ -51,10 +51,6 @@ object AppUtils {
             }
         }
 
-        // IDE / Gradle :run:
-        // .../Conduit/build/libs/Conduit.jar
-        //                  ↑     ↑      ↑
-        //                libs   build  Conduit
         val projectDir = codeSource
             .parentFile          // libs
             ?.parentFile         // build
@@ -182,6 +178,7 @@ object AppUtils {
             "C---shortest-path-bug-analysis-ac8e4e6a-bbbf-41bd-b72a-1c82c7a4c421.json",
             "Displaying-Math-Fonts-in-Compo-121704cb-5586-4aec-b423-e2b258242177.json",
             "Shooting-the-breeze-with-Condy-a8cad37f-8e92-4faa-a5ab-7adf050acc56.json",
+            "Accounting-Puzzles-and-Riddles-5cffb57a-4a57-4089-a51c-ec48c33a439a.json",
         )
         if (!chatsDirExisted) {
             seedChatFiles.forEach { filename -> copyResource("chats/$filename", File(chatsDir, filename)) }
