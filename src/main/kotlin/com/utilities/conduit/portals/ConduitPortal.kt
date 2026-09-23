@@ -1,5 +1,6 @@
 package com.utilities.conduit.portals
 
+import androidx.compose.ui.window.WindowPosition.PlatformDefault.x
 import com.utilities.conduit.AppJson
 import com.utilities.conduit.ConduitUserModel
 import com.utilities.conduit.Expert
@@ -43,57 +44,64 @@ object ConduitPortal {
     }
 
     internal fun getConduitResponse(prompt: String, conduitUserModel: ConduitUserModel?): String {
+        val normalizedPrompt = prompt
+            .replace(Regex("""^(hi|hey|hello)\s+condy,?\s*""", RegexOption.IGNORE_CASE), "")
+            .trim()
+
         return when {
-            prompt.equals("What do you know about me?", ignoreCase = true) -> {
+            normalizedPrompt.equals("What do you know about me?", ignoreCase = true) -> {
                 val res = getFriendlyExternalUserModel(conduitUserModel)
                 println ("Response = $res")
                 res
             }
 
-            prompt.equals("What do you really know about me?", ignoreCase = true) -> {
+            normalizedPrompt.equals("What do you really know about me?", ignoreCase = true) -> {
                 getFriendlyConduitUserModel(conduitUserModel)
             }
 
-            prompt.equals("What do you really really know about me?", ignoreCase = true) -> {
+            normalizedPrompt.equals("What do you really really know about me?", ignoreCase = true) -> {
                 AppJson.encodeToString(conduitUserModel)
             }
 
-            prompt.equals("Thanks", ignoreCase = true) || prompt.equals("Thank you", ignoreCase = true) -> {
+            normalizedPrompt.equals("Thanks", ignoreCase = true) || normalizedPrompt.equals("Thank you", ignoreCase = true) -> {
                 "You're welcome."
             }
 
-            prompt.equals("Sorry", ignoreCase = true) || prompt.equals("I'm sorry", ignoreCase = true) -> {
+            normalizedPrompt.equals("Sorry", ignoreCase = true) || normalizedPrompt.equals("I'm sorry", ignoreCase = true) -> {
                 "No worries."
             }
 
-            prompt.equals("Help", ignoreCase = true) -> {
+            normalizedPrompt.equals("Help", ignoreCase = true) -> {
                 "You are in the Conduit. You can hold a local (no Internet) round-table discussion with the various experts " +
                         "in Conduit Packs.\n\nThey can help you cooperatively, understand each other well, " +
                         "and are aware of each other's responses.\n\n" +
                         "The rest of Conduit is for you to explore and discover."
             }
 
-            prompt.equals("More Help", ignoreCase = true) || prompt.equals("Moar Help", ignoreCase = true) -> {
+            normalizedPrompt.equals("More Help", ignoreCase = true) || normalizedPrompt.equals("Moar Help", ignoreCase = true) -> {
                 "Gemma4 (gemma-2-9b-it-Q4_K_M.gguf, SHA = '13b2a7b4115bbd0900162edcebe476da1ba1fc24e718e8b40d32f6e300f56dfe)' " +
                         "is the key to open the portal. You obviously already know that!\n\n" +
-                        "Once inside, you can:\n"+
+                        "You can place Gemma4 either in the Conduit/llm folder, your desktop, or drag and drop it into the Conduit.\n\n" +
+                        "Once inside Conduit, you can:\n"+
                         "  - chat with multiple experts in packs.\n" +
                         "  - carry on a real branching conversation, and view the tree.\n" +
                         "  - teleport from place to place in your chat\n\n" +
-                        "The support folder for Conduit is '~/Library/Application Support/Conduit'\n" +
-                        "  - All your chats can be found in the chats/ folder there\n" +
-                        "  - Place new pack definitions in the packs/ folder\n" +
-                        "  - Use approved LLM files (.gguf) placed in the llm/ folder (or desktop)\n\n" +
+                        "The application support folder for Conduit is ~/Library/Application Support/Conduit/.\n\n" +
+                        "All of your chats are stored locally in the folder .../Conduit/chats/.\n\n" +
+                        "To use downloaded LLMs, make sure they are part of the approved list (You can edit this list).  " +
+                        "It can be found at ~/Library/Application Support/Conduit/.approved-models.json\n\n" +
+                        "The GGUF files for the LLMs themselves must be placed in the .../Conduit/llm/ folder or on your desktop.\n\n" +
+                        "Similarly, you can create your own pack of experts by following the example in .../Conduit/packs/Sample.json\n\n" +
                         "Enjoy!"
             }
 
-            prompt.equals("Still more Help", ignoreCase = true) -> {
+            normalizedPrompt.equals("Still more Help", ignoreCase = true) -> {
                 "Go forth and explore! Discover new stuff."
             }
 
             else -> {
                 val wasAtRoot = conduitTrails.isAtRoot()
-                val response = conduitTrails.advance(prompt)
+                val response = conduitTrails.advance(normalizedPrompt)
                 response ?: if (!wasAtRoot) {
                     "Ouch!"
                 } else {
