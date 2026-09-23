@@ -1,0 +1,23 @@
+
+bubba@Om packaging % sips -s dpiWidth 72 -s dpiHeight 72 plasma_s64_arrow.png;
+dmgbuild -s dmg_settings.py "Conduit" ../Conduit.dmg
+open ../Conduit.dmg
+
+# icons
+
+mkdir Conduit.iconset
+sips -z 16 16     open_conduit.png --out Conduit.iconset/icon_16x16.png
+sips -z 32 32     open_conduit.png --out Conduit.iconset/icon_16x16@2x.png
+sips -z 32 32     open_conduit.png --out Conduit.iconset/icon_32x32.png
+sips -z 64 64     open_conduit.png --out Conduit.iconset/icon_32x32@2x.png
+sips -z 128 128   open_conduit.png --out Conduit.iconset/icon_128x128.png
+sips -z 256 256   open_conduit.png --out Conduit.iconset/icon_128x128@2x.png
+sips -z 256 256   open_conduit.png --out Conduit.iconset/icon_256x256.png
+sips -z 512 512   open_conduit.png --out Conduit.iconset/icon_256x256@2x.png
+sips -z 512 512   open_conduit.png --out Conduit.iconset/icon_512x512.png
+sips -z 1024 1024 open_conduit.png --out Conduit.iconset/icon_512x512@2x.png
+
+# Produces Conduit.icns
+iconutil -c icns Conduit.iconset 
+
+
