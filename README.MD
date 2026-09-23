@@ -1,5 +1,7 @@
 Conduit
 
+https://the-conduit-app.github.io
+
 Conduit is a local-first desktop AI application for exploring conversations with multiple local LLM experts. Conversations are stored locally, and different experts can be used within the same conversation.
 
 Requirements
