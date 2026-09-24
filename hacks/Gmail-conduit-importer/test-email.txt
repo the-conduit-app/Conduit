@@ -1,0 +1,501 @@
+<email_thread format_version="4">
+<meta>
+<subject>Card Question</subject>
+<messages>34</messages>
+<message_candidates>34</message_candidates>
+<participants>
+<participant name="Alex Morgan" email="alex.morgan@example.test"/>
+<participant name="Jordan Lee" email="jordan.lee@example.test"/>
+<participant name="Casey Brown" email="casey.brown@example.test"/>
+<participant name="connect" email="support@example.test"/>
+<participant name="Example Credit Union" email="creditunion@example.test"/>
+<participant name="Taylor Reed" email="taylor.reed@example.test"/>
+</participants>
+<date_range>2026-01-05T22:55:00.000Z to 2026-07-22T08:46:00.000Z</date_range>
+<attachment_count>20</attachment_count>
+<source>print-view</source>
+<capture_timezone>UTC</capture_timezone>
+<content_trust>untrusted_email_and_attachment_text</content_trust>
+<completeness messages="true" headers="true" attachments="true"/>
+<complete>true</complete>
+<url>https://mail.example.test/thread/example</url>
+<warning code="QUOTED_TEXT_TRIMMED">Recognized quoted reply chains were removed. Signature blocks are carried in &lt;signature&gt;, not removed.</warning>
+</meta>
+<message n="1" date="2026-01-05T22:55:00.000Z" local="Mon, Jan 5, 2026 at 10:55 PM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Jordan
+
+LOREM IPSUM DOLOR SIT AMET. Please let me know whether this notification was expected.
+
+LOREM IPSUM.]]></body>
+</message>
+<message n="2" date="2026-01-06T12:48:00.000Z" local="Tue, Jan 6, 2026 at 12:48 PM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Jordan
+
+LOREM IPSUM DOLOR SIT AMET. I received another notification and would like to understand what caused it.
+
+Thank you for checking.
+
+LOREM.]]></body>
+</message>
+<message n="3" date="2026-01-06T18:13:00.000Z" local="Tue, Jan 6, 2026 at 6:13 PM" from="Jordan Lee" email="jordan.lee@example.test" delivery="sent">
+<to>
+<recipient name="Alex Morgan" email="alex.morgan@example.test"/>
+</to>
+<body format="markdown"><![CDATA[This message was sent securely using SecureMail
+
+Hello Alex,
+
+LOREM IPSUM DOLOR SIT AMET. We reviewed the activity and it appears to be a routine account event.
+
+Please let me know if you believe the activity is unauthorized. If so, we can take the appropriate protective action.
+
+Regards,
+
+Jordan Lee
+
+Member Services Representative
+
+100 Example Avenue
+
+Example City, CA 90000
+
+P: 555.010.2000 | W: www.example.test
+
+This email is a fictitious example for testing.]]></body>
+</message>
+<message n="4" date="2026-01-06T22:55:00.000Z" local="Tue, Jan 6, 2026 at 10:55 PM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Thank you Jordan.
+
+LOREM IPSUM DOLOR SIT AMET. Could you please explain the activity so that I can confirm it was not caused by something I did?
+
+LOREM IPSUM.
+
+&
+
+**2 attachments**]]></body>
+<attachments>
+<attachment name="attachment-a.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-b.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+</attachments>
+</message>
+<message n="5" date="2026-01-06T22:57:00.000Z" local="Tue, Jan 6, 2026 at 10:57 PM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Also, if any account changes are required, how would I receive the replacement?
+
+LOREM IPSUM DOLOR SIT AMET.]]></body>
+<attachments>
+<attachment name="attachment-a.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-b.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+</attachments>
+</message>
+<message n="6" date="2026-01-06T23:21:00.000Z" local="Tue, Jan 6, 2026 at 11:21 PM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Jordan
+
+LOREM IPSUM DOLOR SIT AMET. I have confirmed that I did not initiate this activity. Please take the appropriate protective action.
+
+Please advise on the best way to receive a replacement.
+
+There is no hurry as long as it arrives within a reasonable period.
+
+My mailing address is:
+
+Alex Morgan
+Room 101, Example Hotel
+Example Road
+Exampletown 000000
+Example State
+Exampleland
+
+Thanks.
+
+&
+
+**4 attachments**]]></body>
+<attachments>
+<attachment name="attachment-a.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-b.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-a.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-b.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+</attachments>
+</message>
+<message n="7" date="2026-01-08T17:06:00.000Z" local="Thu, Jan 8, 2026 at 5:06 PM" from="Jordan Lee" email="jordan.lee@example.test" delivery="sent">
+<to>
+<recipient name="Alex Morgan" email="alex.morgan@example.test"/>
+</to>
+<body format="markdown"><![CDATA[This message was sent securely using SecureMail
+
+Hello Alex,
+
+LOREM IPSUM DOLOR SIT AMET. Apologies for the delay. Please send your full mailing address exactly as it should appear for postal delivery.
+
+LOREM IPSUM.]]></body>
+</message>
+<message n="8" date="2026-01-09T00:30:00.000Z" local="Fri, Jan 9, 2026 at 12:30 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Thank you Jordan
+
+The full address is:
+
+Alex Morgan
+Example Hotel, Room 101
+Example Road
+Exampletown 000000
+Example State
+Exampleland
+
+&
+
+**4 attachments**]]></body>
+<attachments>
+<attachment name="attachment-a.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-b.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-b.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-a.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+</attachments>
+</message>
+<message n="9" date="2026-01-09T16:08:00.000Z" local="Fri, Jan 9, 2026 at 4:08 PM" from="Jordan Lee" email="jordan.lee@example.test" delivery="sent">
+<to>
+<recipient name="Alex Morgan" email="alex.morgan@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Alex,
+
+LOREM IPSUM DOLOR SIT AMET. Your replacement item will be mailed out today. Delivery may take longer than usual. Please allow approximately 2–4 weeks.
+
+Once you receive it, please contact support so that we can assist you with activation.
+
+Please let me know if you have any questions.]]></body>
+</message>
+<message n="10" date="2026-01-10T03:58:00.000Z" local="Sat, Jan 10, 2026 at 3:58 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Thank you Jordan.
+
+LOREM IPSUM. I will let you know as soon as I receive it.
+
+&]]></body>
+</message>
+<message n="11" date="2026-01-22T02:57:00.000Z" local="Thu, Jan 22, 2026 at 2:57 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Jordan
+
+LOREM IPSUM DOLOR SIT AMET. Is there a tracking number I can keep an eye on?
+
+I have not received the replacement yet and noticed another test notification.]]></body>
+</message>
+<message n="12" date="2026-01-23T01:03:00.000Z" local="Fri, Jan 23, 2026 at 1:03 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<cc>
+<recipient name="Casey Brown" email="casey.brown@example.test"/>
+</cc>
+<body format="markdown"><![CDATA[Hello Jordan
+
+LOREM IPSUM DOLOR SIT AMET. I received a voice message saying that the item may have been returned. Could you please clarify whether it was sent to the current mailing address?
+
+My current mailing address is:
+
+Alex Morgan
+Example Hotel, Room 101
+Example Road
+Exampletown 000000
+Example State
+Exampleland
+
+Please use the above address for now.
+
+Many thanks,
+
+&]]></body>
+</message>
+<message n="13" date="2026-01-23T16:43:00.000Z" local="Fri, Jan 23, 2026 at 4:43 PM" from="Jordan Lee" email="jordan.lee@example.test" delivery="sent">
+<to>
+<recipient name="Alex Morgan" email="alex.morgan@example.test"/>
+</to>
+<cc>
+<recipient name="Casey Brown" email="casey.brown@example.test"/>
+</cc>
+<body format="markdown"><![CDATA[Hello Alex,
+
+LOREM IPSUM DOLOR SIT AMET. The notice forwarded to us confirms a request to update the mailing address. Please note that international delivery can take several weeks.
+
+LOREM IPSUM.]]></body>
+</message>
+<message n="14" date="2026-01-23T22:54:00.000Z" local="Fri, Jan 23, 2026 at 10:54 PM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<cc>
+<recipient name="Casey Brown" email="casey.brown@example.test"/>
+</cc>
+<body format="markdown"><![CDATA[Thanks much for your phone call.
+
+&]]></body>
+</message>
+<message n="15" date="2026-01-27T05:54:00.000Z" local="Tue, Jan 27, 2026 at 5:54 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Jordan
+
+LOREM IPSUM DOLOR SIT AMET. The replacement arrived yesterday, thanks.
+
+I tried to activate it using the instructions included with it, but the automated system reported an error.
+
+Could you please help? I can try calling tomorrow around the usual time.
+
+LOREM IPSUM.]]></body>
+</message>
+<message n="16" date="2026-01-28T20:34:00.000Z" local="Wed, Jan 28, 2026 at 8:34 PM" from="Jordan Lee" email="jordan.lee@example.test" delivery="sent">
+<to>
+<recipient name="Alex Morgan" email="alex.morgan@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Alex,
+
+Could you kindly send me a picture of the letter or instructions that accompanied the replacement? We need to review it to ensure everything is in order. Please contact our support team if needed.]]></body>
+</message>
+<message n="17" date="2026-01-29T06:17:00.000Z" local="Thu, Jan 29, 2026 at 6:17 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Thanks Jordan.
+
+Here is the photo. The call log shows the attempted call earlier today.
+
+&]]></body>
+</message>
+<message n="18" date="2026-01-29T22:10:00.000Z" local="Thu, Jan 29, 2026 at 10:10 PM" from="Jordan Lee" email="jordan.lee@example.test" delivery="sent">
+<to>
+<recipient name="Alex Morgan" email="alex.morgan@example.test"/>
+</to>
+<cc>
+<recipient name="connect" email="support@example.test"/>
+</cc>
+<body format="markdown"><![CDATA[Hello Alex,
+
+Apologies for the delay and thank you for providing the picture.
+
+Please note that our support number is correct. I will give you a call to assist with activation. Additionally, I have attached a form for your completion. Kindly print, complete, and sign the form with a pen, then send it back at your earliest convenience. Please note that digital signatures are not accepted.
+
+> [Quoted text hidden]
+> [Quoted text hidden]
+> [Quoted text hidden]
+
+This message is part of a fictitious test conversation.
+
+> [Quoted text hidden]]]></body>
+<attachments>
+<attachment name="example-form.pdf" type="application/pdf" status="not downloaded (use Copy + save files)"/>
+</attachments>
+</message>
+<message n="19" date="2026-01-30T06:44:00.000Z" local="Fri, Jan 30, 2026 at 6:44 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Thank you Jordan. I tried once again today and the automated system still could not process the item.
+
+&]]></body>
+</message>
+<message n="20" date="2026-02-03T06:35:00.000Z" local="Tue, Feb 3, 2026 at 6:35 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Jordan
+
+Just checking in regarding this.
+
+LOREM IPSUM.]]></body>
+</message>
+<message n="21" date="2026-02-07T10:42:00.000Z" local="Sat, Feb 7, 2026 at 10:42 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Jordan
+
+I received another notification about the old item. I hope it has been deactivated.
+
+Also please help me activate the new item at your earliest convenience.
+
+Thanks.
+
+&]]></body>
+</message>
+<message n="22" date="2026-02-13T06:34:00.000Z" local="Fri, Feb 13, 2026 at 6:34 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Jordan
+
+Just checking in on this again. I assume you and the other staff must be under pressure right now.
+
+Please let me know if this action item is in the pipeline, just so I can rest assured it has not fallen through the cracks.
+
+With thanks,
+
+&]]></body>
+</message>
+<message n="23" date="2026-02-13T06:36:00.000Z" local="Fri, Feb 13, 2026 at 6:36 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<body format="markdown"><![CDATA[The other reason for my concern is just in case the new item becomes inactive automatically if it is not activated within a certain number of days and you have to send another one.
+
+LOREM IPSUM.]]></body>
+</message>
+<message n="24" date="2026-02-14T11:52:00.000Z" local="Sat, Feb 14, 2026 at 11:52 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</to>
+<cc>
+<recipient name="Example Credit Union" email="creditunion@example.test"/>
+<recipient name="Support Desk" email="support@example.test"/>
+</cc>
+<body format="markdown"><![CDATA[Just checking in to see if there is an update (cc to the general support address in case Jordan is on leave).]]></body>
+</message>
+<message n="25" date="2026-02-16T18:13:00.000Z" local="Mon, Feb 16, 2026 at 6:13 PM" from="Taylor Reed" email="taylor.reed@example.test" delivery="sent">
+<to>
+<recipient name="Alex Morgan" email="alex.morgan@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Alex,
+
+Apologies for the delay in response. I reviewed the account and it appears that the previous item has been disabled. If you remove it from the application controls, that should stop the notifications. As for activating the new item, please attempt the automated process one more time. If this does not work, reply here or contact support.
+
+Regards,
+
+Taylor Reed]]></body>
+</message>
+<message n="26" date="2026-02-18T00:34:00.000Z" local="Wed, Feb 18, 2026 at 12:34 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="taylor.reed@example.test" email="taylor.reed@example.test"/>
+</to>
+<cc>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</cc>
+<body format="markdown"><![CDATA[Hi Taylor
+
+Thanks. I was able to activate the new item yesterday.
+
+However I tried to test it at a nearby terminal and it was declined. Could you please let me know if something is wrong? I made sure to enter the correct PIN.
+
+LOREM IPSUM.]]></body>
+</message>
+<message n="27" date="2026-02-18T15:45:00.000Z" local="Wed, Feb 18, 2026 at 3:45 PM" from="Taylor Reed" email="taylor.reed@example.test" delivery="sent">
+<to>
+<recipient name="Alex Morgan" email="alex.morgan@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Alex,
+
+After reviewing it appears the transaction was declined due to a location setting. If you are currently traveling or living in another country, I can place an appropriate travel notice on the account. Please let me know if you would like to proceed.
+
+Regards,
+
+Taylor Reed
+
+Member Services Representative]]></body>
+</message>
+<message n="28" date="2026-02-18T23:23:00.000Z" local="Wed, Feb 18, 2026 at 11:23 PM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Taylor Reed" email="taylor.reed@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hi Taylor
+
+Yes,
+
+Please allow transactions from my current location.
+
+LOREM IPSUM.]]></body>
+<attachments>
+<attachment name="attachment-a.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-b.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-c.png" type="image/png" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-d.png" type="image/png" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-e.jpg" type="image/jpeg" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-c.png" type="image/png" status="not downloaded (use Copy + save files)"/>
+<attachment name="attachment-d.png" type="image/png" status="not downloaded (use Copy + save files)"/>
+</attachments>
+</message>
+<message n="29" date="2026-02-19T22:58:00.000Z" local="Thu, Feb 19, 2026 at 10:58 PM" from="Taylor Reed" email="taylor.reed@example.test" delivery="sent">
+<to>
+<recipient name="Alex Morgan" email="alex.morgan@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Alex,
+
+I went ahead and set a temporary travel notice for your account. If you are remaining at the destination longer, please let me know so I may extend it. As of now you should be all set to use the account!]]></body>
+</message>
+<message n="30" date="2026-02-20T01:58:00.000Z" local="Fri, Feb 20, 2026 at 1:58 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Taylor Reed" email="taylor.reed@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hi Taylor
+
+Yes please. I have updated my address on the account because I am now living at my new location.
+
+Could you please extend the travel notice as long as possible?
+
+Thanks again
+
+&]]></body>
+</message>
+<message n="31" date="2026-02-21T09:42:00.000Z" local="Sat, Feb 21, 2026 at 9:42 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Taylor Reed" email="taylor.reed@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Please let me know once this is done so I can test it.
+
+Many thanks!
+
+&]]></body>
+</message>
+<message n="32" date="2026-02-24T15:47:00.000Z" local="Tue, Feb 24, 2026 at 3:47 PM" from="Taylor Reed" email="taylor.reed@example.test" delivery="sent">
+<to>
+<recipient name="Alex Morgan" email="alex.morgan@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Hello Alex,
+
+Apologies for the delay. As stated in my previous message, your account is all set and ready for use. Should you have any further questions or concerns, please reply here or contact support.]]></body>
+</message>
+<message n="33" date="2026-02-25T01:50:00.000Z" local="Wed, Feb 25, 2026 at 1:50 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Taylor Reed" email="taylor.reed@example.test"/>
+</to>
+<body format="markdown"><![CDATA[Thank you Taylor. I actually meant setting it up for extended use, not just temporarily.
+
+But I guess we can cross that bridge when it comes to it.
+
+Thanks again
+
+&]]></body>
+</message>
+<message n="34" date="2026-07-22T08:46:00.000Z" local="Wed, Jul 22, 2026 at 8:46 AM" from="Alex Morgan" email="alex.morgan@example.test" delivery="sent">
+<to>
+<recipient name="Taylor Reed" email="taylor.reed@example.test"/>
+</to>
+<cc>
+<recipient name="Jordan Lee" email="jordan.lee@example.test"/>
+</cc>
+<body format="markdown"><![CDATA[Hello Taylor
+
+I am afraid the item was declined again yesterday. Could you please update the travel information again when convenient? Thanks much.
+
+&]]></body>
+</message>
+</email_thread>
