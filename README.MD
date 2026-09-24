@@ -2,9 +2,9 @@ Conduit
 
 https://the-conduit-app.github.io
 
-Conduit is a local-first desktop AI application for exploring conversations with multiple local LLM experts. Conversations are stored locally, and different experts can be used within the same conversation.
+Conduit is a local-AI desktop application for exploring conversations with multiple LLM experts. Conversations are stored locally, and different experts can be used within the same conversation.
 
-Requirements
+Requirements for the Mac version:
 
 * macOS
 * Apple Silicon Mac recommended
@@ -15,9 +15,10 @@ Conduit currently uses llama.cpp through its native Conduit library.
 
 Installation
 
-Download the latest .dmg release and drag Conduit to your Applications folder.
+Download the latest .dmg release and drag Conduit to your Applications folder. [Update Sep 24: I'm afraid you have to download the source and build it yourself
+since the distributed DMG is not code-signed. It should be simple - just change into the directory "packaging" and run ./package.sh]
 
-Use
+Usage
 
 (Your only clue: The following is the secret key that opens the portal. How?)
  - LLM: Gemma4 (gemma-2-9b-it-Q4_K_M.gguf)
