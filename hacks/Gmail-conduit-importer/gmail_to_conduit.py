@@ -3,7 +3,10 @@
 # Usage:
 #    python3 gmail_to_conduit.py email-conversation.txt -o email-conversation-conduit.json
 #
-#    (Then copy email-conversation-conduit.json to .../Conduit/chats/ - You can then
+#    First change the email address to your own on line 202 below. It will display your
+#    own emails differently styled and aligned.
+#
+#    Then copy email-conversation-conduit.json to .../Conduit/chats/ - You can then
 #    navigate the email convo tree graphically and teleport from one message to another
 #    like in a regular Conduit chat)
 #
@@ -196,10 +199,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-
 # Change this only if you want a different sender to be treated as the user.
-USER_EMAIL = "venkataraman.anand@gmail.com"
-
+USER_EMAIL = "alex.morgan@example.test"
 
 def new_id() -> str:
     return str(uuid.uuid4())
