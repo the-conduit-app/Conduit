@@ -200,6 +200,7 @@ from pathlib import Path
 from typing import Optional
 
 # Change this only if you want a different sender to be treated as the user.
+#USER_EMAIL = "venkataraman.anand@gmail.com"
 USER_EMAIL = "alex.morgan@example.test"
 
 def new_id() -> str:

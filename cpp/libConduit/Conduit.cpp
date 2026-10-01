@@ -222,30 +222,13 @@ int Conduit::Session::generate(const char* prompt, Conduit::TokenCallback callba
     bool addSpecial = true;
     bool parseSpecial = true;
 
-    int required = llama_tokenize(
-        vocab,
-        prompt,
-        promptLen,
-        nullptr,
-        0,
-        addSpecial,
-        parseSpecial);
-
+    int required = llama_tokenize(vocab, prompt, promptLen, nullptr,0, addSpecial, parseSpecial);
     if (required < 0)
         required = -required;
 
     std::vector<llama_token> tokens(required + 1);
 
-    const int nTokens =
-        llama_tokenize(
-            vocab,
-            prompt,
-            promptLen,
-            tokens.data(),
-            tokens.size(),
-            addSpecial,
-            parseSpecial);
-
+    const int nTokens = llama_tokenize(vocab, prompt, promptLen, tokens.data(), tokens.size(), addSpecial, parseSpecial);
     if (nTokens < 0)
         return ConduitError::TOKENIZE;
 
@@ -274,7 +257,8 @@ int Conduit::Session::generate(const char* prompt, Conduit::TokenCallback callba
     // shutdown trigger ("<|im_end|>")
     Portal portal(UtfCodec::fromUtf8("<|im_end|>"));
     size_t generatedTokens = 0;
-
+    std::string utf8Pending;
+    
     for (;;) {
         if (_abortCurrentDecode) {
             write(2, "Returning from decode due to user abort\n", 40);
@@ -284,13 +268,18 @@ int Conduit::Session::generate(const char* prompt, Conduit::TokenCallback callba
         
         if (++generatedTokens >= _conduit._maxGenTokens) {
             portal.closeInput();
+
             while (auto cp = portal.pop()) {
                 std::string utf8 = UtfCodec::toUtf8(*cp);
                 callback(utf8.c_str(), userData);
             }
+
+            if (!utf8Pending.empty())
+                return ConduitError::TOKEN_TO_PIECE;
+
             return ConduitError::OUTPUT_MAXED;
         }
-        
+
         llama_token next;
         next = llama_sampler_sample(_sampler, _ctx, -1);
 
@@ -303,10 +292,8 @@ int Conduit::Session::generate(const char* prompt, Conduit::TokenCallback callba
                 callback(utf8.c_str(), userData);
             }
 
-            // while (auto cp = portal.pop()) {
-            //     std::string utf8 = UtfCodec::toUtf8(*cp);
-            //     callback(utf8.c_str(), userData);
-            // }
+            if (!utf8Pending.empty())
+                return ConduitError::TOKEN_TO_PIECE;
 
             return ConduitError::OK;
         }
@@ -317,20 +304,11 @@ int Conduit::Session::generate(const char* prompt, Conduit::TokenCallback callba
 
         std::vector<char> piece(required);
 
-        int len = llama_token_to_piece(
-            vocab,
-            next,
-            piece.data(),
-            piece.size(),
-            0,
-            true);
-
+        int len = llama_token_to_piece(vocab, next, piece.data(), piece.size(), 0, true);
         if (len < 0)
             return ConduitError::TOKEN_TO_PIECE;
 
-        auto utf32 = UtfCodec::fromUtf8(
-            std::string_view(piece.data(), len));
-
+        auto utf32 = UtfCodec::fromUtf8Streaming(utf8Pending, std::string_view(piece.data(), len));
         if (!portal.push(utf32))
             return ConduitError::PORTAL;
 
@@ -339,12 +317,7 @@ int Conduit::Session::generate(const char* prompt, Conduit::TokenCallback callba
             std::string utf8 = UtfCodec::toUtf8(output);
             callback(utf8.c_str(), userData);
         }
-        
-        // while (auto cp = portal.pop()) {
-        //     std::string utf8 = UtfCodec::toUtf8(*cp);
-        //     callback(utf8.c_str(), userData);
-        // }
-        
+
         if (portal.isClosed())
             return ConduitError::OK;
 

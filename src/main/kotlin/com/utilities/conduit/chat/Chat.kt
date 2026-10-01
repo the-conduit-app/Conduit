@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 import java.util.*
 
 // The Chat is a root Node and has a hash of node IDs.
-// Each node has an list (array) of children
+// Each node has a list (array) of children
 @Serializable
 data class Chat(
     val id: String,

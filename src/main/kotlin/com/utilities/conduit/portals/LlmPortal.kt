@@ -38,8 +38,8 @@ object LlmPortal {
                 }
             }
         }
-
         val rc = conduitLib.conduit_generate(sessionPtr, prompt, callback, null)
+
         when (rc) {
             ConduitLib.OK -> {
                 close()
