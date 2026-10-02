@@ -28,6 +28,13 @@ GGUF model
 
 The project uses Kotlin, Compose Multiplatform/Desktop, JNA, and a native C/C++ layer.
 
+## Never built software before?
+
+> **Need help?** If you're not familiar with building software, you
+can copy and paste this entire document into a free ChatGPT or Gemini
+interface and say: *"Please help me build the Conduit app."* Then
+follow the instructions it gives you.
+
 ## Application Startup
 
 The basic startup sequence is:
@@ -58,7 +65,7 @@ A particularly important distinction is between persistent message state and tra
 
 Completed message text belongs to ChatMessage. Streaming response text is maintained separately by ChatManager:
 
-textInProgress[nodeId] → current streamed text
+`textInProgress[nodeId] → current streamed text`
 
 This avoids placing rapidly changing transient Compose state inside persistent conversation nodes and prevents snapshot/state mutations from occurring in inappropriate contexts.
 
@@ -69,7 +76,7 @@ This avoids placing rapidly changing transient Compose state inside persistent c
 * transient response text
 * chat/version invalidation counters
 
-Conversation Model
+## Conversation Model
 
 Conversations are trees of Node objects.
 
@@ -81,7 +88,7 @@ Conversations are trees of Node objects.
 
 cursorNodeId identifies the currently selected point in the conversation.
 
-ChatUtils.getFullHistory() derives the linear path from the root to the current cursor for display in ChatView.
+`ChatUtils.getFullHistory()` derives the linear path from the root to the current cursor for display in ChatView.
 
 TreeView exposes the complete tree and allows the user to select alternate branches.
 
