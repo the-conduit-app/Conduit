@@ -11,6 +11,8 @@ Conduit is a local-AI desktop application for exploring conversations with multi
 * A compatible .gguf LLM model
 * Sufficient memory for the models you choose to run
 
+[Sep 2026 Update: You need to download the repo and build it yourself. To do so, change into the "packaging" directory and run the script ./package.sh. It may involve enabling xcode]
+
 Conduit currently uses llama.cpp through its native Conduit library.
 
 ## Installation

@@ -1,6 +1,6 @@
-Conduit — Technical Overview
+# Conduit — Technical Overview
 
-Overview
+## Overview
 
 Conduit is a Kotlin Compose Desktop application for running and interacting with local LLMs.
 
@@ -26,7 +26,7 @@ GGUF model
 
 The project uses Kotlin, Compose Multiplatform/Desktop, JNA, and a native C/C++ layer.
 
-Application Startup
+## Application Startup
 
 The basic startup sequence is:
 
@@ -42,11 +42,11 @@ Application data is stored under:
 
 Packaged native libraries are located inside the application bundle’s:
 
-Contents/Frameworks
+`Contents/Frameworks`
 
 Development execution also supports loading the native libraries from the project/native build locations.
 
-State Management
+## State Management
 
 AppState provides application-wide state, while ChatManager owns conversation-related mutable state.
 
@@ -58,7 +58,7 @@ textInProgress[nodeId] → current streamed text
 
 This avoids placing rapidly changing transient Compose state inside persistent conversation nodes and prevents snapshot/state mutations from occurring in inappropriate contexts.
 
-Generation state includes:
+### Generation state includes:
 
 * currently generating node
 * whether generation is active
@@ -69,7 +69,7 @@ Conversation Model
 
 Conversations are trees of Node objects.
 
-A node can contain:
+### A node can contain:
 
 * A message
 * Parent/child relationships
@@ -87,15 +87,17 @@ ChatView normally displays the current history directly.
 
 Actual branch changes are handled using BranchTransition:
 
+```kotlin
 data class BranchTransition(
     val shared: List<Node>,
     val outgoing: List<Node>,
     val incoming: List<Node>
 )
+```
 
 The transition is based on the common prefix between the old and new paths.
 
-A critical distinction is made between:
+### A critical distinction is made between:
 
 * Extending the current conversation.
 * Switching to a different branch.
@@ -104,7 +106,7 @@ Normal message generation must not be treated as a branch transition. Only trans
 
 This distinction is important because AnimatedContent changes layout height during its animation. Applying it to ordinary response generation can cause the chat column’s measured height to change unexpectedly and interfere with scrolling.
 
-Scrolling
+## Scrolling
 
 ChatView uses a Compose ScrollState.
 
@@ -114,11 +116,11 @@ maxValue ≈ content height − viewport height
 
 When content is still being animated or remeasured, maxValue can change. Therefore scrolling logic must account for Compose’s asynchronous composition and measurement rather than assuming that a single scroll request represents the final layout.
 
-LLM Integration
+## LLM Integration
 
 LlmPortal provides the Kotlin-facing interface to the native Conduit library.
 
-JNA loads:
+## JNA loads:
 
 libconduit.dylib
 
@@ -128,7 +130,7 @@ Models are identified by SHA-256 rather than relying solely on filenames. This p
 
 The native cache is also keyed by model SHA.
 
-Native Resources
+## Native Resources
 
 Native resources have explicit lifecycle operations for:
 
@@ -137,11 +139,11 @@ Native resources have explicit lifecycle operations for:
 * Destroying sessions.
 * Destroying the Conduit instance.
 
-Native libraries are packaged into the macOS application bundle under Contents/Frameworks.
+Native libraries are packaged into the macOS application bundle under `Contents/Frameworks`.
 
-Persistent Data
+## Persistent Data
 
-Important application data includes:
+### Important application data includes:
 
 Application Support/Conduit/
 ├── chats/
@@ -153,36 +155,48 @@ Bundled assets provide initial/default content when corresponding user data is a
 
 Startup is intentionally defensive: missing directories and optional data should normally be recreated or handled gracefully rather than causing the application to terminate.
 
-Build
+## Build
 
 The project uses Gradle with a JDK toolchain appropriate to the current Kotlin/Compose build.
 
 The release process creates a macOS application bundle and copies the native libraries into:
 
-Conduit.app/Contents/Frameworks
+`Conduit.app/Contents/Frameworks`
 
 The packaging/ directory contains the resources/scripts used to create the distributable macOS image.
 
-Development Notes
+## Development Notes
 
 A few areas deserve particular care when modifying the application:
 
-Compose state
+### Compose state
 
 Avoid putting transient streaming state directly into persistent model objects. State updated from background generation should be marshalled onto the appropriate Compose/main context.
 
-Conversation branches
+### Conversation branches
 
 Do not assume every history change is a branch change. Adding a new child to the current path is normal conversation growth and should not invoke branch-transition animation.
 
-Native model validation
+### Native model validation
 
 Validate model identity before initializing native LLM state. A .gguf filename alone is not sufficient to establish that the file is the expected model.
 
-Startup data
+### Startup data
 
 User data under Application Support should be treated as potentially missing, incomplete, or malformed. Startup should fail only when continuing safely is not possible.
 
-Packaging
+## Packaging
 
 The application depends on its native libraries being present in the expected location inside the packaged application bundle. Changes to native library names or locations should therefore be reflected in both Gradle packaging and runtime library discovery.
+
+## Building (Sep 2026 Update)
+
+You need to clone the repository and build it yourself. To do so, change into the `packaging` directory and run:
+
+```sh
+
+./package.sh
+```
+
+
+
