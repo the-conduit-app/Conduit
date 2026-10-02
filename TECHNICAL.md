@@ -6,6 +6,7 @@ Conduit is a Kotlin Compose Desktop application for running and interacting with
 
 The application consists of three principal layers:
 
+```text
 Compose UI
     │
     ├── ChatView / TreeView
@@ -23,6 +24,7 @@ llama.cpp
          │
          ▼
 GGUF model
+```
 
 The project uses Kotlin, Compose Multiplatform/Desktop, JNA, and a native C/C++ layer.
 
@@ -30,15 +32,17 @@ The project uses Kotlin, Compose Multiplatform/Desktop, JNA, and a native C/C++ 
 
 The basic startup sequence is:
 
+```text
 main()
   ├── copyAssetsToFilesDir()
   ├── createConduit()
   ├── create AppState
   └── launch Compose application
+```  
 
 Application data is stored under:
 
-~/Library/Application Support/Conduit
+`~/Library/Application Support/Conduit`
 
 Packaged native libraries are located inside the application bundle’s:
 
