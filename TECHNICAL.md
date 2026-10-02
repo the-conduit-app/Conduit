@@ -156,11 +156,13 @@ Native libraries are packaged into the macOS application bundle under `Contents/
 
 ### Important application data includes:
 
+```text
 Application Support/Conduit/
 ├── chats/
 ├── packs/
 ├── llm/
 └── .approved-models.json
+```
 
 Bundled assets provide initial/default content when corresponding user data is absent.
 
