@@ -23,12 +23,13 @@ since the distributed DMG is not code-signed. It should be simple - just change 
 ## Usage
 
 (Your only clue: The following is the secret key that opens the portal. How?)
- - LLM: Gemma4 (gemma-2-9b-it-Q4_K_M.gguf)
+ - LLM: Gemma4 (gemma-2-9b-it-Q4_K_M.gguf) 
  - Must be legit (have SHA 13b2a7b4115bbd0900162edcebe476da1ba1fc24e718e8b40d32f6e300f56dfe)
+ - You can get it from [HuggingFace](https://huggingface.co/bartowski/gemma-2-9b-it-GGUF/resolve/main/gemma-2-9b-it-Q4_K_M.gguf)
  
 On first launch, Conduit creates its application data directory:
 
-~/Library/Application Support/Conduit
+`~/Library/Application Support/Conduit`
 
 The directory contains user data such as chats, packs, and approved-model information. Once you're in the app, try talking to Condy for more help.
 
