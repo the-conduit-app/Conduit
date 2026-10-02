@@ -37,7 +37,7 @@ The directory contains user data such as chats, packs, and approved-model inform
 
 Place supported .gguf model files in:
 
-~/Library/Application Support/Conduit/llm
+`~/Library/Application Support/Conduit/llm`
 
 Conduit identifies approved models by SHA-256 hash rather than filename alone. Renaming a model does not make an unapproved model valid.
 
@@ -60,7 +60,7 @@ The chat view displays the path from the root to the currently selected node, wh
 
 Packs provide predefined expert configurations and can be found under:
 
-~/Library/Application Support/Conduit/packs
+`~/Library/Application Support/Conduit/packs`
 
 A pack can define the experts available for a particular task or workflow. Find community packs to download at https://github.com/the-conduit-app/the-conduit-app.github.io/discussions
 
@@ -70,7 +70,7 @@ Conduit is designed around local data and local model execution.
 
 Conversation files and application data are stored under:
 
-~/Library/Application Support/Conduit
+`~/Library/Application Support/Conduit`
 
 LLM model files are also read locally. Conduit does not require a cloud LLM service to generate responses.
 
