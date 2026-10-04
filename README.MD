@@ -17,8 +17,50 @@ Conduit currently uses llama.cpp through its native Conduit library.
 
 ## Installation
 
-Download the latest .dmg release and drag Conduit to your Applications folder. [Update Sep 24: I'm afraid you have to download the source and build it yourself
-since the distributed DMG is not code-signed. It should be simple - just change into the directory "packaging" and run ./package.sh]
+[Update Sep 24: I’m afraid you have to download the source and build it yourself since I didn’t code-sign the distributed DMG.] It should be simple — just follow the steps below. After Conduit.dmg has been produced, open it and drag the Conduit app into your Applications folder.
+
+### The Gist of it is
+```text
+bubba@Om /tmp % git clone https://github.com/the-conduit-app/Conduit.git
+Cloning into 'Conduit'...
+remote: Enumerating objects: 1836, done.
+remote: Counting objects: 100% (1836/1836), done.
+remote: Compressing objects: 100% (560/560), done.
+remote: Total 1836 (delta 988), reused 1779 (delta 932), pack-reused 0 (from 0)
+Receiving objects: 100% (1836/1836), 22.67 MiB | 418.00 KiB/s, done.
+Resolving deltas: 100% (988/988), done.
+...
+
+bubba@Om % cd ./Conduit/packaging 
+bubba@Om packaging % ./package.sh 
++ '[' '!' -f package.sh ']'
++ cd ../cpp/libConduit
++ make install
+mkdir -p "/Users/bubba/Library/Application Support/Conduit/lib"
+cp -f libconduit.dylib "/Users/bubba/Library/Application Support/Conduit/lib"
+codesign --force --sign - "/Users/bubba/Library/Application Support/Conduit/lib/libconduit.dylib"
+/Users/bubba/Library/Application Support/Conduit/lib/libconduit.dylib: replacing existing signature
+
++ cd ../macwindow
++ make install
+mkdir -p "/Users/bubba/Library/Application Support/Conduit/lib"
+cp libmacwindow.dylib "/Users/bubba/Library/Application Support/Conduit/lib/"
+
++ cd ../..
++ rm -rf build/compose/binaries/main/app/Conduit.app
++ rm -f Conduit.dmg
++ ./gradlew --rerun-tasks copyNativeLibsToApp
+... [more output from the command - just paste into ChatGPT/Gemini interface if there are problems]
+...
+BUILD SUCCESSFUL in 43s
+15 actionable tasks: 15 executed
++ cd packaging
++ dmgbuild -s dmg_settings.py Conduit ../Conduit.dmg
+
+bubba@Om packaging % ls -lh ../Conduit.dmg
+-rw-r--r--@ 1 bubba  staff    68M Oct  4 12:25 ../Conduit.dmg
+bubba@Om packaging % open ../Conduit.dmg 
+```
 
 ## Usage
 
