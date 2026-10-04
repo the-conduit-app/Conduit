@@ -179,7 +179,8 @@ object AppUtils {
             "Displaying-Math-Fonts-in-Compo-121704cb-5586-4aec-b423-e2b258242177.json",
             "Shooting-the-breeze-with-Condy-a8cad37f-8e92-4faa-a5ab-7adf050acc56.json",
             "Accounting-Puzzles-and-Riddles-5cffb57a-4a57-4089-a51c-ec48c33a439a.json",
-            "Poem-Translation-and-Cultural--f7907a97-857d-4d48-9b2f-b4d5444d3bed.json"
+            "Poem-Translation-and-Cultural--f7907a97-857d-4d48-9b2f-b4d5444d3bed.json",
+            "Proof-of-Square-Root-of-2-Irra-295c2c73-2971-4bbc-8f14-d0f082b0a7cb.json",
         )
         if (!chatsDirExisted) {
             seedChatFiles.forEach { filename -> copyResource("chats/$filename", File(chatsDir, filename)) }

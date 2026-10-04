@@ -2,7 +2,7 @@
     "id": "a8cad37f-8e92-4faa-a5ab-7adf050acc56",
     "createdAt": 1789803099870,
     "rootNodeId": "429dd112-07fa-4c7a-8128-c752729ef324",
-    "cursorNodeId": "35a5dfd9-75f1-4be3-aceb-75835f97c98b",
+    "cursorNodeId": "f3344d85-e960-4b5d-a56f-a7be8bc29a3e",
     "title": "Shooting the breeze with Condy",
     "nodes": {
         "429dd112-07fa-4c7a-8128-c752729ef324": {
@@ -84,6 +84,12 @@
             "type": "TEXT",
             "createdAt": 1789803138253,
             "parentId": "376ce673-4072-47d9-8e42-28b71c8bf65f",
+            "children": [
+                "3049eb95-b10c-4c9a-8daf-79377dc5efc4",
+                "d53cc4df-403d-40e0-860b-f6f8e488ec72",
+                "ee5170a4-f5b4-4f00-9dac-2c20891f92ee",
+                "97cbabc4-d046-422c-a812-96ad7f58d7f7"
+            ],
             "message": {
                 "title": "Condy (Humans) · Pack: Default",
                 "timestamp": 1789803138253,
@@ -382,6 +388,324 @@
                 "timestamp": 1789803388188,
                 "text": "1 Blot of gibberish, became flibberished, and then vanished",
                 "responseTime": 1714
+            }
+        },
+        "3049eb95-b10c-4c9a-8daf-79377dc5efc4": {
+            "id": "3049eb95-b10c-4c9a-8daf-79377dc5efc4",
+            "type": "TEXT",
+            "createdAt": 1789803781477,
+            "parentId": "6c04785c-d148-4005-a70b-94e7ef07084e",
+            "children": [
+                "b1415c9c-f2b6-4e17-87d5-ccb1c6812862"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789803781477,
+                "authorType": "USER",
+                "text": "help"
+            }
+        },
+        "b1415c9c-f2b6-4e17-87d5-ccb1c6812862": {
+            "id": "b1415c9c-f2b6-4e17-87d5-ccb1c6812862",
+            "type": "TEXT",
+            "createdAt": 1789803781479,
+            "parentId": "3049eb95-b10c-4c9a-8daf-79377dc5efc4",
+            "children": [
+                "40938149-c3dd-4606-a1fc-b3676145a829"
+            ],
+            "message": {
+                "title": "Simple (Echoing) · Pack: Default",
+                "timestamp": 1789803781479,
+                "text": "help",
+                "responseTime": 113
+            }
+        },
+        "40938149-c3dd-4606-a1fc-b3676145a829": {
+            "id": "40938149-c3dd-4606-a1fc-b3676145a829",
+            "type": "TEXT",
+            "createdAt": 1789803786868,
+            "parentId": "b1415c9c-f2b6-4e17-87d5-ccb1c6812862",
+            "children": [
+                "cc8b8933-3bc6-4c7c-8139-ff52970cc1ac"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789803786868,
+                "authorType": "USER",
+                "text": "help"
+            }
+        },
+        "cc8b8933-3bc6-4c7c-8139-ff52970cc1ac": {
+            "id": "cc8b8933-3bc6-4c7c-8139-ff52970cc1ac",
+            "type": "TEXT",
+            "createdAt": 1789803786873,
+            "parentId": "40938149-c3dd-4606-a1fc-b3676145a829",
+            "children": [
+                "917d34ce-42b2-4678-a19b-04f4aa128d4a"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789803786873,
+                "text": "You are in the Conduit. You can hold a local (no Internet) round-table discussion with the various experts in Conduit Packs.\n\nThey can help you cooperatively, understand each other well,and are aware of each other's responses.\n\nThe rest of Conduit is for you to explore and discover.",
+                "responseTime": 8336
+            }
+        },
+        "917d34ce-42b2-4678-a19b-04f4aa128d4a": {
+            "id": "917d34ce-42b2-4678-a19b-04f4aa128d4a",
+            "type": "TEXT",
+            "createdAt": 1789803835212,
+            "parentId": "cc8b8933-3bc6-4c7c-8139-ff52970cc1ac",
+            "children": [
+                "ee8682be-20b9-413b-bd7c-e39d5b1f0be9"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789803835212,
+                "authorType": "USER",
+                "text": "More help"
+            }
+        },
+        "ee8682be-20b9-413b-bd7c-e39d5b1f0be9": {
+            "id": "ee8682be-20b9-413b-bd7c-e39d5b1f0be9",
+            "type": "TEXT",
+            "createdAt": 1789803835217,
+            "parentId": "917d34ce-42b2-4678-a19b-04f4aa128d4a",
+            "children": [
+                "73540c45-1d47-4aaf-9cc0-c259acc5c134"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789803835217,
+                "text": "Gemma4 (gemma-2-9b-it-Q4_K_M.gguf, SHA = '13b2a7b4115bbd0900162edcebe476da1ba1fc24e718e8b40d32f6e300f56dfe)' is the key to open the portal. You obviously already know that!\n\nOnce inside, you can:\n  - chat with multiple experts in packs.\n  - carry on a real branching conversation, and view the tree.\n  - teleport from place to place in your chat\n\nThe support folder for Conduit is Application Support/Conduit:\n  - All your chats can be found in the chats/ folder there\n  - Place new pack definitions in the packs/ folder\n  - Place approved LLM files (.gguf) in the llm/ folder (or desktop)\n\nEnjoy!",
+                "responseTime": 17165
+            }
+        },
+        "73540c45-1d47-4aaf-9cc0-c259acc5c134": {
+            "id": "73540c45-1d47-4aaf-9cc0-c259acc5c134",
+            "type": "TEXT",
+            "createdAt": 1789803944455,
+            "parentId": "ee8682be-20b9-413b-bd7c-e39d5b1f0be9",
+            "children": [
+                "78484483-eb9e-419a-acf5-9edcde98dc6c"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789803944455,
+                "authorType": "USER",
+                "text": "more help"
+            }
+        },
+        "78484483-eb9e-419a-acf5-9edcde98dc6c": {
+            "id": "78484483-eb9e-419a-acf5-9edcde98dc6c",
+            "type": "TEXT",
+            "createdAt": 1789803944468,
+            "parentId": "73540c45-1d47-4aaf-9cc0-c259acc5c134",
+            "children": [
+                "11d18547-2501-46b9-a6af-6cea12447e01"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789803944468,
+                "text": "Gemma4 (gemma-2-9b-it-Q4_K_M.gguf, SHA = '13b2a7b4115bbd0900162edcebe476da1ba1fc24e718e8b40d32f6e300f56dfe)' is the key to open the portal. You obviously already know that!\n\nOnce inside, you can:\n  - chat with multiple experts in packs.\n  - carry on a real branching conversation, and view the tree.\n  - teleport from place to place in your chat\n\nThe support folder for Conduit is '~/Library/Application Support/Conduit'\n  - All your chats can be found in the chats/ folder there\n  - Place new pack definitions in the packs/ folder\n  - Use approved LLM files (.gguf) placed in the llm/ folder (or desktop)\n\nEnjoy!",
+                "responseTime": 17789
+            }
+        },
+        "11d18547-2501-46b9-a6af-6cea12447e01": {
+            "id": "11d18547-2501-46b9-a6af-6cea12447e01",
+            "type": "TEXT",
+            "createdAt": 1789804023412,
+            "parentId": "78484483-eb9e-419a-acf5-9edcde98dc6c",
+            "children": [
+                "2fe4ce77-fa7c-4af5-8ab0-00b94985a175"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789804023412,
+                "authorType": "USER",
+                "text": "more help"
+            }
+        },
+        "2fe4ce77-fa7c-4af5-8ab0-00b94985a175": {
+            "id": "2fe4ce77-fa7c-4af5-8ab0-00b94985a175",
+            "type": "TEXT",
+            "createdAt": 1789804023426,
+            "parentId": "11d18547-2501-46b9-a6af-6cea12447e01",
+            "children": [
+                "efc27ad6-ac88-4676-929e-2f7ec8f6d0fc"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789804023426,
+                "text": "Gemma4 (gemma-2-9b-it-Q4_K_M.gguf, SHA = '13b2a7b4115bbd0900162edcebe476da1ba1fc24e718e8b40d32f6e300f56dfe)' is the key to open the portal. You obviously already know that!\n\nOnce inside, you can:\n  - chat with multiple experts in packs.\n  - carry on a real branching conversation, and view the tree.\n  - teleport from place to place in your chat\n\nThe support folder for Conduit is '~/Library/Application Support/Conduit'\n  - All your chats can be found in the chats/ folder there\n  - Place new pack definitions in the packs/ folder\n  - Use approved LLM files (.gguf) placed in the llm/ folder (or desktop)\n\nEnjoy!",
+                "responseTime": 17662
+            }
+        },
+        "efc27ad6-ac88-4676-929e-2f7ec8f6d0fc": {
+            "id": "efc27ad6-ac88-4676-929e-2f7ec8f6d0fc",
+            "type": "TEXT",
+            "createdAt": 1789804090213,
+            "parentId": "2fe4ce77-fa7c-4af5-8ab0-00b94985a175",
+            "children": [
+                "b89ec411-1b21-41fa-a4ee-277879edb2e5"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789804090213,
+                "authorType": "USER",
+                "text": "more help"
+            }
+        },
+        "b89ec411-1b21-41fa-a4ee-277879edb2e5": {
+            "id": "b89ec411-1b21-41fa-a4ee-277879edb2e5",
+            "type": "TEXT",
+            "createdAt": 1789804090228,
+            "parentId": "efc27ad6-ac88-4676-929e-2f7ec8f6d0fc",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789804090228,
+                "text": "Gemma4 (gemma-2-9b-it-Q4_K_M.gguf, SHA = '13b2a7b4115bbd0900162edcebe476da1ba1fc24e718e8b40d32f6e300f56dfe)' is the key to open the portal. You obviously already know that!\n\nOnce inside, you can:\n  - chat with multiple experts in packs.\n  - carry on a real branching conversation, and view the tree.\n  - teleport from place to place in your chat\n\nThe support folder for Conduit is '~/Library/Application Support/Conduit'\n  - All your chats can be found in the chats/ folder there\n  - Place new pack definitions in the packs/ folder\n  - Use approved LLM files (.gguf) placed in the llm/ folder (or desktop)\n\nEnjoy!",
+                "responseTime": 7649
+            }
+        },
+        "d53cc4df-403d-40e0-860b-f6f8e488ec72": {
+            "id": "d53cc4df-403d-40e0-860b-f6f8e488ec72",
+            "type": "TEXT",
+            "createdAt": 1789813198831,
+            "parentId": "6c04785c-d148-4005-a70b-94e7ef07084e",
+            "children": [
+                "f4385f66-47cf-4cae-8cad-39f5b4643e70"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789813198831,
+                "authorType": "USER",
+                "text": "ok thanks"
+            }
+        },
+        "f4385f66-47cf-4cae-8cad-39f5b4643e70": {
+            "id": "f4385f66-47cf-4cae-8cad-39f5b4643e70",
+            "type": "TEXT",
+            "createdAt": 1789813198850,
+            "parentId": "d53cc4df-403d-40e0-860b-f6f8e488ec72",
+            "message": {
+                "title": "Simple (Echoing) · Pack: Default",
+                "timestamp": 1789813198850,
+                "text": "ok thanks",
+                "responseTime": 128
+            }
+        },
+        "ee5170a4-f5b4-4f00-9dac-2c20891f92ee": {
+            "id": "ee5170a4-f5b4-4f00-9dac-2c20891f92ee",
+            "type": "TEXT",
+            "createdAt": 1789813222884,
+            "parentId": "6c04785c-d148-4005-a70b-94e7ef07084e",
+            "children": [
+                "1d885de3-fbdd-4a6e-a38d-1cd50a1ee188"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1789813222884,
+                "authorType": "USER",
+                "text": "ok thanks!"
+            }
+        },
+        "1d885de3-fbdd-4a6e-a38d-1cd50a1ee188": {
+            "id": "1d885de3-fbdd-4a6e-a38d-1cd50a1ee188",
+            "type": "TEXT",
+            "createdAt": 1789813222904,
+            "parentId": "ee5170a4-f5b4-4f00-9dac-2c20891f92ee",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1789813222904,
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 1655
+            }
+        },
+        "97cbabc4-d046-422c-a812-96ad7f58d7f7": {
+            "id": "97cbabc4-d046-422c-a812-96ad7f58d7f7",
+            "type": "TEXT",
+            "createdAt": 1791000699165,
+            "parentId": "6c04785c-d148-4005-a70b-94e7ef07084e",
+            "children": [
+                "b91cf8f3-6556-4d2e-be3a-f4f662cca495"
+            ],
+            "message": {
+                "title": "You · 3 Oct",
+                "timestamp": 1791000699164,
+                "authorType": "USER",
+                "text": "Can I change what you know about me?"
+            }
+        },
+        "b91cf8f3-6556-4d2e-be3a-f4f662cca495": {
+            "id": "b91cf8f3-6556-4d2e-be3a-f4f662cca495",
+            "type": "TEXT",
+            "createdAt": 1791000699174,
+            "parentId": "97cbabc4-d046-422c-a812-96ad7f58d7f7",
+            "children": [
+                "47882775-497c-4466-8220-b5bd4f505709"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1791000699174,
+                "text": "Of course you can. Every time you talk to someone here, you change what I know about you.",
+                "responseTime": 1124
+            }
+        },
+        "47882775-497c-4466-8220-b5bd4f505709": {
+            "id": "47882775-497c-4466-8220-b5bd4f505709",
+            "type": "TEXT",
+            "createdAt": 1791000729051,
+            "parentId": "b91cf8f3-6556-4d2e-be3a-f4f662cca495",
+            "children": [
+                "ba37d7ac-559f-4083-bb33-c48caf14718f"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1791000729051,
+                "authorType": "USER",
+                "text": "No. I mean like directly"
+            }
+        },
+        "ba37d7ac-559f-4083-bb33-c48caf14718f": {
+            "id": "ba37d7ac-559f-4083-bb33-c48caf14718f",
+            "type": "TEXT",
+            "createdAt": 1791000729061,
+            "parentId": "47882775-497c-4466-8220-b5bd4f505709",
+            "children": [
+                "4c9f596f-8e0b-4269-b84f-3cfa2b8ded29"
+            ],
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1791000729061,
+                "text": "Ouch!",
+                "responseTime": 62
+            }
+        },
+        "4c9f596f-8e0b-4269-b84f-3cfa2b8ded29": {
+            "id": "4c9f596f-8e0b-4269-b84f-3cfa2b8ded29",
+            "type": "TEXT",
+            "createdAt": 1791000739599,
+            "parentId": "ba37d7ac-559f-4083-bb33-c48caf14718f",
+            "children": [
+                "f3344d85-e960-4b5d-a56f-a7be8bc29a3e"
+            ],
+            "message": {
+                "title": "You",
+                "timestamp": 1791000739599,
+                "authorType": "USER",
+                "text": "hi"
+            }
+        },
+        "f3344d85-e960-4b5d-a56f-a7be8bc29a3e": {
+            "id": "f3344d85-e960-4b5d-a56f-a7be8bc29a3e",
+            "type": "TEXT",
+            "createdAt": 1791000739608,
+            "parentId": "4c9f596f-8e0b-4269-b84f-3cfa2b8ded29",
+            "message": {
+                "title": "Condy (Humans) · Pack: Default",
+                "timestamp": 1791000739607,
+                "text": "Hello, I am Condy, the Conduit. I'm not really an expert and I can only answer the following question: 'What do you know about me?'",
+                "responseTime": 1641
             }
         }
     }
