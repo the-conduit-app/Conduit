@@ -19,7 +19,7 @@ Conduit currently uses llama.cpp through its native Conduit library.
 
 [Update Sep 24: I’m afraid you have to download the source and build it yourself since I didn’t code-sign the distributed DMG.] It should be simple — just follow the steps below. After Conduit.dmg has been produced, open it and drag the Conduit app into your Applications folder.
 
-### The Gist of it is
+### The gist of it is
 ```text
 bubba@Om /tmp % git clone https://github.com/the-conduit-app/Conduit.git
 Cloning into 'Conduit'...
