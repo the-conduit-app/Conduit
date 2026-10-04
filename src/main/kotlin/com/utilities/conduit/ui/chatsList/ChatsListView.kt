@@ -4,7 +4,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,8 +14,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.key
-import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -24,7 +21,6 @@ import com.utilities.conduit.AppState
 import com.utilities.conduit.chat.ChatsListItem
 import com.utilities.conduit.maintenance.MaintenanceUtils
 import com.utilities.conduit.ui.LeftPanelMode
-import com.utilities.conduit.ui.LocalLeftViewOpacity
 import com.utilities.conduit.ui.LocalRightViewOpacity
 import com.utilities.conduit.ui.Sounds
 import com.utilities.conduit.ui.chatView.ConduitContextMenuRepresentation
@@ -98,28 +94,31 @@ fun ChatsListView(state: AppState, filterText: String) {
                 ) {
                     ContextMenuArea(
                         items = {
-                            listOf(
-                                ContextMenuItem("Rename…") {
-                                    showRenameDialog = item
-                                },
-                                ContextMenuItem("Delete…") {
-                                    scope.launch {
-                                        val removed = state.chatsList.remove(item)
-                                        if (removed && item.chat.id == state.chatManager.currentChat.id) {
-                                            state.notification.trigger(
-                                                "Chat deleted. Continue chatting here to restore it."
-                                            )
+                            buildList {
+                                if (!state.chatManager.isGenerating) {
+                                    add(ContextMenuItem("Rename…") {
+                                        showRenameDialog = item
+                                    })
+                                    add(ContextMenuItem("Delete…") {
+                                        scope.launch {
+                                            val removed = state.chatsList.remove(item)
+                                            if (removed && item.chat.id == state.chatManager.currentChat.id) {
+                                                state.notification.trigger(
+                                                    "Chat deleted. Continue chatting here to restore it."
+                                                )
+                                            }
                                         }
-                                    }
-                                },
-                                ContextMenuItem("TreeView") {
+                                    })
+                                }
+
+                                add(ContextMenuItem("TreeView") {
                                     scope.launch {
                                         Sounds.Mooz.play()
                                         selectChat(item)
                                         state.leftPanelMode = LeftPanelMode.TREE
                                     }
-                                }
-                            )
+                                })
+                            }
                         }
                     ) {
                         Row(

@@ -30,8 +30,8 @@ fun ConduitProgressIndicator(
     LaunchedEffect(images) {
         while (true) {
             animate(
-                initialValue = 0f,
-                targetValue = 1f,
+                initialValue = 1f,
+                targetValue = 0f,
                 animationSpec = tween(
                     durationMillis = 4000,
                     easing = EaseInOut
